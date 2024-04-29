@@ -1,0 +1,73 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "create-block/simplecal-calendar",
+	"version": "0.1.0",
+	"title": "SimpleCal Calendar",
+	"category": "widgets",
+	"icon": "calendar",
+	"description": "Display SimpleCal calendar events in a calendar or agenda view.",
+	"example": {},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": "Calendar of Events"
+		},
+		"displayStyle": {
+			"type": "string",
+			"default": "agenda"
+		},
+		"hideOnNoEvents": {
+			"type": "boolean",
+			"default": false
+		},
+		"noEventsText": {
+			"type": "string",
+			"default": "There are no upcoming events."
+		},
+		"agendaLayout": {
+			"type": "integer"
+		},
+		"agendaShowThumbnail": {
+			"type": "boolean",
+			"default": false
+		},
+		"agendaShowExcerpt": {
+			"type": "boolean",
+			"default": false
+		},
+		"agendaShowMonthYearHeaders": {
+			"type": "boolean",
+			"default": true
+		},
+		"blockTheme" : {
+			"type": "string",
+			"default": "theme1"
+		},
+		"displayPastEvents" : {
+			"type": "boolean",
+			"default": false
+		},
+		"displayPastEventsDays": {
+			"type": "integer",
+			"default": 7
+		},
+		"displayFutureEventsDays": {
+			"type": "integer",
+			"default": 0
+		},
+		"eventTags": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"supports": {
+        "html": false
+	},
+	"textdomain": "simplecal-calendar",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}

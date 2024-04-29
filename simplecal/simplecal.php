@@ -18,18 +18,21 @@ ini_set('error_log','php-errors.log');
 error_reporting(E_ALL);
 
 class SimpleCal {
-	private $tz;
+	public static $tz;
 	private $tz_string;
+	private $post_meta;
 	
 	public function __construct() {
-		$this->tz = wp_timezone();
+		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
 		add_action('init',[$this,'simplecal_create_event_posts']);
 		add_action('widgets_init', [$this,'register_simplecal_widget']);
-
+		add_action( 'init', [$this,'register_simplecal_calendar_block']);
+		
 		if (is_admin()) {
 			add_action('add_meta_boxes', [$this,'simplecal_event_metaboxes']);
 			add_action('save_post_simplecal_event', [$this,'simplecal_event_save_meta']);
+			// TODO: Enqueue admin JS to modify event end date on start date change, hide time on "all-day events, validate end time after start time, etc.
 		}
 
 	}
@@ -60,30 +63,37 @@ class SimpleCal {
 		);
 	}
 
+	// TODO: Customize admin panel view to show start/end dates, venue, etc.
+
 	function register_simplecal_widget() {
 		register_widget('SimpleCal_Widget');
 	}
 
+	function register_simplecal_calendar_block() {
+		register_block_type( __DIR__ . '/simplecal-calendar/build');
+	}
+
 	function simplecal_event_metaboxes() {
+		global $post;
 		add_meta_box('event_date_time', 'Event Date and Time', [$this,'simplecal_event_meta_datetime'], 'simplecal_event', 'side', 'default');
 		add_meta_box('event_location', 'Event Location', [$this,'simplecal_event_meta_location'], 'simplecal_event', 'side', 'default');
 		add_meta_box('event_moreinfo', 'Event More Info', [$this,'simplecal_event_meta_moreinfo'], 'simplecal_event', 'side', 'default');
 	}
 
 	function simplecal_event_meta_datetime($post, $args) {
-		global $post;
-
 		echo "<small>All times displayed in the <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
 		$metabox_ids = array("start", "end"); // Cycle through the start and end time metaboxes for the event
 		foreach ($metabox_ids as $key):
-			if (get_post_meta($post->ID, "_simplecal_event_{$key}_timestamp", true)) :
-				$time = "@" . get_post_meta($post->ID, "_simplecal_event_{$key}_timestamp", true);
+			if ($post->{"simplecal_event_{$key}_timestamp"}) :
+				$time = "@" . $post->{"simplecal_event_{$key}_timestamp"};
+				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
 			else :
 				$time = 'now';
+				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
+				$timestamp->setTime($timestamp->format('H'),0,0,0); // Reset the hours and seconds on the timestamp to 00
 			endif;
-			$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
-			$timestamp->setTimeZone($this->tz); // Specifying the timezone when creating a DateTime from a Unix timestamp does nothing, so we set it after
+			$timestamp->setTimeZone(self::$tz); // Specifying the timezone when creating a DateTime from a Unix timestamp does nothing, so we set it after
 			
 			$datestring = $timestamp->format('Y-m-d');
 			$timestring = $timestamp->format('H:i');
@@ -92,7 +102,7 @@ class SimpleCal {
 			echo '<input type="date" name="event_' . $key . '_date" value="' . $datestring . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
 			echo '<input type="time" name="event_' . $key . '_time" value="' . $timestring . '" />';
 		
-			$alldayevent = get_post_meta($post->ID, '_simplecal_event_all_day', true);
+			$alldayevent = $post->simplecal_event_all_day;
 
 			echo ($key == 'start' ? '<br /><label><input type="checkbox" name="event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label>' : '');
 		endforeach;
@@ -100,10 +110,10 @@ class SimpleCal {
 
 	function simplecal_event_meta_location($post, $args) {
 		echo '<h3>Physical</h3>';
-		$metabox_ids = ["location", "street_address", "city", "state"];
+		$metabox_ids = ["venue_name", "street_address", "city", "state"];
 		foreach ($metabox_ids as $metabox_id) :
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
-			$event_meta = get_post_meta($post->ID, '_simplecal_event_' . $metabox_id, true);
+			$event_meta = $post->{"simplecal_event_{$metabox_id}"};
 			echo '<input type="text" class="fullwidth" name="event_' . $metabox_id . '" value="' . $event_meta . '"/><br />';
 		endforeach;
 		echo '<label for="event_country">Country</label><br />';
@@ -111,7 +121,7 @@ class SimpleCal {
 	?>
 		<h3>Virtual</h3>
 		<label for="event_virtual_platform">Virtual Platform</label><br />
-		<input name="event_virtual_platform" type="text" list="virtual_platforms" placeholder="e.g. Zoom" value="<?php echo get_post_meta($post->ID, '_simplecal_event_virtual_platform', true); ?>" />
+		<input name="event_virtual_platform" type="text" list="virtual_platforms" placeholder="e.g. Zoom" value="<?= $post->simplecal_event_virtual_platform; ?>" />
 		<datalist id="virtual_platforms">
 			<option value="Google Meet">
 			<option value="Jitsi">
@@ -121,11 +131,11 @@ class SimpleCal {
 			<option value="Zoom">
 		</datalist>
 		<label for="event_meeting_link">Meeting Link</label><br />
-		<input name="event_meeting_link" type="url" placeholder="e.g. https://zoom.us/j/8675309" value="<?php echo get_post_meta($post->ID, '_simplecal_event_meeting_link', true); ?>" />
+		<input name="event_meeting_link" type="url" placeholder="e.g. https://zoom.us/j/8675309" value="<?= $post->simplecal_event_meeting_link; ?>" />
 		
 		<h3>Privacy</h3>
 		<label>
-			<input type="checkbox" name="event_private_location" value="1" <?php checked(get_post_meta($post->ID, '_simplecal_event_private_location', true), 1, true); ?>/>
+			<input type="checkbox" name="event_private_location" value="1" <?php checked($post->simplecal_event_private_location, 1, true); ?>/>
 			Show location only to logged-in members?
 		</label>
 	<?php
@@ -136,8 +146,7 @@ class SimpleCal {
 		
 		foreach ($metabox_ids as $metabox_id => $type) :
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
-			$event_meta = get_post_meta($post->ID, '_simplecal_event_' . $metabox_id, true);	
-			echo '<input type="' . $type . '" class="fullwidth" name="event_' . $metabox_id . '" value="' . $event_meta . '" /><br />';
+			echo '<input type="' . $type . '" class="fullwidth" name="event_' . $metabox_id . '" value="' . $post->{"simplecal_event_{$metabox_id}"} . '" /><br />';
 		endforeach;
 	}
 		
@@ -162,23 +171,23 @@ class SimpleCal {
 		foreach ($metabox_ids as $key) : // Format the fields and parse them as a DateTime object, then output the Unix timestamp to be saved to the event's meta
 			//$timestamp = DateTime::createFromFormat('Y-m-d H:i', $_POST["{$key}_date"] . ' ' . $_POST["{$key}_time"]);
 			$time = $_POST["event_{$key}_date"] . ' ' . $_POST["event_{$key}_time"];
-			$timestamp = new DateTime($time, $this->tz);
-			$events_meta["_simplecal_event_{$key}_timestamp"] = $timestamp->format('U');
+			$timestamp = new DateTime($time, self::$tz);
+			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format('U');
 		endforeach;
 
-		$metas = ['all_day', 'private_location', 'location', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
+		$metas = ['all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
 		foreach ($metas as $meta) :
 			if (!empty($_POST['event_' . $meta])) :
-				$events_meta['_simplecal_event_' . $meta] = $_POST['event_' . $meta];
+				$events_meta['simplecal_event_' . $meta] = $_POST['event_' . $meta];
 			else :
-				$events_meta['_simplecal_event_' . $meta] = NULL;
+				$events_meta['simplecal_event_' . $meta] = NULL;
 			endif;
 		endforeach;
 	
 		foreach ($events_meta as $key => $value) :
 			if ($post->post_type == 'revision') return;
 			$value = implode(',', (array)$value);
-			if (get_post_meta($post_id, $key, FALSE)) :
+			if ($post->{$key}):
 				update_post_meta($post_id, $key, $value);
 			else :
 				add_post_meta($post_id, $key, $value);
@@ -188,23 +197,23 @@ class SimpleCal {
 	}
 
 	// Retrieve the date from within the loop
-	function simplecal_event_get_the_date() {
+	public static function simplecal_event_get_the_date() {
 		global $post;
 
-		$starttime = "@" . $post->_simplecal_event_start_timestamp;
+		$starttime = "@" . $post->simplecal_event_start_timestamp;
 		$starttimestamp = new DateTime($starttime);
-		$starttimestamp->setTimeZone($this->tz);
+		$starttimestamp->setTimeZone(self::$tz);
 		
 		if ($post->_end_timestamp) :
-			$endtime = "@" . $post->_simplecal_event_end_timestamp;
+			$endtime = "@" . $post->simplecal_event_end_timestamp;
 		else :
 			$endtime = $starttime;
 		endif;
 
 		$endtimestamp = new DateTime($endtime);
-		$endtimestamp->setTimeZone($this->tz);
+		$endtimestamp->setTimeZone(self::$tz);
 
-		if (! $post->_simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
+		if (! $post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
 			$eventdate = $starttimestamp->format('M d, Y \a\t g:i a');
 		else :
 			if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
@@ -231,6 +240,7 @@ class SimpleCal {
 }
 
 class SimpleCal_Widget extends WP_Widget {
+	// TODO: Make this a wrapper that calls the block render? Prepopulates $attributes from the widget settings and then just includes render.php?
 	public function __construct() {
 		parent::__construct(
 			'simplecal_widget',
@@ -240,15 +250,29 @@ class SimpleCal_Widget extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
-		// outputs the content of the widget
+		echo $args['before_widget'];
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		}
+		echo 'This is the widget body. This is where calendar events should get displayed.';
+		echo $args['after_widget'];
 	}
 
 	public function form( $instance ) {
-		// outputs the options form in the admin
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'text_domain' );
+?>
+		<p>
+		<label for="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 'text_domain' ); ?></label> 
+		<input class="widefat" id="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?= esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?= esc_attr( $title ); ?>">
+		</p>
+		<?php 
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		// processes widget options to be saved
+		$instance = array();
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
+
+		return $instance;
 	}
 }
 
