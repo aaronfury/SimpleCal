@@ -1,1 +1,72 @@
-.wp-block-create-block-simplecal-calendar{color:#323232;padding:4px}.simplecal_theme1 .simplecal_list_month_header,.simplecal_theme1 .simplecal_list_year_header{font-size:1.5em;font-weight:700;margin:.25em 0}.simplecal_theme1 .simplecal_list_month_header{font-size:1.25em}.simplecal_theme1 .simplecal_list_item{display:flex;flex-flow:row nowrap;margin:10px 0}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail{flex:1 0 100px;margin-right:10px}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail img{max-width:100%}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper{display:flex;flex:1 1 auto;flex-flow:column nowrap}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper a{color:#1b4a70;text-decoration:none}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_title{font-size:1.1em;order:2}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_date{color:#606060;order:1}.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_location{order:3}
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/style.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+.wp-block-create-block-simplecal-calendar {
+  color: #323232;
+  padding: 4px;
+}
+
+/*
+	div.simplecal_themeX
+		h2.simplecal_title
+		div.simplecal_list_year_header
+		div.simplecal_list_month_header
+
+		div.simplecal_list_item
+			div.simplecal_list_item_thumbnail
+				img
+			div.simplecal_list_item_content_wrapper
+				div.simplecal_list_item_title
+				div.simplecal_list_item_date
+				div.simplecal_list_item_location
+					div.simplecal_list_item_location_physical
+						span.simplecal_list_item_venue_name
+						span.simplecal_list_item_venue_separator
+						span.simplecal_list_item_city
+						span.simplecal_list_item_city_separator
+						span.simplecal_list_item_state
+					div.simplecal_list_location_virtual
+				div.simplecal_list_item_excerpt
+*/
+.simplecal_theme1 .simplecal_list_year_header, .simplecal_theme1 .simplecal_list_month_header {
+  margin: 0.25em 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.simplecal_theme1 .simplecal_list_month_header {
+  font-size: 1.25em;
+}
+.simplecal_theme1 .simplecal_list_item {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 10px 0;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail {
+  flex: 1 0 100px;
+  margin-right: 10px;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail img {
+  max-width: 100%;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column nowrap;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper a {
+  text-decoration: none;
+  color: #1b4a70;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_title {
+  font-size: 1.1em;
+  order: 2;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_date {
+  order: 1;
+  color: #606060;
+}
+.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_location {
+  order: 3;
+}
+
+/*# sourceMappingURL=style-index.css.map*/

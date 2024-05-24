@@ -10,7 +10,7 @@ License URI:  https://creativecommons.org/publicdomain/zero/1.0/
 Text Domain:  simplecal
 */
 
-// Debugging shortcut... make sure these are commented out or set to "0" (or false) in the production site
+// TODO: Debugging shortcut... make sure these are commented out or set to "0" (or false) in the production site
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors','Off');
@@ -32,9 +32,16 @@ class SimpleCal {
 		if (is_admin()) {
 			add_action('add_meta_boxes', [$this,'simplecal_event_metaboxes']);
 			add_action('save_post_simplecal_event', [$this,'simplecal_event_save_meta']);
-			// TODO: Enqueue admin JS to modify event end date on start date change, hide time on "all-day events, validate end time after start time, etc.
+			add_action('admin_enqueue_scripts', [$this,'simplecal_enqueue_admin_scripts']);
+			// TODO: Add CSS for admin panel
 		}
+	}
 
+	function simplecal_enqueue_admin_scripts($hook) {
+		if (!in_array($hook, ['post.php','post-new.php'])) {
+			return;
+		}
+		wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). 'js/admin.js');
 	}
 
 	// Allow creation of event-style posts
@@ -63,8 +70,6 @@ class SimpleCal {
 		);
 	}
 
-	// TODO: Customize admin panel view to show start/end dates, venue, etc.
-
 	function register_simplecal_widget() {
 		register_widget('SimpleCal_Widget');
 	}
@@ -83,6 +88,10 @@ class SimpleCal {
 	function simplecal_event_meta_datetime($post, $args) {
 		echo "<small>All times displayed in the <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
+		$alldayevent = $post->simplecal_event_all_day;
+
+		echo '<div style="margin: 1em 0;"><label><input type="checkbox" name="event_all_day" id="simplecal_event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label></div>';
+
 		$metabox_ids = array("start", "end"); // Cycle through the start and end time metaboxes for the event
 		foreach ($metabox_ids as $key):
 			if ($post->{"simplecal_event_{$key}_timestamp"}) :
@@ -95,30 +104,36 @@ class SimpleCal {
 			endif;
 			$timestamp->setTimeZone(self::$tz); // Specifying the timezone when creating a DateTime from a Unix timestamp does nothing, so we set it after
 			
-			$datestring = $timestamp->format('Y-m-d');
-			$timestring = $timestamp->format('H:i');
+			$datetime_string = $timestamp->format('Y-m-d\TH:i');
 		
 			echo '<h3>' . ucfirst($key) . ' Date and Time</h3>';
-			echo '<input type="date" name="event_' . $key . '_date" value="' . $datestring . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
-			echo '<input type="time" name="event_' . $key . '_time" value="' . $timestring . '" />';
-		
-			$alldayevent = $post->simplecal_event_all_day;
+			echo '<input type="datetime-local" name="event_' . $key . '_datetime" id="simplecal_event_' . $key . '_datetime" value="' . $datetime_string . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
 
-			echo ($key == 'start' ? '<br /><label><input type="checkbox" name="event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label>' : '');
 		endforeach;
+
+		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
 	}
 
 	function simplecal_event_meta_location($post, $args) {
 		echo '<h3>Physical</h3>';
-		$metabox_ids = ["venue_name", "street_address", "city", "state"];
+		$metabox_ids = ["venue_name", "street_address", "city"];
 		foreach ($metabox_ids as $metabox_id) :
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			$event_meta = $post->{"simplecal_event_{$metabox_id}"};
-			echo '<input type="text" class="fullwidth" name="event_' . $metabox_id . '" value="' . $event_meta . '"/><br />';
+			echo '<input type="text" class="fullwidth" name="event_' . $metabox_id . '" id="simplecal_event_' . $metabox_id . '" value="' . $event_meta . '" /><br />';
 		endforeach;
-		echo '<label for="event_country">Country</label><br />';
-		$this->simplecal_country_input('event_country');
-	?>
+?>
+		<label for="event_state">State</label><br />
+		<?php $this->simplecal_state_input("event_state", $post->{"simplecal_event_state"}); ?>
+		<br />
+		
+		<label for="event_country">Country</label><br />
+		<input type="text" class="fullwidth" name="event_country" id="simplecal_event_country" disabled value="<?php echo $post->{"simplecal_event_country"} ?? "United States of America"; ?>"/>
+		<br />
+<?php
+		// TODO: Find a way to populate country and state lists for international. https://github.com/dr5hn/countries-states-cities-database seems like an option, combined with some AJAX. Places API is too expensive to offer, and having each person get their own API key seems cumbersome.
+?>
+
 		<h3>Virtual</h3>
 		<label for="event_virtual_platform">Virtual Platform</label><br />
 		<input name="event_virtual_platform" type="text" list="virtual_platforms" placeholder="e.g. Zoom" value="<?= $post->simplecal_event_virtual_platform; ?>" />
@@ -155,22 +170,16 @@ class SimpleCal {
 
 		if (!current_user_can('edit_post', $post_id)) return;
 
-		if (!key_exists('event_start_date', $_POST)) return;
+		if (!key_exists('event_start_datetime', $_POST)) return;
 
-		foreach (['event_start_time', 'event_end_time'] as $required) :
-			if (! key_exists($required, $_POST)) :
-				$_POST[$required] = '00:00';
-			endif;
-		endforeach;
-
-		if (! key_exists('event_end_date', $_POST)) :
-			$_POST['event_end_date'] = $_POST['event_start_date'];
+		if (!key_exists('event_end_datetime', $_POST)) :
+			$_POST['event_end_datetime'] = $_POST['event_start_datetime'];
 		endif;
 
 		$metabox_ids = ['start', 'end']; // Cycle through the start and end timestamps for the event
 		foreach ($metabox_ids as $key) : // Format the fields and parse them as a DateTime object, then output the Unix timestamp to be saved to the event's meta
 			//$timestamp = DateTime::createFromFormat('Y-m-d H:i', $_POST["{$key}_date"] . ' ' . $_POST["{$key}_time"]);
-			$time = $_POST["event_{$key}_date"] . ' ' . $_POST["event_{$key}_time"];
+			$time = str_replace('T',' ',$_POST["event_{$key}_datetime"]);
 			$timestamp = new DateTime($time, self::$tz);
 			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format('U');
 		endforeach;
@@ -194,6 +203,12 @@ class SimpleCal {
 			endif;
 			if (!$value) delete_post_meta($post_id, '_' . $key);
 		endforeach;
+
+		// Save the selected state to prepopulate it on the next event.
+		// TODO: Implement this for other fields? Or like a favorites list?
+		if ($events_meta['simplecal_event_state']) :
+			update_option('simplecal_last_state', $events_meta['simplecal_event_state']);
+		endif;
 	}
 
 	// Retrieve the date from within the loop
@@ -225,6 +240,78 @@ class SimpleCal {
 			endif;
 		endif;
 		return $eventdate;
+	}
+
+	function simplecal_get_state_input($dom_name, $field_value) {
+		if (empty($field_value)) {
+			$field_value = get_option('simplecal_last_state','');
+		}
+
+		$states = [
+			'AL'=>'Alabama',
+			'AK'=>'Alaska',
+			'AZ'=>'Arizona',
+			'AR'=>'Arkansas',
+			'CA'=>'California',
+			'CO'=>'Colorado',
+			'CT'=>'Connecticut',
+			'DE'=>'Delaware',
+			'DC'=>'District of Columbia',
+			'FL'=>'Florida',
+			'GA'=>'Georgia',
+			'HI'=>'Hawaii',
+			'ID'=>'Idaho',
+			'IL'=>'Illinois',
+			'IN'=>'Indiana',
+			'IA'=>'Iowa',
+			'KS'=>'Kansas',
+			'KY'=>'Kentucky',
+			'LA'=>'Louisiana',
+			'ME'=>'Maine',
+			'MD'=>'Maryland',
+			'MA'=>'Massachusetts',
+			'MI'=>'Michigan',
+			'MN'=>'Minnesota',
+			'MS'=>'Mississippi',
+			'MO'=>'Missouri',
+			'MT'=>'Montana',
+			'NE'=>'Nebraska',
+			'NV'=>'Nevada',
+			'NH'=>'New Hampshire',
+			'NJ'=>'New Jersey',
+			'NM'=>'New Mexico',
+			'NY'=>'New York',
+			'NC'=>'North Carolina',
+			'ND'=>'North Dakota',
+			'OH'=>'Ohio',
+			'OK'=>'Oklahoma',
+			'OR'=>'Oregon',
+			'PA'=>'Pennsylvania',
+			'RI'=>'Rhode Island',
+			'SC'=>'South Carolina',
+			'SD'=>'South Dakota',
+			'TN'=>'Tennessee',
+			'TX'=>'Texas',
+			'UT'=>'Utah',
+			'VT'=>'Vermont',
+			'VA'=>'Virginia',
+			'WA'=>'Washington',
+			'WV'=>'West Virginia',
+			'WI'=>'Wisconsin',
+			'WY'=>'Wyoming'
+		];
+
+		$output = "<select name=$dom_name>";
+		foreach ($states as $code=>$name) {
+			$output .= "<option value=\"$code\"" . ($field_value == $code ? ' selected ' : '') . ">$name</option>";
+		}
+
+		$output .= "</select>";
+		return $output;
+	}
+
+	function simplecal_state_input($dom_name, $field_value) {
+		echo $this->simplecal_get_state_input($dom_name, $field_value);
 	}
 
 	function simplecal_get_country_input($dom_name) {
