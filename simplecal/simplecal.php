@@ -25,19 +25,19 @@ class SimpleCal {
 	public function __construct() {
 		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
-		add_action('init',[$this,'simplecal_create_event_posts']);
-		add_action('widgets_init', [$this,'register_simplecal_widget']);
-		add_action( 'init', [$this,'register_simplecal_calendar_block']);
+		add_action('init',[$this,'create_event_posts']);
+		add_action('widgets_init', [$this,'register_widget']);
+		add_action( 'init', [$this,'register_block']);
 		
 		if (is_admin()) {
-			add_action('add_meta_boxes', [$this,'simplecal_event_metaboxes']);
-			add_action('save_post_simplecal_event', [$this,'simplecal_event_save_meta']);
-			add_action('admin_enqueue_scripts', [$this,'simplecal_enqueue_admin_scripts']);
+			add_action('add_meta_boxes', [$this,'event_metaboxes']);
+			add_action('save_post_simplecal_event', [$this,'event_save_meta']);
+			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
 			// TODO: Add CSS for admin panel
 		}
 	}
 
-	function simplecal_enqueue_admin_scripts($hook) {
+	function enqueue_admin_scripts($hook) {
 		if (!in_array($hook, ['post.php','post-new.php'])) {
 			return;
 		}
@@ -45,7 +45,7 @@ class SimpleCal {
 	}
 
 	// Allow creation of event-style posts
-	function simplecal_create_event_posts() {
+	function create_event_posts() {
 		register_post_type('simplecal_event', [
 			'labels' => [
 				'name' => 'Events',
@@ -70,22 +70,22 @@ class SimpleCal {
 		);
 	}
 
-	function register_simplecal_widget() {
+	function register_widget() {
 		register_widget('SimpleCal_Widget');
 	}
 
-	function register_simplecal_calendar_block() {
+	function register_block() {
 		register_block_type( __DIR__ . '/simplecal-calendar/build');
 	}
 
-	function simplecal_event_metaboxes() {
+	function event_metaboxes() {
 		global $post;
-		add_meta_box('event_date_time', 'Event Date and Time', [$this,'simplecal_event_meta_datetime'], 'simplecal_event', 'side', 'default');
-		add_meta_box('event_location', 'Event Location', [$this,'simplecal_event_meta_location'], 'simplecal_event', 'side', 'default');
-		add_meta_box('event_moreinfo', 'Event More Info', [$this,'simplecal_event_meta_moreinfo'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_date_time', 'Event Date and Time', [$this,'event_meta_datetime'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_location', 'Event Location', [$this,'event_meta_location'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_moreinfo', 'Event More Info', [$this,'event_meta_moreinfo'], 'simplecal_event', 'side', 'default');
 	}
 
-	function simplecal_event_meta_datetime($post, $args) {
+	function event_meta_datetime($post, $args) {
 		echo "<small>All times displayed in the <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
 		$alldayevent = $post->simplecal_event_all_day;
@@ -114,7 +114,7 @@ class SimpleCal {
 		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
 	}
 
-	function simplecal_event_meta_location($post, $args) {
+	function event_meta_location($post, $args) {
 		echo '<h3>Physical</h3>';
 		$metabox_ids = ["venue_name", "street_address", "city"];
 		foreach ($metabox_ids as $metabox_id) :
@@ -124,7 +124,7 @@ class SimpleCal {
 		endforeach;
 ?>
 		<label for="event_state">State</label><br />
-		<?php $this->simplecal_state_input("event_state", $post->{"simplecal_event_state"}); ?>
+		<?php $this->state_input("event_state", $post->{"simplecal_event_state"}); ?>
 		<br />
 		
 		<label for="event_country">Country</label><br />
@@ -156,7 +156,7 @@ class SimpleCal {
 	<?php
 	}
 		
-	function simplecal_event_meta_moreinfo($post, $args) {
+	function event_meta_moreinfo($post, $args) {
 		$metabox_ids = ["website" => "url"];
 		
 		foreach ($metabox_ids as $metabox_id => $type) :
@@ -165,7 +165,7 @@ class SimpleCal {
 		endforeach;
 	}
 		
-	function simplecal_event_save_meta($post_id) {
+	function event_save_meta($post_id) {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
 		if (!current_user_can('edit_post', $post_id)) return;
@@ -212,7 +212,7 @@ class SimpleCal {
 	}
 
 	// Retrieve the date from within the loop
-	public static function simplecal_event_get_the_date() {
+	public static function event_get_the_date($format) {
 		global $post;
 
 		$starttime = "@" . $post->simplecal_event_start_timestamp;
@@ -228,21 +228,55 @@ class SimpleCal {
 		$endtimestamp = new DateTime($endtime);
 		$endtimestamp->setTimeZone(self::$tz);
 
-		if (! $post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
-			$eventdate = $starttimestamp->format('M d, Y \a\t g:i a');
-		else :
-			if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
-				$eventdate = $starttimestamp->format('M d, Y');
-			elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) : // If the start and end month/year are the same, just provide a dashed date
-				$eventdate = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
-			else : // If months aren't the same, return the full start and end dates
-				$eventdate = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
-			endif;
-		endif;
-		return $eventdate;
+		switch ($format) :
+			case "datetime" :
+				if (! $post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
+					$data = $starttimestamp->format('M d, Y \a\t g:i a');
+				else :
+					if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
+						$data = $starttimestamp->format('M d, Y');
+					elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) : // If the start and end month/year are the same, just provide a dashed date
+						$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
+					else : // If months aren't the same, return the full start and end dates
+						$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
+					endif;
+				endif;
+				break;
+			case "date" :
+				if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
+					$data = $starttimestamp->format('M d, Y');
+				elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) : // If the start and end month/year are the same, just provide a dashed date
+					$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
+				else : // If months aren't the same, return the full start and end dates
+					$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
+				endif;
+				break;
+			case "time" :
+				if ($post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
+					$data = "All day";
+				else :
+					$data = $starttimestamp->format('g:i a');
+					if ($endtime != $starttime) :
+						$data .= ' - ' . $endtimestamp->format('g:i a');
+					endif;
+				endif;
+				break;
+		endswitch;
+
+		return $data;
 	}
 
-	function simplecal_get_state_input($dom_name, $field_value) {
+	public static function get_formatted_website($url, $link_text = "More information") {
+		if (preg_match('/^(?:https?:\/\/)?(?:www\.)?(.*\..*)\/?/', $url, $matches)) {
+			$domain = explode('/',$matches[1])[0];
+		} else {
+			$domain = explode('/',$url)[0];
+		}
+		$formatted = "<a href=\"$url\" target=\"_blank\">$domain</a>";
+		return $formatted;
+	}
+
+	function get_state_input($dom_name, $field_value) {
 		if (empty($field_value)) {
 			$field_value = get_option('simplecal_last_state','');
 		}
@@ -310,18 +344,18 @@ class SimpleCal {
 		return $output;
 	}
 
-	function simplecal_state_input($dom_name, $field_value) {
-		echo $this->simplecal_get_state_input($dom_name, $field_value);
+	function state_input($dom_name, $field_value) {
+		echo $this->get_state_input($dom_name, $field_value);
 	}
 
-	function simplecal_get_country_input($dom_name) {
+	function get_country_input($dom_name) {
 		// TODO: Add multinational support, obvs. Duh. But you know, America first.
 		$output = "<select name=$dom_name><option value='US' selected='selected'>United States of America</option></select>";
 		return $output;
 	}
 
-	function simplecal_country_input($dom_name) {
-		echo $this->simplecal_get_country_input($dom_name);
+	function country_input($dom_name) {
+		echo $this->get_country_input($dom_name);
 	}
 
 }

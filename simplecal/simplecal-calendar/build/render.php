@@ -64,25 +64,48 @@
 				<div class="simplecal_list_item_title">
 					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
 				</div>
+				<div class="simplecal_list_item_datetime">
+					<?= SimpleCal::event_get_the_date("datetime"); ?>
+				</div>
 				<div class="simplecal_list_item_date">
-					<?= SimpleCal::simplecal_event_get_the_date(); ?>
+					<?= SimpleCal::event_get_the_date("date"); ?>
+				</div>
+				<div class="simplecal_list_item_time">
+					<?= SimpleCal::event_get_the_date("time"); ?>
 				</div>
 <?php
 					if (!$post->simplecal_event_private_location || (($post->simpelcal_event_private_location) && is_user_logged_in())) {
 ?>
 				<div class="simplecal_list_item_location">
-					<div class="simplecal_list_item_location_physical">
-					<span class="material-symbols-outlined">pin_drop</span>
+<?php
+						if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
+?>
+					<div class="simplecal_list_item_meta simplecal_list_item_location_physical">
+						<span class="material-symbols-outlined">pin_drop</span>
 						<span class="simplecal_list_item_venue_name"><?= $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?= $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list__item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?= $post->simplecal_event_state; ?></span>
 					</div>
-					<div class="simplecal_list_item_location_virtual">
-					<span class="material-symbols-outlined">camera_video</span>
+<?php
+						}
+						if ($post->simplecal_event_meeting_link) {
+?>
+					<div class="simplecal_list_item_meta simplecal_list_item_location_virtual">
+						<span class="material-symbols-outlined">camera_video</span>
 						<?= ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?>
 					</div>
+<?php
+						}
+?>
 				</div>
 <?php
 					}
-
+					if ($post->simplecal_event_website) {
+?>
+				<div class="simplecal_list_item_meta simplecal_list_item_website">
+					<span class="material-symbols-outlined">open_in_new</span>
+					<?= SimpleCal::get_formatted_website($post->simplecal_event_website); ?>
+				</div>
+<?php
+					}
 					if ($attributes["agendaShowExcerpt"]) {
 ?>
 				<div class="simplecal_list_item_excerpt">
@@ -94,7 +117,7 @@
 			</div><!-- .simplecal_list_item_content_wrapper -->
 		</div><!-- .simplecal_list_item -->
 <?php
-		}
+				}
 ?>
 	</div><!-- .simplecal_block -->
 <?php
