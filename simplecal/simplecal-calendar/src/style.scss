@@ -14,17 +14,24 @@
 				img
 			div.simplecal_list_item_content_wrapper
 				div.simplecal_list_item_title
+				div.simplecal_list_item_datetime
 				div.simplecal_list_item_date
+				div.simplecal_list_item_time
 				div.simplecal_list_item_location
+					div.simplecal_list_item_meta	
 					div.simplecal_list_item_location_physical
-						span.simplecal_list_item_venue_name
-						span.simplecal_list_item_venue_separator
-						span.simplecal_list_item_city
-						span.simplecal_list_item_city_separator
-						span.simplecal_list_item_state
+						div.simplecal_list_item_meta_icon
+						div.simplecal_list_item_meta_data
+							span.simplecal_list_item_venue_name
+							span.simplecal_list_item_venue_separator
+							span.simplecal_list_item_city
+							span.simplecal_list_item_city_separator
+							span.simplecal_list_item_state
 					div.simplecal_list_location_virtual
 				div.simplecal_list_item_excerpt
 				div.simplecal_list_item_more_info_link
+					div.simplecal_list_item_meta_icon
+					div.simplecal_list_item_meta_data
 */
 
 .simplecal_theme1 {
@@ -58,6 +65,9 @@
 			}
 			.simplecal_list_item_meta {
 				margin: 0.25em 0;
+				display: flex;
+				flex-flow: row nowrap;
+				column-gap: 0.5em;;
 			}
 
 			.simplecal_list_item_title {
@@ -70,10 +80,7 @@
 			.simplecal_list_item_time {
 				display: none;
 			}
-			.simplecal_list_item_location {
-			}
-			.simplecal_list_item_website {
-			}
+
 			.simplecal_list_item_excerpt {
 				p:first-of-type {
 					margin-top: 0;
@@ -83,8 +90,11 @@
 			.material-symbols-outlined {
 				vertical-align: middle;
 				font-size: 1em;
-				margin-right: 0.25em;
 			}
 		}
+	}
+	
+	.simplecal_past_event {
+		opacity: 0.6;
 	}
 }

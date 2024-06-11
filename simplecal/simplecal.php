@@ -3,7 +3,7 @@
 Plugin Name:  SimpleCal
 Plugin URI:   https://github.com/aaronfury/SimpleCal
 Description:  This is a simple, free plugin for adding calendar events to WordPress using a custom post type and a widget. It is simple, and it is free.
-Version:      0.1.20240417
+Version:      0.1.20240611
 Author:       Aaron Firouz
 License:      Creative Commons Zero
 License URI:  https://creativecommons.org/publicdomain/zero/1.0/
