@@ -12,7 +12,7 @@ import './editor.scss';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes }) {
-	const {title = 'Calendar of Events', eventTags = 'all', displayStyle = 'agenda', hideOnNoEvents = false, noEventsText = "There are no upcoming events.", blockTheme = 'theme1', agendaLayout = 'layout1', agendaShowThumbnail = false, agendaShowExcerpt = false, agendaShowMonthYearHeaders = true, displayPastEvents = false, displayPastEventsDays = 7, displayFutureEventsDays = 30} = attributes;
+	const {title = 'Calendar of Events', eventTags = 'all', displayStyle = 'agenda', hideOnNoEvents = false, noEventsText = "There are no upcoming events.", blockTheme = 'theme1', agendaLayout = 'layout1', agendaShowThumbnail = false, agendaShowExcerpt = false, agendaPostsPerPage = 10, agendaShowMonthYearHeaders = true, displayPastEvents = false, displayPastEventsDays = 7, displayFutureEventsDays = 30} = attributes;
 	return (
 		<>
 			<InspectorControls>
@@ -88,6 +88,12 @@ export default function Edit( { attributes, setAttributes }) {
 						onChange= {() => {
 							setAttributes({agendaShowExcerpt: !agendaShowExcerpt})
 						}}
+					/>
+					<NumberControl
+						label= "Display this number of events at a time"
+						help= "Set to '0' to display all events"
+						value= {agendaPostsPerPage}
+						onChange= {(value) => setAttributes({agendaPostsPerPage: value})}
 					/>
 					<ToggleControl
 						label= "Group events under month and year headers"

@@ -4,6 +4,9 @@ Plugin Name:  SimpleCal
 Plugin URI:   https://github.com/aaronfury/SimpleCal
 Description:  This is a simple, free plugin for adding calendar events to WordPress using a custom post type and a widget. It is simple, and it is free.
 Version:      0.1.20240611
+Requires at least: 6.2
+Tested up to: 6.5.4
+Requires PHP: 7.2
 Author:       Aaron Firouz
 License:      Creative Commons Zero
 License URI:  https://creativecommons.org/publicdomain/zero/1.0/
@@ -26,8 +29,12 @@ class SimpleCal {
 		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
 		add_action('init',[$this,'create_event_posts']);
-		add_action('widgets_init', [$this,'register_widget']);
 		add_action( 'init', [$this,'register_block']);
+		// Ya know what? Fuck the widget. Outdated bullshit. I'm not wasting time on it.
+		// add_action('widgets_init', [$this,'register_widget']);
+
+		add_action('wp_ajax_simplecal_get_events', [$this, 'get_events_ajax']);
+		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'get_events_ajax']);
 		
 		if (is_admin()) {
 			add_action('add_meta_boxes', [$this,'event_metaboxes']);
@@ -211,6 +218,76 @@ class SimpleCal {
 		endif;
 	}
 
+
+	public function get_events_ajax() {
+
+		// Determine the desired page
+		$page = (array_key_exists('page', $_POST) ? $_POST['page'] : 0);
+		$pageParam = ($page < 0 ? -$page : $page + 1);
+
+		// Build the query parameters
+		$args = [
+			'post_type' => 'simplecal_event'
+		];
+
+		// Build the query for agenda views
+		if ($_POST['displayStyle'] == 'agenda') {
+			$args = $args + [
+				'paged' => true,
+				'page' => $pageParam,
+				'orderby' => 'meta_value_num'
+			];
+			
+			if ($page >= 0) {
+				$args = $args + [
+					'meta_key' => 'simplecal_event_start_timestamp',
+					'meta_value' => date('U'),
+					'meta_compare' => '>=',
+					'meta_type' => 'NUMERIC',
+					'order' => 'ASC'
+				];
+			} else {
+				$args = $args + [
+					'meta_key' => 'simplecal_event_end_timestamp',
+					'order' => 'DESC',
+					'meta_type' => 'NUMERIC'
+				];
+
+				if (array_key_exists('displayPastEventsDays', $_POST)) {
+					$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
+					$args = $args + [
+						'meta_value' => [$past_event_cutoff->format('U'), date('U')],
+						'meta_compare' => 'BETWEEN'
+					];
+				} else {
+					$args = $args + [
+						'meta_value' => date('U'),
+						'meta_compare' => '<='
+					];
+				}
+			}
+		}
+
+		// Build the query for calendar views
+
+		$events = new WP_Query($args);
+		
+		ob_start();
+		if ($_POST['displayStyle'] == 'agenda') {
+			include_once(plugin_dir_path(__FILE__) . 'templates/agenda.php');
+		}
+
+		$output = ob_get_clean();
+		wp_reset_postdata();
+
+		wp_send_json_success([
+			"output" => $output
+		]);		
+	}
+
+	public function get_events_calendar($month, $year) {
+
+	}
 	// Retrieve the date from within the loop
 	public static function event_get_the_date($format) {
 		global $post;
@@ -380,10 +457,10 @@ class SimpleCal_Widget extends WP_Widget {
 	}
 
 	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'New title', 'text_domain' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : 'Calendar';
 ?>
 		<p>
-		<label for="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:', 'text_domain' ); ?></label> 
+		<label for="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>">Title:</label> 
 		<input class="widefat" id="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?= esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?= esc_attr( $title ); ?>">
 		</p>
 		<?php 

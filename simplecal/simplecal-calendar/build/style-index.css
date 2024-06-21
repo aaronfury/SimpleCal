@@ -50,7 +50,7 @@
   margin: 10px 0;
 }
 .simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail {
-  flex: 1 0 100px;
+  flex: 0 0 100px;
   margin-right: 10px;
 }
 .simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail img {
