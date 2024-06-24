@@ -10,15 +10,13 @@ $(document).ready(() => {
 	});
 
 	$('.simplecal_nav_prev, .simplecal_nav_next').on('click', (event) => {
-		var instance = $(event.target).parent();
+		var instance = $(event.currentTarget).parent();
 	
-		console.log($(instance).data('page'));
-		if ($(event.target).hasClass('simplecal_nav_prev')) {
+		if ($(event.currentTarget).hasClass('simplecal_nav_prev')) {
 			$(instance).data().page--;
 		} else {
 			$(instance).data().page++;
 		}
-		console.log($(instance).data('page'));
 		var formData = scGetFormData($(instance));
 
 		scGetEvents(formData).done((response) => {

@@ -222,8 +222,8 @@ class SimpleCal {
 	public function get_events_ajax() {
 
 		// Determine the desired page
-		$page = (array_key_exists('page', $_POST) ? $_POST['page'] : 0);
-		$pageParam = ($page < 0 ? -$page : $page + 1);
+		$page = intval((array_key_exists('page', $_POST) ? $_POST['page'] : 0));
+		$page_param = ($page < 0 ? -$page : $page + 1);
 
 		// Build the query parameters
 		$args = [
@@ -234,7 +234,7 @@ class SimpleCal {
 		if ($_POST['displayStyle'] == 'agenda') {
 			$args = $args + [
 				'paged' => true,
-				'page' => $pageParam,
+				'page' => $page_param,
 				'orderby' => 'meta_value_num'
 			];
 			
@@ -278,10 +278,15 @@ class SimpleCal {
 		}
 
 		$output = ob_get_clean();
+		$output .= "<div>page = {$page}</div><div>page_param = {$page_param}</div><div>events->max_num_pages = {$events->max_num_pages}</div>";
 		wp_reset_postdata();
 
+		$more_prev = ((($page < 0) && ($events->max_num_pages > $page_param)) || $page >= 0);
+		$more_next = ((($page >= 0) && ($events->max_num_pages > $page_param)) || $page < 0);
 		wp_send_json_success([
-			"output" => $output
+			'output' => $output,
+			'more_prev_pages' => $more_prev,
+			'more_next_pages' => $more_next
 		]);		
 	}
 
