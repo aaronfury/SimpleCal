@@ -20,4 +20,5 @@
 			</div>
 		</div>
 	</div>
+	<div class="simplecal-root simplecal_<?= $attributes['blockTheme']; ?>" data-display-style="<?= $attributes['displayStyle']; ?>" data-display-past-events=<?= $attributes['displayPastEvents']; ?> data-display-past-events-days=<?= $attributes['displayPastEventsDays']; ?> data-display-future-events-days=<?= $attributes['displayFutureEventsDays']; ?> data-agenda-show-month-year-headers=<?= $attributes['agendaShowMonthYearHeaders']; ?> data-agenda-posts-per-page=<?= $attributes['agendaPostsPerPage']; ?> data-agenda-show-thumbnail=<?= $attributes['agendaShowThumbnail']; ?> data-agenda-show-excerpt=<?= $attributes['agendaShowExcerpt']; ?> data-widget-title=<?= $attributes['title']; ?>>
 </div>

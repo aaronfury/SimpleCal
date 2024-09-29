@@ -36,15 +36,20 @@
 
 .simplecal_theme1 {
 	.simplecal_nav_prev, .simplecal_nav_next {
+		opacity: 0.5;
 		display: flex;
 		flex-flow: row nowrap;
 		column-gap: 0.25em;
 		justify-content: center;
-		cursor: pointer;
 		transition: 0.25s all ease-in-out;
+		cursor: default;
+		&.active {
+			opacity: 1;
+			cursor: pointer;
 
-		&:hover {
-			font-weight: bold;
+			&:hover {
+				font-weight: bold;
+			}
 		}
 	}
 	

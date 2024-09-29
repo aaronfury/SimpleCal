@@ -4,25 +4,45 @@ $(document).ready(() => {
 
 		var formData = scGetFormData(instance);
 		
+		if (formData['displayPastEvents'] && formData['page'] == 0) {
+			$(instance).children('.simplecal_nav_prev').addClass('active');
+		}
+
 		scGetEvents(formData).done((response) => {
 			$(instance).children('.simplecal_events_wrapper').html(response.data.output);
+			if (response.data.more_next_pages) {
+				$(instance).children('.simplecal_nav_next').addClass('active');
+			} else {
+				$(instance).children('.simplecal_nav_next').removeClass('active');
+			}
 		});
-	});
 
-	$('.simplecal_nav_prev, .simplecal_nav_next').on('click', (event) => {
-		var instance = $(event.currentTarget).parent();
+		$(instance).on('click', '.simplecal_nav_prev.active, .simplecal_nav_next.active', (event) => {
+			var instance = $(event.currentTarget).parent();
 	
-		if ($(event.currentTarget).hasClass('simplecal_nav_prev')) {
-			$(instance).data().page--;
-		} else {
-			$(instance).data().page++;
-		}
-		var formData = scGetFormData($(instance));
+			if ($(event.currentTarget).hasClass('simplecal_nav_prev')) {
+				$(instance).data().page--;
+			} else {
+				$(instance).data().page++;
+			}
+			var formData = scGetFormData($(instance));
 
-		scGetEvents(formData).done((response) => {
-			$(instance).children('.simplecal_events_wrapper').fadeOut().html(response.data.output).fadeIn();
+			scGetEvents(formData).done((response) => {
+				$(instance).children('.simplecal_events_wrapper').fadeTo(0).html(response.data.output).css('opacity',1);
+				if (response.data.more_next_pages) {
+					$(instance).children('.simplecal_nav_next').addClass('active');
+				} else {
+					$(instance).children('.simplecal_nav_next').removeClass('active');
+				}
+				if (response.data.more_prev_pages || (formData['displayPastEvents'] && formData['page'] == 0)) {
+					$(instance).children('.simplecal_nav_prev').addClass('active');
+				} else {
+					$(instance).children('.simplecal_nav_prev').removeClass('active');
+				}
+			});
 		});
 	});
+
 });
 
 function scGetFormData(instance) {

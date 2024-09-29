@@ -73,7 +73,15 @@ class SimpleCal {
 			'menu_position' => 5,
 			'menu_icon' => 'dashicons-calendar-alt',
 			'rewrite' => array('slug' => 'events', 'with_front' => false),
+			'rest_base' => 'simplecal_event',
+    		'rest_controller_class' => 'WP_REST_Posts_Controller',
 		]
+		);
+
+		register_rest_field( 'simplecal_event', 'meta', [
+			'get_callback' => function ($data) {
+				return get_post_meta( $data['id'], '', '' );
+			}]
 		);
 	}
 
@@ -278,7 +286,6 @@ class SimpleCal {
 		}
 
 		$output = ob_get_clean();
-		$output .= "<div>page = {$page}</div><div>page_param = {$page_param}</div><div>events->max_num_pages = {$events->max_num_pages}</div>";
 		wp_reset_postdata();
 
 		$more_prev = ((($page < 0) && ($events->max_num_pages > $page_param)) || $page >= 0);

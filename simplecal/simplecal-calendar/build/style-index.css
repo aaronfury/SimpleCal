@@ -37,15 +37,20 @@
 					div.simplecal_list_item_meta_data
 */
 .simplecal_theme1 .simplecal_nav_prev, .simplecal_theme1 .simplecal_nav_next {
+  opacity: 0.5;
   display: flex;
   flex-flow: row nowrap;
   -moz-column-gap: 0.25em;
        column-gap: 0.25em;
   justify-content: center;
-  cursor: pointer;
   transition: 0.25s all ease-in-out;
+  cursor: default;
 }
-.simplecal_theme1 .simplecal_nav_prev:hover, .simplecal_theme1 .simplecal_nav_next:hover {
+.simplecal_theme1 .simplecal_nav_prev.active, .simplecal_theme1 .simplecal_nav_next.active {
+  opacity: 1;
+  cursor: pointer;
+}
+.simplecal_theme1 .simplecal_nav_prev.active:hover, .simplecal_theme1 .simplecal_nav_next.active:hover {
   font-weight: bold;
 }
 .simplecal_theme1 .simplecal_list_year_header, .simplecal_theme1 .simplecal_list_month_header {
