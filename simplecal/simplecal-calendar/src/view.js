@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -7,9 +7,9 @@ import Agenda from './Components/Agenda';
 import AgendaItem from './Components/AgendaItem';
 
 const scInstances = document.querySelectorAll('.simplecal-root');
-
 scInstances.forEach(instance => {
 	const root = ReactDOM.createRoot(instance);
+	
 	root.render(
 		<SimpleCal
 			displayStyle={instance.getAttribute('data-display-style')}
@@ -24,24 +24,58 @@ scInstances.forEach(instance => {
 	/>);
 });
 
-function SimpleCal(props) {
-	const queryParams = {};
-	const [items, setItems] = useState([]);
+function SimpleCal({displayStyle,displayPastEvents,displayPastEventsDays,displayFutureEventsDays,agendaShowMonthYearHeaders, agendaPostsPerPage,agendaShowThumbnail,agendaShowExcerpt}) {
+	let currentDate = new Date();
 
-	apiFetch({
-		path: addQueryArgs('/wp/v2/simplecal_event', queryParams)
-	}).then((posts) => {
-		console.log(posts);
-		posts.forEach( (post) => {
-			const newItem = {title: post.title.rendered, startDate: post.meta.simplecal_event_start_timestamp, description: post.content.rendered};
-			setItems((items) => [...items, newItem]);
+	const [calItems, setCalItems] = useState([]);
+	const [agendaPage, setAgendaPage] = useState(1);
+	const [calendarMonth, setCalendarMonth] = useState(currentDate.getMonth());
+
+	var queryParams = {
+		'pastEvents' : displayPastEvents,
+		'pastEventsDays' : displayPastEventsDays,
+		'futureEventsDays' : displayFutureEventsDays,
+		'displayStyle' : displayStyle,
+	};
+
+	if (displayStyle == 'agenda') {
+		queryParams.agendaPostsPerPage = agendaPostsPerPage;
+		queryParams.agendaPage = agendaPage;
+	} else {
+		queryParams.calendarMonth = calendarMonth;
+	}
+
+	useEffect(() => {
+		fetchCalItems();
+	}, [agendaPage, calendarMonth]);
+
+	const fetchCalItems = async () => {
+		await apiFetch({
+			path: addQueryArgs('simplecal/v1/events', queryParams),
+		}).then(response => {
+			console.log(response);
+			
+			var items = [];
+			response.data.forEach( (post) => {
+				items.push({
+					title: post.title,
+					startDate: post.start_date,
+					endDate: post.end_date,
+					description: post.description,
+					thumbnail: post.thumbnail
+				});
+			});
+			setCalItems(items);
 		});
-	});
-
+	}
 	return (
 		<>
-		{items.map(item => (
-			<AgendaItem title={item.title} startDate={item.startDate} description={item.description}></AgendaItem>
+		<ButtonGroup>
+			<Button variant="primary" onClick={() => setAgendaPage(agendaPage -1)}>Previous Page</Button>
+			<Button onClick={() => setAgendaPage(agendaPage +1)}>Next Page</Button>
+		</ButtonGroup>
+		{calItems.map(item => (
+			<AgendaItem title={item.title} startDate={item.startDate} endDate={item.endDate} description={item.description}></AgendaItem>
 		))}
 		</>
 	)

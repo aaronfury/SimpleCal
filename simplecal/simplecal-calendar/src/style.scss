@@ -35,6 +35,11 @@
 */
 
 .simplecal_theme1 {
+	.simplecal_nav_pagination {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-between;
+	}
 	.simplecal_nav_prev, .simplecal_nav_next {
 		opacity: 0.5;
 		display: flex;

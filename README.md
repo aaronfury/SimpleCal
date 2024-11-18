@@ -19,3 +19,4 @@ I love you all.
 * Option to show event only to logged-in users
 * Date (month) selection
 * Calendar view
+* Option to auto-delete old events

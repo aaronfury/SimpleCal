@@ -73,7 +73,7 @@
 }
 .simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail {
   flex: 0 0 100px;
-  margin-right: 10px;
+  margin-left: 10px;
 }
 .simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail img {
   max-width: 100%;
@@ -114,5 +114,3 @@
 .simplecal_theme1 .simplecal_past_event {
   opacity: 0.6;
 }
-
-/*# sourceMappingURL=style-index.css.map*/

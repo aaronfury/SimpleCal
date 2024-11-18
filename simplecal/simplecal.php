@@ -28,31 +28,121 @@ class SimpleCal {
 	public function __construct() {
 		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
-		add_action('init',[$this,'create_event_posts']);
-		add_action( 'init', [$this,'register_block']);
-		// Ya know what? Fuck the widget. Outdated bullshit. I'm not wasting time on it.
-		// add_action('widgets_init', [$this,'register_widget']);
+		add_action('init',[$this, 'cpt_register']);
+		add_action('init', [$this, 'block_register']);
+		add_action('widgets_init', [$this, 'widget_register']);
+		add_action('rest_api_init', [$this, 'api_route_register_list']);
 
-		add_action('wp_ajax_simplecal_get_events', [$this, 'get_events_ajax']);
-		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'get_events_ajax']);
+		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
+		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
 		
 		if (is_admin()) {
-			add_action('add_meta_boxes', [$this,'event_metaboxes']);
-			add_action('save_post_simplecal_event', [$this,'event_save_meta']);
+			add_action('add_meta_boxes', [$this,'cpt_register_metaboxes']);
+			add_action('save_post_simplecal_event', [$this,'cpt_save_meta']);
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
+			add_filter("manage_simplecal_event_posts_columns", [$this, 'columns_set']);
+			add_action("manage_edit-simplecal_event_sortable_columns", [$this, 'columns_set_sortable']);
+			add_action("manage_simplecal_event_posts_custom_column", [$this, 'columns_set_values'], 10, 2);
+			add_action("pre_get_posts", [$this, 'columns_sort']);
 			// TODO: Add CSS for admin panel
 		}
 	}
 
-	function enqueue_admin_scripts($hook) {
-		if (!in_array($hook, ['post.php','post-new.php'])) {
-			return;
-		}
-		wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). 'js/admin.js');
+	//// CUSTOMIZE COLUMNS FOR THE CPT IN WP-ADMIN ////
+	function columns_set($cols) {
+		$cols = [
+			'cb' => $cols['cb'],
+			'title' => 'Title',
+			'startDate' => 'Start Date',
+			'endDate' => 'End Date',
+			'location' => 'Location',
+			'city' => 'City',
+			'state' => 'State',
+			'country' => 'Country'
+		];
+		
+		return $cols;
+	}
+	
+	function columns_set_sortable($cols) {
+		$cols = [
+			'title' => 'Title',
+			'startDate' => 'Start Date',
+			'endDate' => 'End Date',
+			'location' => 'Location',
+			'city' => 'City',
+			'state' => 'State',
+			'country' => 'Country'
+		];
+		
+		return $cols;
 	}
 
-	// Allow creation of event-style posts
-	function create_event_posts() {
+	function columns_set_values($column_name, $post_id) {
+		$meta = get_post_meta($post_id);
+
+		switch  ($column_name) {
+			case 'startDate':
+				$value = date('m/d/Y', $meta['simplecal_event_start_timestamp'][0]);
+				break;
+			case 'endDate':
+				$value = date('m/d/Y', $meta['simplecal_event_end_timestamp'][0]);
+				break;
+			case 'location':
+				$value = $meta['simplecal_event_venue_name'][0];
+				break;
+			case 'city':
+				$value = $meta['simplecal_event_city'][0];
+				break;
+			case 'state':
+				$value = $meta['simplecal_event_state'][0];
+				break;
+			case 'country':
+				$value = $meta['simplecal_event_country'][0];
+				break;
+		}
+		echo $value;
+	}
+
+	function columns_sort($query) {
+		if ('simplecal_event' != $query->get('post_type')) {
+			return;
+		}
+
+		$orderby = $query->get('orderby');
+		switch ($orderby) {
+			case 'Start Date':
+				$query->set('meta_key', 'simplecal_event_start_timestamp');
+				$query->set('orderby', 'meta_value_num');
+				break;
+			case 'End Date':
+				$query->set('meta_key', 'simplecal_event_end_timestamp');
+				$query->set('orderby', 'meta_value_num');
+				break;
+			case 'Location':
+				$query->set('meta_key', 'simplecal_event_venue_name');
+				$query->set('orderby', 'meta_value');
+				break;
+			case 'City':
+				$query->set('meta_key', 'simplecal_event_city');
+				$query->set('orderby', 'meta_value');
+				break;
+			case 'State':
+				$query->set('meta_key', 'simplecal_event_state');
+				$query->set('orderby', 'meta_value');
+				break;
+			case 'Country':
+				$query->set('meta_key', 'simplecal_event_country');
+				$query->set('orderby', 'meta_value');
+				break;
+			default:
+				$query->set('orderby', 'title');
+		}
+	}
+
+	//// REGISTER CUSTOM POST TYPE AND META BOXES ////
+
+	function cpt_register() {
 		register_post_type('simplecal_event', [
 			'labels' => [
 				'name' => 'Events',
@@ -85,22 +175,14 @@ class SimpleCal {
 		);
 	}
 
-	function register_widget() {
-		register_widget('SimpleCal_Widget');
-	}
-
-	function register_block() {
-		register_block_type( __DIR__ . '/simplecal-calendar/build');
-	}
-
-	function event_metaboxes() {
+	function cpt_register_metaboxes() {
 		global $post;
-		add_meta_box('event_date_time', 'Event Date and Time', [$this,'event_meta_datetime'], 'simplecal_event', 'side', 'default');
-		add_meta_box('event_location', 'Event Location', [$this,'event_meta_location'], 'simplecal_event', 'side', 'default');
-		add_meta_box('event_moreinfo', 'Event More Info', [$this,'event_meta_moreinfo'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_date_time', 'Event Date and Time', [$this,'cpt_meta_box_datetime'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_location', 'Event Location', [$this,'cpt_meta_box_location'], 'simplecal_event', 'side', 'default');
+		add_meta_box('event_moreinfo', 'Event More Info', [$this,'cpt_meta_box_moreinfo'], 'simplecal_event', 'side', 'default');
 	}
 
-	function event_meta_datetime($post, $args) {
+	function cpt_meta_box_datetime($post, $args) {
 		echo "<small>All times displayed in the <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
 		$alldayevent = $post->simplecal_event_all_day;
@@ -129,7 +211,7 @@ class SimpleCal {
 		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
 	}
 
-	function event_meta_location($post, $args) {
+	function cpt_meta_box_location($post, $args) {
 		echo '<h3>Physical</h3>';
 		$metabox_ids = ["venue_name", "street_address", "city"];
 		foreach ($metabox_ids as $metabox_id) :
@@ -171,16 +253,16 @@ class SimpleCal {
 	<?php
 	}
 		
-	function event_meta_moreinfo($post, $args) {
+	function cpt_meta_box_moreinfo($post, $args) {
 		$metabox_ids = ["website" => "url"];
 		
 		foreach ($metabox_ids as $metabox_id => $type) :
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			echo '<input type="' . $type . '" class="fullwidth" name="event_' . $metabox_id . '" value="' . $post->{"simplecal_event_{$metabox_id}"} . '" /><br />';
 		endforeach;
-	}
-		
-	function event_save_meta($post_id) {
+	}	
+
+	function cpt_save_meta($post_id) {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
 		if (!current_user_can('edit_post', $post_id)) return;
@@ -225,9 +307,99 @@ class SimpleCal {
 			update_option('simplecal_last_state', $events_meta['simplecal_event_state']);
 		endif;
 	}
+	
+	function enqueue_admin_scripts($hook) {
+		if (!in_array($hook, ['post.php','post-new.php'])) {
+			return;
+		}
+		wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). 'js/admin.js');
+	}
 
+	//// REGISTER WP BLOCK AND WIDGET ////
+	function widget_register() {
+		register_widget('SimpleCal_Widget');
+	}
 
-	public function get_events_ajax() {
+	
+	function block_register() {
+		register_block_type( __DIR__ . '/simplecal-calendar/build');
+	}
+
+	//// WP REST API SUPPORT ////
+	function api_route_register_list() {
+		register_rest_route('simplecal/v1', '/events', [
+			'methods' => WP_REST_Server::READABLE,
+			'callback' => [$this, 'api_route_callback_list'],
+			'args' => [
+				'pastEvents' => [
+					'type' => 'boolean',
+					'required' => false
+				],
+				'pastEventsDays' => [
+					'type' => 'integer',
+					'required' => false
+				],
+				'futureEventsDatys' => [
+					'type' => 'integer',
+					'required' => false
+				],
+				'displayStyle' => [
+					'type' => 'string',
+					'required' => false
+				],
+				'agendaPostsPerPage' => [
+					'type' => 'integer',
+					'required' => false
+				],
+				'agendaPage' => [
+					'type' => 'integer',
+					'required' => false
+				],
+				'calendarMonth' => [
+					'type' => 'integer',
+					'required' => false
+				]
+			]
+		]);
+	}
+
+	function api_route_callback_list($request) {
+		$params = $request->get_params();
+		$events_list = [];
+
+		$args = [
+			'post_type' => 'simplecal_event'
+		];
+
+		if ($params['displayStyle'] == 'agenda') {
+			$args['posts_per_page'] = $params['agendaPostsPerPage'];
+			$args['paged'] = $params['agendaPage'];
+		} else {
+			$args['posts_per_page'] = -1;
+		}
+
+		$events = new WP_Query($args);
+
+		if ($events->have_posts()) {
+			global $post;
+		
+			while ($events->have_posts()) {
+				$events->the_post();
+				$events_list[] = [
+					'title' => html_entity_decode(get_the_title()),
+					'event_id' => $post->ID,
+					'start_date' => $post->simplecal_event_start_timestamp,
+					'end_date' => $post->simplecal_event_end_timestamp,
+					'description' => html_entity_decode(get_the_excerpt()),
+					'thumbnail' => get_the_post_thumbnail_url()
+				];
+			}
+		}
+
+		wp_send_json_success($events_list);
+	}
+
+	public function ajax_get_events() {
 
 		// Determine the desired page
 		$page = intval((array_key_exists('page', $_POST) ? $_POST['page'] : 0));
@@ -297,9 +469,13 @@ class SimpleCal {
 		]);		
 	}
 
+	//// UTILITIES ////
+	
+	// Filter events for a given month and year
 	public function get_events_calendar($month, $year) {
 
 	}
+
 	// Retrieve the date from within the loop
 	public static function event_get_the_date($format) {
 		global $post;
@@ -446,7 +622,6 @@ class SimpleCal {
 	function country_input($dom_name) {
 		echo $this->get_country_input($dom_name);
 	}
-
 }
 
 class SimpleCal_Widget extends WP_Widget {

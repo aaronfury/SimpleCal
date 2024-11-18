@@ -4,21 +4,39 @@
 ?>
 <div <?= get_block_wrapper_attributes(['data-hide-on-no-events' => $attributes['hideOnNoEvents']]); ?>>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" /> <!-- TODO: Move this into the JS and make it conditional load? -->
-	<div class="simplecal simplecal_<?= $attributes['blockTheme']; ?>" data-display-style="<?= $attributes['displayStyle']; ?>" data-display-past-events=<?= $attributes['displayPastEvents']; ?> data-display-past-events-days=<?= $attributes['displayPastEventsDays']; ?> data-display-future-events-days=<?= $attributes['displayFutureEventsDays']; ?> data-agenda-show-month-year-headers=<?= $attributes['agendaShowMonthYearHeaders']; ?> data-agenda-posts-per-page=<?= $attributes['agendaPostsPerPage']; ?> data-agenda-show-thumbnail=<?= $attributes['agendaShowThumbnail']; ?> data-agenda-show-excerpt=<?= $attributes['agendaShowExcerpt']; ?>>
+	<div class="simplecal simplecal_<?= $attributes['blockTheme']; ?>" data-display-style="<?= $attributes['displayStyle']; ?>" data-display-past-events="<?= empty($attributes['displayPastEvents']) ? 'false' : 'true'; ?>" data-display-past-events-days="<?= $attributes['displayPastEventsDays']; ?>" data-display-future-events-days="<?= $attributes['displayFutureEventsDays']; ?>" data-agenda-show-month-year-headers="<?= empty($attributes['agendaShowMonthYearHeaders']) ? 'false' : 'true'; ?>" data-agenda-posts-per-page="<?= $attributes['agendaPostsPerPage']; ?>" data-agenda-show-thumbnail="<?= $attributes['agendaShowThumbnail']; ?>" data-agenda-show-excerpt="<?= empty($attributes['agendaShowExcerpt']) ? 'false' : 'true'; ?>">
 		<?php if ($attributes['title']) { ?><h2 class="simplecal_title"><?= $attributes['title']; ?></h2><?php } ?>
-		<div class="simplecal_nav_prev">
-			<div class="simplecal_nav_arrow">
-				<span class="material-symbols-outlined">arrow_back</span>
+		<div class="simplecal_nav_pagination">
+			<div class="simplecal_nav_prev">
+				<div class="simplecal_nav_arrow">
+					<span class="material-symbols-outlined">arrow_back</span>
+				</div>
+				<div>Previous Events</div>
 			</div>
-			<div>Previous Events</div>
+			<div class="simplecal_nav_next">
+				<div>Future Events</div>
+				<div class="simplecal_nav_arrow">
+					<span class="material-symbols-outlined">arrow_forward</span>
+				</div>
+			</div>
 		</div>
 		<div class="simplecal_events_wrapper"></div>
-		<div class="simplecal_nav_next">
-			<div>Future Events</div>
-			<div class="simplecal_nav_arrow">
-				<span class="material-symbols-outlined">arrow_forward</span>
+		<div class="simplecal_nav_pagination">
+			<div class="simplecal_nav_prev">
+				<div class="simplecal_nav_arrow">
+					<span class="material-symbols-outlined">arrow_back</span>
+				</div>
+				<div>Previous Events</div>
+			</div>
+			<div class="simplecal_nav_next">
+				<div>Future Events</div>
+				<div class="simplecal_nav_arrow">
+					<span class="material-symbols-outlined">arrow_forward</span>
+				</div>
 			</div>
 		</div>
+		
 	</div>
-	<div class="simplecal-root simplecal_<?= $attributes['blockTheme']; ?>" data-display-style="<?= $attributes['displayStyle']; ?>" data-display-past-events=<?= $attributes['displayPastEvents']; ?> data-display-past-events-days=<?= $attributes['displayPastEventsDays']; ?> data-display-future-events-days=<?= $attributes['displayFutureEventsDays']; ?> data-agenda-show-month-year-headers=<?= $attributes['agendaShowMonthYearHeaders']; ?> data-agenda-posts-per-page=<?= $attributes['agendaPostsPerPage']; ?> data-agenda-show-thumbnail=<?= $attributes['agendaShowThumbnail']; ?> data-agenda-show-excerpt=<?= $attributes['agendaShowExcerpt']; ?> data-widget-title=<?= $attributes['title']; ?>>
+	
+	<div class="simplecal-root simplecal_<?= $attributes['blockTheme']; ?>" data-display-style="<?= $attributes['displayStyle']; ?>" data-display-past-events="<?= empty($attributes['displayPastEvents']) ? 'false' : 'true'; ?>" data-display-past-events-days="<?= $attributes['displayPastEventsDays']; ?>" data-display-future-events-days="<?= $attributes['displayFutureEventsDays']; ?>" data-agenda-show-month-year-headers="<?= empty($attributes['agendaShowMonthYearHeaders']) ? 'false' : 'true'; ?>" data-agenda-posts-per-page="<?= $attributes['agendaPostsPerPage']; ?>" data-agenda-show-thumbnail="<?= $attributes['agendaShowThumbnail']; ?>" data-agenda-show-excerpt="<?= empty($attributes['agendaShowExcerpt']) ? 'false' : 'true'; ?>" data-widget-title="<?= $attributes['title']; ?>">
 </div>
