@@ -31,7 +31,6 @@ class SimpleCal {
 		add_action('init',[$this, 'cpt_register']);
 		add_action('init', [$this, 'block_register']);
 		add_action('widgets_init', [$this, 'widget_register']);
-		add_action('rest_api_init', [$this, 'api_route_register_list']);
 
 		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
 		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
@@ -162,7 +161,7 @@ class SimpleCal {
 			'show_in_rest' => true,
 			'menu_position' => 5,
 			'menu_icon' => 'dashicons-calendar-alt',
-			'rewrite' => array('slug' => 'events', 'with_front' => false),
+			'rewrite' => ['slug' => 'events', 'with_front' => false],
 			'rest_base' => 'simplecal_event',
     		'rest_controller_class' => 'WP_REST_Posts_Controller',
 		]
@@ -190,23 +189,22 @@ class SimpleCal {
 		echo '<div style="margin: 1em 0;"><label><input type="checkbox" name="event_all_day" id="simplecal_event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label></div>';
 
 		$metabox_ids = array("start", "end"); // Cycle through the start and end time metaboxes for the event
-		foreach ($metabox_ids as $key):
-			if ($post->{"simplecal_event_{$key}_timestamp"}) :
+		foreach ($metabox_ids as $key) {
+			if ($post->{"simplecal_event_{$key}_timestamp"}) {
 				$time = "@" . $post->{"simplecal_event_{$key}_timestamp"};
 				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
-			else :
+			} else {
 				$time = 'now';
 				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
 				$timestamp->setTime($timestamp->format('H'),0,0,0); // Reset the hours and seconds on the timestamp to 00
-			endif;
+			}
 			$timestamp->setTimeZone(self::$tz); // Specifying the timezone when creating a DateTime from a Unix timestamp does nothing, so we set it after
 			
 			$datetime_string = $timestamp->format('Y-m-d\TH:i');
 		
 			echo '<h3>' . ucfirst($key) . ' Date and Time</h3>';
 			echo '<input type="datetime-local" name="event_' . $key . '_datetime" id="simplecal_event_' . $key . '_datetime" value="' . $datetime_string . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
-
-		endforeach;
+		}
 
 		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
 	}
@@ -214,11 +212,11 @@ class SimpleCal {
 	function cpt_meta_box_location($post, $args) {
 		echo '<h3>Physical</h3>';
 		$metabox_ids = ["venue_name", "street_address", "city"];
-		foreach ($metabox_ids as $metabox_id) :
+		foreach ($metabox_ids as $metabox_id) {
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			$event_meta = $post->{"simplecal_event_{$metabox_id}"};
 			echo '<input type="text" class="fullwidth" name="event_' . $metabox_id . '" id="simplecal_event_' . $metabox_id . '" value="' . $event_meta . '" /><br />';
-		endforeach;
+		}
 ?>
 		<label for="event_state">State</label><br />
 		<?php $this->state_input("event_state", $post->{"simplecal_event_state"}); ?>
@@ -256,10 +254,10 @@ class SimpleCal {
 	function cpt_meta_box_moreinfo($post, $args) {
 		$metabox_ids = ["website" => "url"];
 		
-		foreach ($metabox_ids as $metabox_id => $type) :
+		foreach ($metabox_ids as $metabox_id => $type) {
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			echo '<input type="' . $type . '" class="fullwidth" name="event_' . $metabox_id . '" value="' . $post->{"simplecal_event_{$metabox_id}"} . '" /><br />';
-		endforeach;
+		}
 	}	
 
 	function cpt_save_meta($post_id) {
@@ -269,9 +267,11 @@ class SimpleCal {
 
 		if (!key_exists('event_start_datetime', $_POST)) return;
 
-		if (!key_exists('event_end_datetime', $_POST)) :
+		if (!key_exists('event_end_datetime', $_POST)) {
 			$_POST['event_end_datetime'] = $_POST['event_start_datetime'];
-		endif;
+		}
+
+		global $post;
 
 		$metabox_ids = ['start', 'end']; // Cycle through the start and end timestamps for the event
 		foreach ($metabox_ids as $key) : // Format the fields and parse them as a DateTime object, then output the Unix timestamp to be saved to the event's meta
@@ -282,30 +282,29 @@ class SimpleCal {
 		endforeach;
 
 		$metas = ['all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
-		foreach ($metas as $meta) :
-			if (!empty($_POST['event_' . $meta])) :
+		foreach ($metas as $meta) {
+			if (!empty($_POST['event_' . $meta])) {
 				$events_meta['simplecal_event_' . $meta] = $_POST['event_' . $meta];
-			else :
+			} else {
 				$events_meta['simplecal_event_' . $meta] = NULL;
-			endif;
-		endforeach;
-	
-		foreach ($events_meta as $key => $value) :
-			if ($post->post_type == 'revision') return;
+			}
+		}
+
+		foreach ($events_meta as $key => $value) {
 			$value = implode(',', (array)$value);
-			if ($post->{$key}):
+			if ($post->{$key}) {
 				update_post_meta($post_id, $key, $value);
-			else :
+			} else {
 				add_post_meta($post_id, $key, $value);
-			endif;
+			}
 			if (!$value) delete_post_meta($post_id, '_' . $key);
-		endforeach;
+		}
 
 		// Save the selected state to prepopulate it on the next event.
 		// TODO: Implement this for other fields? Or like a favorites list?
-		if ($events_meta['simplecal_event_state']) :
+		if ($events_meta['simplecal_event_state']) {
 			update_option('simplecal_last_state', $events_meta['simplecal_event_state']);
-		endif;
+		}
 	}
 	
 	function enqueue_admin_scripts($hook) {
@@ -325,80 +324,7 @@ class SimpleCal {
 		register_block_type( __DIR__ . '/simplecal-calendar/build');
 	}
 
-	//// WP REST API SUPPORT ////
-	function api_route_register_list() {
-		register_rest_route('simplecal/v1', '/events', [
-			'methods' => WP_REST_Server::READABLE,
-			'callback' => [$this, 'api_route_callback_list'],
-			'args' => [
-				'pastEvents' => [
-					'type' => 'boolean',
-					'required' => false
-				],
-				'pastEventsDays' => [
-					'type' => 'integer',
-					'required' => false
-				],
-				'futureEventsDatys' => [
-					'type' => 'integer',
-					'required' => false
-				],
-				'displayStyle' => [
-					'type' => 'string',
-					'required' => false
-				],
-				'agendaPostsPerPage' => [
-					'type' => 'integer',
-					'required' => false
-				],
-				'agendaPage' => [
-					'type' => 'integer',
-					'required' => false
-				],
-				'calendarMonth' => [
-					'type' => 'integer',
-					'required' => false
-				]
-			]
-		]);
-	}
-
-	function api_route_callback_list($request) {
-		$params = $request->get_params();
-		$events_list = [];
-
-		$args = [
-			'post_type' => 'simplecal_event'
-		];
-
-		if ($params['displayStyle'] == 'agenda') {
-			$args['posts_per_page'] = $params['agendaPostsPerPage'];
-			$args['paged'] = $params['agendaPage'];
-		} else {
-			$args['posts_per_page'] = -1;
-		}
-
-		$events = new WP_Query($args);
-
-		if ($events->have_posts()) {
-			global $post;
-		
-			while ($events->have_posts()) {
-				$events->the_post();
-				$events_list[] = [
-					'title' => html_entity_decode(get_the_title()),
-					'event_id' => $post->ID,
-					'start_date' => $post->simplecal_event_start_timestamp,
-					'end_date' => $post->simplecal_event_end_timestamp,
-					'description' => html_entity_decode(get_the_excerpt()),
-					'thumbnail' => get_the_post_thumbnail_url()
-				];
-			}
-		}
-
-		wp_send_json_success($events_list);
-	}
-
+	//// WP AJAX INTERFACE ////
 	public function ajax_get_events() {
 
 		// Determine the desired page
@@ -424,7 +350,7 @@ class SimpleCal {
 					'meta_value' => date('U'),
 					'meta_compare' => '>=',
 					'meta_type' => 'NUMERIC',
-					'order' => 'ASC'
+					'order' => 'DESC'
 				];
 			} else {
 				$args = $args + [
@@ -484,49 +410,49 @@ class SimpleCal {
 		$starttimestamp = new DateTime($starttime);
 		$starttimestamp->setTimeZone(self::$tz);
 		
-		if ($post->_end_timestamp) :
+		if ($post->_end_timestamp) {
 			$endtime = "@" . $post->simplecal_event_end_timestamp;
-		else :
+		} else {
 			$endtime = $starttime;
-		endif;
+		}
 
 		$endtimestamp = new DateTime($endtime);
 		$endtimestamp->setTimeZone(self::$tz);
 
-		switch ($format) :
-			case "datetime" :
-				if (! $post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
+		switch ($format) {
+			case "datetime":
+				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
 					$data = $starttimestamp->format('M d, Y \a\t g:i a');
-				else :
-					if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
+				} else {
+					if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) { // If the start and end dates are the same, just return the start date
 						$data = $starttimestamp->format('M d, Y');
-					elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) : // If the start and end month/year are the same, just provide a dashed date
+					} elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) { // If the start and end month/year are the same, just provide a dashed date
 						$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
-					else : // If months aren't the same, return the full start and end dates
+					} else { // If months aren't the same, return the full start and end dates
 						$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
-					endif;
-				endif;
+					}
+				}
 				break;
-			case "date" :
-				if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) : // If the start and end dates are the same, just return the start date
+			case "date":
+				if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) { // If the start and end dates are the same, just return the start date
 					$data = $starttimestamp->format('M d, Y');
-				elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) : // If the start and end month/year are the same, just provide a dashed date
+				} elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) { // If the start and end month/year are the same, just provide a dashed date
 					$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
-				else : // If months aren't the same, return the full start and end dates
+				} else { // If months aren't the same, return the full start and end dates
 					$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
-				endif;
+				}
 				break;
 			case "time" :
-				if ($post->simplecal_event_all_day) : // If it's *not* an all-day event, include the start time
+				if ($post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
 					$data = "All day";
-				else :
+				} else {
 					$data = $starttimestamp->format('g:i a');
-					if ($endtime != $starttime) :
+					if ($endtime != $starttime) {
 						$data .= ' - ' . $endtimestamp->format('g:i a');
-					endif;
-				endif;
+					}
+				}
 				break;
-		endswitch;
+		}
 
 		return $data;
 	}

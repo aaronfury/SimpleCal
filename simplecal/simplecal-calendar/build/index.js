@@ -47,6 +47,7 @@ function Edit({
     agendaShowThumbnail = false,
     agendaShowExcerpt = false,
     agendaPostsPerPage = 10,
+    agendaDisplayPagination = 'both',
     agendaShowMonthYearHeaders = true,
     displayPastEvents = false,
     displayPastEventsDays = 7,
@@ -134,6 +135,25 @@ function Edit({
     value: agendaPostsPerPage,
     onChange: value => setAttributes({
       agendaPostsPerPage: value
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+    label: "Display pagination at top or bottom of agenda view",
+    value: agendaDisplayPagination,
+    options: [{
+      label: 'Top',
+      value: 'top'
+    }, {
+      label: 'Bottom',
+      value: 'bottom'
+    }, {
+      label: 'Both',
+      value: 'both'
+    }, {
+      label: 'None',
+      value: 'none'
+    }],
+    onChange: value => setAttributes({
+      agendaDisplayPagination: value
     })
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
     label: "Group events under month and year headers",
@@ -290,7 +310,7 @@ module.exports = window["wp"]["components"];
   \************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/simplecal-calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"integer"},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaPostsPerPage":{"type":"integer","default":10},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/simplecal-calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"integer"},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaPostsPerPage":{"type":"integer","default":10},"agendaDisplayPagination":{"type":"string","default":"both"},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php"}');
 
 /***/ })
 

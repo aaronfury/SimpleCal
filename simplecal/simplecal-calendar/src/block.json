@@ -40,6 +40,10 @@
 			"type": "integer",
 			"default": 10
 		},
+		"agendaDisplayPagination": {
+			"type": "string",
+			"default": "both"
+		},
 		"agendaShowMonthYearHeaders": {
 			"type": "boolean",
 			"default": true
@@ -72,6 +76,5 @@
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
-	"render": "file:./render.php",
-	"viewScript": "file:./view.js"
+	"render": "file:./render.php"
 }

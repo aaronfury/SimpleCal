@@ -1,5 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
 
 import './editor.scss';
 
@@ -12,7 +12,7 @@ import './editor.scss';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes }) {
-	const {title = 'Calendar of Events', eventTags = 'all', displayStyle = 'agenda', hideOnNoEvents = false, noEventsText = "There are no upcoming events.", blockTheme = 'theme1', agendaLayout = 'layout1', agendaShowThumbnail = false, agendaShowExcerpt = false, agendaPostsPerPage = 10, agendaShowMonthYearHeaders = true, displayPastEvents = false, displayPastEventsDays = 7, displayFutureEventsDays = 30} = attributes;
+	const {title = 'Calendar of Events', eventTags = 'all', displayStyle = 'agenda', hideOnNoEvents = false, noEventsText = "There are no upcoming events.", blockTheme = 'theme1', agendaLayout = 'layout1', agendaShowThumbnail = false, agendaShowExcerpt = false, agendaPostsPerPage = 10, agendaDisplayPagination = 'both', agendaShowMonthYearHeaders = true, displayPastEvents = false, displayPastEventsDays = 7, displayFutureEventsDays = 30} = attributes;
 	return (
 		<>
 			<InspectorControls>
@@ -94,6 +94,17 @@ export default function Edit( { attributes, setAttributes }) {
 						help= "Set to '0' to display all events"
 						value= {agendaPostsPerPage}
 						onChange= {(value) => setAttributes({agendaPostsPerPage: value})}
+					/>
+					<SelectControl
+						label="Display pagination at top or bottom of agenda view"
+						value= {agendaDisplayPagination}
+						options= {[
+							{label: 'Top', value: 'top'},
+							{label: 'Bottom', value: 'bottom'},
+							{label: 'Both', value: 'both'},
+							{label: 'None', value: 'none'}
+						]}
+						onChange= {(value) => setAttributes({agendaDisplayPagination: value})}
 					/>
 					<ToggleControl
 						label= "Group events under month and year headers"
