@@ -26,8 +26,11 @@ class SimpleCal {
 	private $post_meta;
 	
 	public function __construct() {
+		global $pagenow;
+
 		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
+
 		add_action('init',[$this, 'cpt_register']);
 		add_action('init', [$this, 'block_register']);
 		add_action('widgets_init', [$this, 'widget_register']);
@@ -36,13 +39,18 @@ class SimpleCal {
 		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
 		
 		if (is_admin()) {
-			add_action('add_meta_boxes', [$this,'cpt_register_metaboxes']);
-			add_action('save_post_simplecal_event', [$this,'cpt_save_meta']);
+			if ('edit.php' == $pagenow && 'simplecal_event' == $_GET['post_type']) {
+				add_filter("manage_simplecal_event_posts_columns", [$this, 'columns_set']);
+				add_filter("manage_edit-simplecal_event_sortable_columns", [$this, 'columns_set_sortable']);
+				add_action("manage_simplecal_event_posts_custom_column", [$this, 'columns_set_values'], 10, 2);
+				add_action("pre_get_posts", [$this, 'columns_sort']);
+			}
+			if ('post.php' == $pagenow ) {
+				add_action('add_meta_boxes', [$this,'cpt_register_metaboxes']);
+				add_action('save_post_simplecal_event', [$this,'cpt_save_meta']);
+			}
+			
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
-			add_filter("manage_simplecal_event_posts_columns", [$this, 'columns_set']);
-			add_action("manage_edit-simplecal_event_sortable_columns", [$this, 'columns_set_sortable']);
-			add_action("manage_simplecal_event_posts_custom_column", [$this, 'columns_set_values'], 10, 2);
-			add_action("pre_get_posts", [$this, 'columns_sort']);
 			// TODO: Add CSS for admin panel
 		}
 	}
@@ -79,13 +87,15 @@ class SimpleCal {
 
 	function columns_set_values($column_name, $post_id) {
 		$meta = get_post_meta($post_id);
+		$post_start = new DateTime($meta['simplecal_event_start_timestamp'][0]);
+		$post_end = new DateTime($meta['simplecal_event_end_timestamp'][0]);
 
 		switch  ($column_name) {
 			case 'startDate':
-				$value = date('m/d/Y', $meta['simplecal_event_start_timestamp'][0]);
+				$value = $post_start->format('m/d/Y');
 				break;
 			case 'endDate':
-				$value = date('m/d/Y', $meta['simplecal_event_end_timestamp'][0]);
+				$value = $post_end->format('m/d/Y');
 				break;
 			case 'location':
 				$value = $meta['simplecal_event_venue_name'][0];
@@ -107,32 +117,34 @@ class SimpleCal {
 		if ('simplecal_event' != $query->get('post_type')) {
 			return;
 		}
-
+		
 		$orderby = $query->get('orderby');
 		switch ($orderby) {
 			case 'Start Date':
+				$query->set('orderby', 'meta_value');
 				$query->set('meta_key', 'simplecal_event_start_timestamp');
-				$query->set('orderby', 'meta_value_num');
+				$query->set('meta_type', 'DATETIME');
 				break;
 			case 'End Date':
+				$query->set('orderby', 'meta_value');
 				$query->set('meta_key', 'simplecal_event_end_timestamp');
-				$query->set('orderby', 'meta_value_num');
+				$query->set('meta_type', 'DATETIME');
 				break;
 			case 'Location':
-				$query->set('meta_key', 'simplecal_event_venue_name');
 				$query->set('orderby', 'meta_value');
+				$query->set('meta_key', 'simplecal_event_venue_name');
 				break;
 			case 'City':
-				$query->set('meta_key', 'simplecal_event_city');
 				$query->set('orderby', 'meta_value');
+				$query->set('meta_key', 'simplecal_event_city');
 				break;
 			case 'State':
-				$query->set('meta_key', 'simplecal_event_state');
 				$query->set('orderby', 'meta_value');
+				$query->set('meta_key', 'simplecal_event_state');
 				break;
 			case 'Country':
-				$query->set('meta_key', 'simplecal_event_country');
 				$query->set('orderby', 'meta_value');
+				$query->set('meta_key', 'simplecal_event_country');
 				break;
 			default:
 				$query->set('orderby', 'title');
@@ -182,29 +194,39 @@ class SimpleCal {
 	}
 
 	function cpt_meta_box_datetime($post, $args) {
-		echo "<small>All times displayed in the <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
-
 		$alldayevent = $post->simplecal_event_all_day;
 
 		echo '<div style="margin: 1em 0;"><label><input type="checkbox" name="event_all_day" id="simplecal_event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label></div>';
 
-		$metabox_ids = array("start", "end"); // Cycle through the start and end time metaboxes for the event
+		$metabox_ids = ["start", "end"]; // Cycle through the start and end time metaboxes for the event
 		foreach ($metabox_ids as $key) {
 			if ($post->{"simplecal_event_{$key}_timestamp"}) {
-				$time = "@" . $post->{"simplecal_event_{$key}_timestamp"};
-				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
+				$timestamp = new DateTime($post->{"simplecal_event_{$key}_timestamp"}); // Pull the meta in Unix timestamp format and set it as a DateTime object
 			} else {
-				$time = 'now';
-				$timestamp = new DateTime($time); // Pull the meta in Unix timestamp format and set it as a DateTime object
+				$timestamp = new DateTime('now', self::$tz); // Pull the meta in Unix timestamp format and set it as a DateTime object
 				$timestamp->setTime($timestamp->format('H'),0,0,0); // Reset the hours and seconds on the timestamp to 00
 			}
-			$timestamp->setTimeZone(self::$tz); // Specifying the timezone when creating a DateTime from a Unix timestamp does nothing, so we set it after
 			
 			$datetime_string = $timestamp->format('Y-m-d\TH:i');
 		
 			echo '<h3>' . ucfirst($key) . ' Date and Time</h3>';
 			echo '<input type="datetime-local" name="event_' . $key . '_datetime" id="simplecal_event_' . $key . '_datetime" value="' . $datetime_string . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
 		}
+
+		$post_timezone = $timestamp->getTimezone(); // Just use the last $timestamp object, presumably from the end_timestamp
+
+		//$timezones = DateTimeZone::listIdentifiers();
+		$timezone_list = $this->timezone_list();
+		
+		echo '<h3>Timezone</h3>';
+		echo '<input type="text" list="timezones" id="event_timezone" name="event_timezone" value="' . ($post->simplecal_event_timezone ?? $this->tz_string) . '"><br />';
+		echo '<datalist id="timezones">';
+		foreach ($timezone_list as $timezone => $display_name) {
+			echo "<option value='$timezone'>$display_name</option>";
+		}
+		echo '</datalist>';
+
+		echo "<small>The timezone defaults to <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
 		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
 	}
@@ -250,7 +272,7 @@ class SimpleCal {
 		</label>
 	<?php
 	}
-		
+
 	function cpt_meta_box_moreinfo($post, $args) {
 		$metabox_ids = ["website" => "url"];
 		
@@ -258,7 +280,7 @@ class SimpleCal {
 			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			echo '<input type="' . $type . '" class="fullwidth" name="event_' . $metabox_id . '" value="' . $post->{"simplecal_event_{$metabox_id}"} . '" /><br />';
 		}
-	}	
+	}
 
 	function cpt_save_meta($post_id) {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
@@ -275,13 +297,11 @@ class SimpleCal {
 
 		$metabox_ids = ['start', 'end']; // Cycle through the start and end timestamps for the event
 		foreach ($metabox_ids as $key) : // Format the fields and parse them as a DateTime object, then output the Unix timestamp to be saved to the event's meta
-			//$timestamp = DateTime::createFromFormat('Y-m-d H:i', $_POST["{$key}_date"] . ' ' . $_POST["{$key}_time"]);
-			$time = str_replace('T',' ',$_POST["event_{$key}_datetime"]);
-			$timestamp = new DateTime($time, self::$tz);
-			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format('U');
+			$timestamp = new DateTime($_POST["event_{$key}_datetime"], ($_POST['event_timezone'] ? new DateTimeZone($_POST['event_timezone']) : self::$tz));
+			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format(DATE_ATOM);
 		endforeach;
 
-		$metas = ['all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
+		$metas = ['timezone', 'all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
 		foreach ($metas as $meta) {
 			if (!empty($_POST['event_' . $meta])) {
 				$events_meta['simplecal_event_' . $meta] = $_POST['event_' . $meta];
@@ -308,10 +328,14 @@ class SimpleCal {
 	}
 	
 	function enqueue_admin_scripts($hook) {
-		if (!in_array($hook, ['post.php','post-new.php'])) {
-			return;
+		if (in_array($hook, ['post.php','post-new.php'])) {
+			$screen = get_current_screen();
+
+			if (is_object($screen) && 'simplecal_event' == $screen->post_type ){
+				wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). 'js/admin.js');
+			}
 		}
-		wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). 'js/admin.js');
+		return;
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -326,56 +350,56 @@ class SimpleCal {
 
 	//// WP AJAX INTERFACE ////
 	public function ajax_get_events() {
-
 		// Determine the desired page
 		$page = intval((array_key_exists('page', $_POST) ? $_POST['page'] : 0));
+		$posts_per_page = intval((array_key_exists('agendaPostsPerPage', $_POST) ? ($_POST['agendaPostsPerPage'] == 0 ? -1 : $_POST['agendaPostsPerPage']) : 10));
 		$page_param = ($page < 0 ? -$page : $page + 1);
 
 		// Build the query parameters
 		$args = [
-			'post_type' => 'simplecal_event'
+			'post_type' => 'simplecal_event',
+			'post_status' => 'publish',
+			'orderby' => 'meta_value',
+			'meta_key' => 'simplecal_event_start_timestamp',
+			'meta_type' => 'DATETIME'
 		];
 
 		// Build the query for agenda views
 		if ($_POST['displayStyle'] == 'agenda') {
 			$args = $args + [
-				'paged' => true,
-				'page' => $page_param,
-				'orderby' => 'meta_value_num'
+				'posts_per_page' => $posts_per_page,
+				'paged' => $page_param,
 			];
 			
 			if ($page >= 0) {
 				$args = $args + [
-					'meta_key' => 'simplecal_event_start_timestamp',
-					'meta_value' => date('U'),
+					'meta_value' => date('Y-m-d H:i:s'),
 					'meta_compare' => '>=',
-					'meta_type' => 'NUMERIC',
-					'order' => 'DESC'
+					'order' => 'ASC'
 				];
 			} else {
 				$args = $args + [
-					'meta_key' => 'simplecal_event_end_timestamp',
-					'order' => 'DESC',
-					'meta_type' => 'NUMERIC'
+					'order' => 'DESC'
 				];
 
 				if (array_key_exists('displayPastEventsDays', $_POST)) {
-					$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
-					$args = $args + [
-						'meta_value' => [$past_event_cutoff->format('U'), date('U')],
-						'meta_compare' => 'BETWEEN'
-					];
-				} else {
-					$args = $args + [
-						'meta_value' => date('U'),
-						'meta_compare' => '<='
-					];
+					if ($_POST['displayPastEventsDays'] == 0) {
+						$args = $args + [
+							'meta_value' => date('Y-m-d H:i:s'),
+							'meta_compare' => '<='
+						];
+					} else {
+						$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
+						$args = $args + [
+							'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+							'meta_compare' => 'BETWEEN'
+						];
+					}
 				}
 			}
 		}
 
 		// Build the query for calendar views
-
 		$events = new WP_Query($args);
 		
 		ob_start();
@@ -390,8 +414,14 @@ class SimpleCal {
 		$more_next = ((($page >= 0) && ($events->max_num_pages > $page_param)) || $page < 0);
 		wp_send_json_success([
 			'output' => $output,
+			'current_page' => $page,
+			'current_page_param' => $page_param,
 			'more_prev_pages' => $more_prev,
-			'more_next_pages' => $more_next
+			'more_next_pages' => $more_next,
+			'query' => $events->request,
+			'query_vars' => $events->query_vars,
+			'query_args' => $args,
+			'filters' => $GLOBALS['wp_filter']
 		]);		
 	}
 
@@ -406,18 +436,16 @@ class SimpleCal {
 	public static function event_get_the_date($format) {
 		global $post;
 
-		$starttime = "@" . $post->simplecal_event_start_timestamp;
-		$starttimestamp = new DateTime($starttime);
-		$starttimestamp->setTimeZone(self::$tz);
+		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
+		$starttimestamp = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		
-		if ($post->_end_timestamp) {
-			$endtime = "@" . $post->simplecal_event_end_timestamp;
+		if ($post->simplecal_event_end_timestamp) {
+			$endtime = $post->simplecal_event_end_timestamp;
 		} else {
 			$endtime = $starttime;
 		}
 
-		$endtimestamp = new DateTime($endtime);
-		$endtimestamp->setTimeZone(self::$tz);
+		$endtimestamp = new DateTime($endtime, $post_timezone);
 
 		switch ($format) {
 			case "datetime":
@@ -548,6 +576,39 @@ class SimpleCal {
 	function country_input($dom_name) {
 		echo $this->get_country_input($dom_name);
 	}
+
+	function timezone_list() {
+		static $timezones = null;
+		
+		if ($timezones === null) {
+			$timezones = [];
+			$offsets = [];
+			$now = new DateTime('now', new DateTimeZone('UTC'));
+			
+			foreach (DateTimeZone::listIdentifiers() as $timezone) {
+				$now->setTimezone(new DateTimeZone($timezone));
+				$offsets[] = $offset = $now->getOffset();
+				$timezones[$timezone] = '(' . $this->format_GMT_offset($offset) . ') ' . $this->format_timezone_name($timezone);
+			}
+			
+			array_multisort($offsets, $timezones);
+		}
+		
+		return $timezones;
+	}
+	
+	function format_GMT_offset($offset) {
+		$hours = intval($offset / 3600);
+		$minutes = abs(intval($offset % 3600 / 60));
+		return 'GMT' . ($offset!==false ? sprintf('%+03d:%02d', $hours, $minutes) : '');
+	}
+	
+	function format_timezone_name($name) {
+		$name = str_replace('/', '- ', $name);
+		$name = str_replace('_', ' ', $name);
+		$name = str_replace('St ', 'St. ', $name);
+		return $name;
+	}
 }
 
 class SimpleCal_Widget extends WP_Widget {
@@ -560,7 +621,7 @@ class SimpleCal_Widget extends WP_Widget {
 		);
 	}
 
-	public function widget( $args, $instance ) {
+	public function widget($args, $instance) {
 		echo $args['before_widget'];
 		if ( ! empty( $instance['title'] ) ) {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
@@ -569,19 +630,19 @@ class SimpleCal_Widget extends WP_Widget {
 		echo $args['after_widget'];
 	}
 
-	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : 'Calendar';
+	public function form($instance) {
+		$title = !empty($instance['title']) ? $instance['title'] : 'Calendar';
 ?>
 		<p>
-		<label for="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>">Title:</label> 
-		<input class="widefat" id="<?= esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?= esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?= esc_attr( $title ); ?>">
+		<label for="<?= esc_attr($this->get_field_id('title')); ?>">Title:</label> 
+		<input class="widefat" id="<?= esc_attr($this->get_field_id('title')); ?>" name="<?= esc_attr($this->get_field_name('title')); ?>" type="text" value="<?= esc_attr($title); ?>">
 		</p>
 		<?php 
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance = array();
-		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? sanitize_text_field( $new_instance['title'] ) : '';
+		$instance = [];
+		$instance['title'] = (!empty($new_instance['title'])) ? sanitize_text_field($new_instance['title']) : '';
 
 		return $instance;
 	}

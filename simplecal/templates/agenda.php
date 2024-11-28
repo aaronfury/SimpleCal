@@ -7,14 +7,18 @@ if ($events->have_posts()) {
 		$events->the_post();
 		$post_id = get_the_ID();
 
-		if ($_POST['agendaShowMonthYearHeaders']) {
-			if ($prev_event_year && $prev_event_year != date('Y', $post->simplecal_event_start_timestamp)) {
-				echo "<div class='simplecal_list_year_header'>" . date('Y', $post->simplecal_event_start_timestamp) . "</div>";
-			}
-			$prev_event_year = date('Y', $post->simplecal_event_start_timestamp); // Since we want it to skip showing the year header for the first time, we set it regardless of whether it's changed, but we do it after the echo so that it doesn't factor into the first iteration
+		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : SimpleCal::$tz;
+		$start_datetime = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
+		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 
-			if (!$prev_event_month || ("$prev_event_month $prev_event_year" != date('F Y', $post->simplecal_event_start_timestamp))) {
-				$prev_event_month = date('F', $post->simplecal_event_start_timestamp); // Update the previous month marker
+		if ($_POST['agendaShowMonthYearHeaders']) {
+			if ($prev_event_year && $prev_event_year != $start_datetime->format('Y')) {
+				echo "<div class='simplecal_list_year_header'>" . $start_datetime->format('Y') . "</div>";
+			}
+			$prev_event_year = $start_datetime->format('Y'); // Since we want it to skip showing the year header for the first time, we set it regardless of whether it's changed, but we do it after the echo so that it doesn't factor into the first iteration
+
+			if (!$prev_event_month || ("$prev_event_month $prev_event_year" != $start_datetime->format('F Y'))) {
+				$prev_event_month = $start_datetime->format('F'); // Update the previous month marker
 				echo "<div class='simplecal_list_month_header" . (strtotime("$prev_event_month 1, $prev_event_year") < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>$prev_event_month</div>";
 			}
 		}

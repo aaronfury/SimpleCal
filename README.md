@@ -20,3 +20,4 @@ I love you all.
 * Date (month) selection
 * Calendar view
 * Option to auto-delete old events
+* Infinite Scroll??

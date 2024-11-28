@@ -36,6 +36,7 @@ function Edit({
   attributes,
   setAttributes
 }) {
+  const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)();
   const {
     title = 'Calendar of Events',
     eventTags = 'all',
@@ -53,7 +54,9 @@ function Edit({
     displayPastEventsDays = 7,
     displayFutureEventsDays = 30
   } = attributes;
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    ...blockProps
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
     title: "Settings"
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
     label: "Title",
@@ -132,9 +135,12 @@ function Edit({
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
     label: "Display this number of events at a time",
     help: "Set to '0' to display all events",
+    min: "0",
+    spinControls: "custom",
+    __next40pxDefaultSize: true,
     value: agendaPostsPerPage,
     onChange: value => setAttributes({
-      agendaPostsPerPage: value
+      agendaPostsPerPage: parseInt(value)
     })
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
     label: "Display pagination at top or bottom of agenda view",
@@ -166,9 +172,12 @@ function Edit({
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
     label: "Display events for X days in the future",
     help: "Set to '0' to display all future events",
+    spinControls: "custom",
+    min: "0",
+    __next40pxDefaultSize: true,
     value: displayFutureEventsDays,
     onChange: value => setAttributes({
-      displayFutureEventsDays: value
+      displayFutureEventsDays: parseInt(value)
     })
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
     label: "Display past events",
@@ -181,13 +190,14 @@ function Edit({
   }), displayPastEvents ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
     label: "Display events for X days in the past",
     help: "Set to '0' to display all past events",
+    spinControls: "custom",
+    min: "0",
+    __next40pxDefaultSize: true,
     value: displayPastEventsDays,
     onChange: value => setAttributes({
-      displayPastEventsDays: value
+      displayPastEventsDays: parseInt(value)
     })
-  })) : null)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
-    ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)()
-  }, title && title != '' ? title : 'SimpleCal Calendar'));
+  })) : null)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, title && title != '' ? title : 'SimpleCal Calendar'));
 }
 
 /***/ }),

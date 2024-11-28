@@ -11,10 +11,29 @@ import './editor.scss';
  *
  * @return {Element} Element to render.
  */
-export default function Edit( { attributes, setAttributes }) {
-	const {title = 'Calendar of Events', eventTags = 'all', displayStyle = 'agenda', hideOnNoEvents = false, noEventsText = "There are no upcoming events.", blockTheme = 'theme1', agendaLayout = 'layout1', agendaShowThumbnail = false, agendaShowExcerpt = false, agendaPostsPerPage = 10, agendaDisplayPagination = 'both', agendaShowMonthYearHeaders = true, displayPastEvents = false, displayPastEventsDays = 7, displayFutureEventsDays = 30} = attributes;
+export default function Edit({ attributes, setAttributes }) {
+	const blockProps = useBlockProps();
+
+	const {
+		title = 'Calendar of Events',
+		eventTags = 'all',
+		displayStyle = 'agenda',
+		hideOnNoEvents = false,
+		noEventsText = "There are no upcoming events.",
+		blockTheme = 'theme1',
+		agendaLayout = 'layout1',
+		agendaShowThumbnail = false,
+		agendaShowExcerpt = false,
+		agendaPostsPerPage = 10,
+		agendaDisplayPagination = 'both',
+		agendaShowMonthYearHeaders = true,
+		displayPastEvents = false,
+		displayPastEventsDays = 7,
+		displayFutureEventsDays = 30
+	} = attributes;
+
 	return (
-		<>
+		<div {...blockProps}>
 			<InspectorControls>
 				<PanelBody title="Settings">
 					<TextControl
@@ -92,8 +111,11 @@ export default function Edit( { attributes, setAttributes }) {
 					<NumberControl
 						label= "Display this number of events at a time"
 						help= "Set to '0' to display all events"
+						min='0'
+						spinControls='custom'
+						__next40pxDefaultSize= {true}
 						value= {agendaPostsPerPage}
-						onChange= {(value) => setAttributes({agendaPostsPerPage: value})}
+						onChange= {(value) => setAttributes({agendaPostsPerPage: parseInt(value)})}
 					/>
 					<SelectControl
 						label="Display pagination at top or bottom of agenda view"
@@ -116,8 +138,11 @@ export default function Edit( { attributes, setAttributes }) {
 					<NumberControl
 						label= "Display events for X days in the future"
 						help= "Set to '0' to display all future events"
+						spinControls='custom'
+						min='0'
+						__next40pxDefaultSize= {true}
 						value= {displayFutureEventsDays}
-						onChange= {(value) => setAttributes({displayFutureEventsDays: value})}
+						onChange= {(value) => setAttributes({displayFutureEventsDays: parseInt(value)})}
 					/>
 					<ToggleControl
 						label= "Display past events"
@@ -131,15 +156,18 @@ export default function Edit( { attributes, setAttributes }) {
 							<NumberControl
 								label= "Display events for X days in the past"
 								help= "Set to '0' to display all past events"
+								spinControls='custom'
+								min='0'
+								__next40pxDefaultSize= {true}
 								value= {displayPastEventsDays}
-								onChange= {(value) => setAttributes({displayPastEventsDays: value})}
+								onChange= {(value) => setAttributes({displayPastEventsDays: parseInt(value)})}
 							/>
 						</>
 						: null
 					}
 				</PanelBody>
 			</InspectorControls>
-			<p { ...useBlockProps() }>{(title && title != '') ? title : 'SimpleCal Calendar'}</p>
-		</>
+			<p>{(title && title != '') ? title : 'SimpleCal Calendar'}</p>
+		</div>
 	);
 }
