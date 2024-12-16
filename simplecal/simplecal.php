@@ -52,6 +52,9 @@ class SimpleCal {
 			
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
 			// TODO: Add CSS for admin panel
+		} else {
+			add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+			add_filter('single_template', [$this,'cpt_register_templates']);
 		}
 	}
 
@@ -176,6 +179,7 @@ class SimpleCal {
 			'rewrite' => ['slug' => 'events', 'with_front' => false],
 			'rest_base' => 'simplecal_event',
     		'rest_controller_class' => 'WP_REST_Posts_Controller',
+			'has_archive' => 'events'
 		]
 		);
 
@@ -184,6 +188,15 @@ class SimpleCal {
 				return get_post_meta( $data['id'], '', '' );
 			}]
 		);
+	}
+
+	function cpt_register_templates($template) {
+		global $post;
+	
+		if ( 'simplecal_event' === $post->post_type && locate_template( array( 'single-simplecal-event.php' ) ) !== $template ) {
+			return plugin_dir_path( __FILE__ ) . '/templates/single-simplecal-event.php';
+		}
+		return $template;
 	}
 
 	function cpt_register_metaboxes() {
@@ -312,12 +325,8 @@ class SimpleCal {
 
 		foreach ($events_meta as $key => $value) {
 			$value = implode(',', (array)$value);
-			if ($post->{$key}) {
-				update_post_meta($post_id, $key, $value);
-			} else {
-				add_post_meta($post_id, $key, $value);
-			}
-			if (!$value) delete_post_meta($post_id, '_' . $key);
+			update_post_meta($post_id, $key, $value);
+			if (!$value) delete_post_meta($post_id, $key);
 		}
 
 		// Save the selected state to prepopulate it on the next event.
@@ -336,6 +345,10 @@ class SimpleCal {
 			}
 		}
 		return;
+	}
+
+	function enqueue_styles($hook) {
+		wp_enqueue_style('simplecal_css', plugin_dir_url(__FILE__) . '/templates/style.css');
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -433,7 +446,7 @@ class SimpleCal {
 	}
 
 	// Retrieve the date from within the loop
-	public static function event_get_the_date($format) {
+	public static function event_get_the_date($format = 'fulldatetime') {
 		global $post;
 
 		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
@@ -442,15 +455,55 @@ class SimpleCal {
 		if ($post->simplecal_event_end_timestamp) {
 			$endtime = $post->simplecal_event_end_timestamp;
 		} else {
-			$endtime = $starttime;
+			$endtime = $starttimestamp;
 		}
 
 		$endtimestamp = new DateTime($endtime, $post_timezone);
 
 		switch ($format) {
-			case "datetime":
+			case 'startdatetime':
 				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
 					$data = $starttimestamp->format('M d, Y \a\t g:i a');
+				} else {
+					$data = $starttimestamp->format('M d, Y');
+				}
+				break;
+			case 'enddatetime':
+				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+					$data = $endtimestamp->format('M d, Y \a\t g:i a');
+				} else {
+					$data = $endtimestamp->format('M d, Y');
+				}
+				break;
+			case 'startdate':
+				$data = $starttimestamp->format('M d, Y');
+				break;
+			case 'enddate':
+				$data = $endtimestamp->format('M d, Y');
+				break;
+			case 'startdow':
+				$data = $starttimestamp->format('l');
+				break;
+			case 'enddow':
+				$data = $endtimestamp->format('l');
+				break;
+			case 'starttime':
+				$data = $starttimestamp->format('g:i a');
+				break;
+			case 'endtime':
+				$data = $endtimestamp->format('g:i a');
+				break;
+			case 'eventmeta1':
+				$data = '<div class="simplecal_event_meta"><span class="simplecal_event_meta_value">';
+				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+					$data .= $starttimestamp->format('M d, Y g:i a');
+					if ($starttimestamp->format('Y-m-d') != $endtimestamp->format('Y-m-d')) { // If the start and end dates are not the same, append the end date
+						$data .= ' - ' . $endtimestamp->format('Y-m-d g:i a');
+					} else {
+						if ($starttimestamp->format('g:i a') != $endtimestamp->format('g:i a')) {
+							$data .= ' - ' . $endtimestamp->format('g:i a');
+						}
+					}
 				} else {
 					if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) { // If the start and end dates are the same, just return the start date
 						$data = $starttimestamp->format('M d, Y');
@@ -460,29 +513,39 @@ class SimpleCal {
 						$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
 					}
 				}
+				$data .= '</span></div>';
 				break;
-			case "date":
-				if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) { // If the start and end dates are the same, just return the start date
-					$data = $starttimestamp->format('M d, Y');
-				} elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) { // If the start and end month/year are the same, just provide a dashed date
-					$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
-				} else { // If months aren't the same, return the full start and end dates
-					$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
-				}
-				break;
-			case "time" :
-				if ($post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-					$data = "All day";
-				} else {
-					$data = $starttimestamp->format('g:i a');
-					if ($endtime != $starttime) {
-						$data .= ' - ' . $endtimestamp->format('g:i a');
-					}
+			case 'eventmeta2':
+				// TODO: Add "Doors"
+				$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Start</span><span class="simplecal_event_meta_value">' . $starttimestamp->format('M d, Y g:i a') . '</span></div>';
+				if ($starttimestamp != $endtimestamp) {
+					$data .= '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">End</span><span class="simplecal_event_meta_value">' . $endtimestamp->format('M d, Y g:i a') . '</span></div>';
 				}
 				break;
 		}
 
 		return $data;
+	}
+
+	public static function event_get_the_location($format, $maplink) {
+		// TODO: Holy shit this is god-awful code. Just horrendous. Every single thing about this is trash. Fix it. Fix it before anyone sees!
+		global $post;
+		
+		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
+			$link = urlencode(implode(", ", array_filter([$post->simplecal_event_venue_name, $post->simplecal_event_street_address, $post->simplecal_event_city, $post->simplecal_event_state, $post->simplecal_event_country], 'strlen')));
+
+			switch ($format) {
+			 	case 'eventmeta1' :
+					$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">' . ($maplink == 'linktext' && $link ? '<a href="https://maps.apple.com/q=' . $link . '">' : '') .'<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' .  ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '' ) . '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' . ($post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '') . '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' . ($maplink == 'linktext' && $link ? '</a>' : '') . '</span></div>';
+					break;
+				default :
+					$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">IT\'S SOMEWHERE</span></div>';
+			}
+
+			return $data;
+		} else {
+			return '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">NONE</span></div>';
+		}
 	}
 
 	public static function get_formatted_website($url, $link_text = "More information") {

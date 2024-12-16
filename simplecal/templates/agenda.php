@@ -47,7 +47,7 @@ if ($events->have_posts()) {
 					<?= SimpleCal::event_get_the_date("time"); ?>
 				</div>
 <?php
-		if (!$post->simplecal_event_private_location || (($post->simpelcal_event_private_location) && is_user_logged_in())) {
+		if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
 ?>
 				<div class="simplecal_list_item_location">
 <?php
