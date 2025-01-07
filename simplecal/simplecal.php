@@ -209,7 +209,7 @@ class SimpleCal {
 	function cpt_meta_box_datetime($post, $args) {
 		$alldayevent = $post->simplecal_event_all_day;
 
-		echo '<div style="margin: 1em 0;"><label><input type="checkbox" name="event_all_day" id="simplecal_event_all_day" value="true" ' . checked($alldayevent) . ' /> All day event?</label></div>';
+		echo '<div style="margin: 1em 0;"><label><input type="checkbox" name="event_all_day" id="simplecal_event_all_day" value="true" ' . ($alldayevent ? 'checked="checked"' : '') . ' /> All day event?</label></div>';
 
 		$metabox_ids = ["start", "end"]; // Cycle through the start and end time metaboxes for the event
 		foreach ($metabox_ids as $key) {
@@ -220,10 +220,10 @@ class SimpleCal {
 				$timestamp->setTime($timestamp->format('H'),0,0,0); // Reset the hours and seconds on the timestamp to 00
 			}
 			
-			$datetime_string = $timestamp->format('Y-m-d\TH:i');
+			$datetime_string = $alldayevent ? $timestamp->format('Y-m-d') : $timestamp->format('Y-m-d\TH:i');
 		
 			echo '<h3>' . ucfirst($key) . ' Date and Time</h3>';
-			echo '<input type="datetime-local" name="event_' . $key . '_datetime" id="simplecal_event_' . $key . '_datetime" value="' . $datetime_string . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
+			echo '<input type="' . ($alldayevent ? 'date' : 'datetime-local') . '" name="event_' . $key . '_datetime" id="simplecal_event_' . $key . '_datetime" value="' . $datetime_string . '" ' . ($key == 'start' ? 'required ' : '') . '/>';
 		}
 
 		$post_timezone = $timestamp->getTimezone(); // Just use the last $timestamp object, presumably from the end_timestamp
@@ -241,7 +241,7 @@ class SimpleCal {
 
 		echo "<small>The timezone defaults to <em>$this->tz_string</em> time zone based on your WordPress settings.</small>";
 
-		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"><p>The event\'s end date/time must be after the start date/time.</p></div>';
+		echo '<div id="simplecal_event_datetime_error" style="display: none; color: red;"></div>';
 	}
 
 	function cpt_meta_box_location($post, $args) {
@@ -316,7 +316,7 @@ class SimpleCal {
 
 		$metas = ['timezone', 'all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
 		foreach ($metas as $meta) {
-			if (!empty($_POST['event_' . $meta])) {
+			if (isset($_POST['event_' . $meta])) {
 				$events_meta['simplecal_event_' . $meta] = $_POST['event_' . $meta];
 			} else {
 				$events_meta['simplecal_event_' . $meta] = NULL;
@@ -446,85 +446,124 @@ class SimpleCal {
 	}
 
 	// Retrieve the date from within the loop
-	public static function event_get_the_date($format = 'fulldatetime') {
+	public static function event_get_the_date(string $date_or_time = 'both', string $start_or_end = "both", string $date_format = 'M d, Y', string $time_format = 'g:i a', string $span_link = ' - ', string $date_time_link = ' at ', ) {
+		// TODO: Add support for "doors" time. Maybe a separate function?
 		global $post;
 
 		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
 		$starttimestamp = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		
-		if ($post->simplecal_event_end_timestamp) {
+		if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
 			$endtime = $post->simplecal_event_end_timestamp;
-		} else {
-			$endtime = $starttimestamp;
+			$endtimestamp = new DateTime($endtime, $post_timezone);
 		}
 
-		$endtimestamp = new DateTime($endtime, $post_timezone);
+		$date_string = '';
 
-		switch ($format) {
-			case 'startdatetime':
-				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-					$data = $starttimestamp->format('M d, Y \a\t g:i a');
-				} else {
-					$data = $starttimestamp->format('M d, Y');
-				}
-				break;
-			case 'enddatetime':
-				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-					$data = $endtimestamp->format('M d, Y \a\t g:i a');
-				} else {
-					$data = $endtimestamp->format('M d, Y');
-				}
-				break;
-			case 'startdate':
-				$data = $starttimestamp->format('M d, Y');
-				break;
-			case 'enddate':
-				$data = $endtimestamp->format('M d, Y');
-				break;
-			case 'startdow':
-				$data = $starttimestamp->format('l');
-				break;
-			case 'enddow':
-				$data = $endtimestamp->format('l');
-				break;
-			case 'starttime':
-				$data = $starttimestamp->format('g:i a');
-				break;
-			case 'endtime':
-				$data = $endtimestamp->format('g:i a');
-				break;
-			case 'eventmeta1':
-				$data = '<div class="simplecal_event_meta"><span class="simplecal_event_meta_value">';
-				if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-					$data .= $starttimestamp->format('M d, Y g:i a');
-					if ($starttimestamp->format('Y-m-d') != $endtimestamp->format('Y-m-d')) { // If the start and end dates are not the same, append the end date
-						$data .= ' - ' . $endtimestamp->format('Y-m-d g:i a');
-					} else {
-						if ($starttimestamp->format('g:i a') != $endtimestamp->format('g:i a')) {
-							$data .= ' - ' . $endtimestamp->format('g:i a');
+		// Formatting is too different to mess with nested switches and whatnot
+		switch ($start_or_end) {
+			case 'start':
+				switch ($date_or_time) {
+					case 'date' :
+						$date_string .= $starttimestamp->format($date_format);
+						break;
+					case 'both':
+						$date_string .= $starttimestamp->format($date_format);
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+							$date_string .= $date_time_link;
 						}
-					}
-				} else {
-					if ($starttimestamp->format('Y-m-d') == $endtimestamp->format('Y-m-d')) { // If the start and end dates are the same, just return the start date
-						$data = $starttimestamp->format('M d, Y');
-					} elseif ($starttimestamp->format('Y-m') == $endtimestamp->format('Y-m')) { // If the start and end month/year are the same, just provide a dashed date
-						$data = $starttimestamp->format('M d - ') . $endtimestamp->format('d, Y');
-					} else { // If months aren't the same, return the full start and end dates
-						$data = $starttimestamp->format('M d, Y') . ' - ' . $endtimestamp->format('M d, Y');
-					}
+					case 'time':
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+							$date_string .= $starttimestamp->format($time_format);
+						}
+						break;
 				}
-				$data .= '</span></div>';
-				break;
-			case 'eventmeta2':
-				// TODO: Add "Doors"
-				$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Start</span><span class="simplecal_event_meta_value">' . $starttimestamp->format('M d, Y g:i a') . '</span></div>';
-				if ($starttimestamp != $endtimestamp) {
-					$data .= '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">End</span><span class="simplecal_event_meta_value">' . $endtimestamp->format('M d, Y g:i a') . '</span></div>';
+				return $date_string;
+			case 'end':
+				if (!isset($endtime)) {
+					return null;
 				}
-				break;
-		}
 
-		return $data;
+				switch ($date_or_time) {
+					case 'date' :
+						$date_string .= $endtimestamp->format($date_format);
+						break;
+					case 'both':
+						$date_string .= $endtimestamp->format($date_format);
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
+							$date_string .= $date_time_link;
+						}
+					case 'time':
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
+							$date_string .= $endtimestamp->format($time_format);
+						}
+						break;
+				}
+				return $date_string;
+			case 'both':
+				switch ($date_or_time) {
+					case 'date' :
+						$date_string .= $starttimestamp->format($date_format);
+						break;
+					case 'both':
+						$date_string .= $starttimestamp->format($date_format);
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
+							$date_string .= ' ';
+						}
+					case 'time':
+						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+							$date_string .= $starttimestamp->format($time_format);
+						}
+						break;
+				}
+
+				if (!isset($endtime)) {
+					return $date_string;
+				}
+
+				$date_string .= $span_link;
+
+				if ($starttimestamp->format('ymd') == $endtimestamp->format('ymd')) { // If start and end date are the same
+					if ($date_or_time == 'date') { // If it's only meant to return dates, then just return the start date
+						return $date_string;
+					}
+
+					if (!$post->simplecal_event_all_day || $starttimestamp->format('Hi') != $endtimestamp->format('Hi')) { // If it's not an all-day event and start and end times are different, append the end time
+						if ($date_or_time == 'both') $date_string .= ' ';
+						$date_string .= $endtimestamp->format($time_format);
+					}
+
+					return $date_string;
+				} else { // If start and end date are different
+					$date_string .= $endtimestamp->format($date_format);
+					
+					switch ($date_or_time) {
+						case 'date': // If it's only meant to return dates, return only the date portion
+							return $date_string;
+						case 'both':
+							if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
+								$date_string .= ' ';
+							}
+						case 'time':
+							if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
+								$date_string .= $endtimestamp->format($time_format);
+							}
+							break;
+					}
+					
+				}
+			return $date_string;
+		}
+	}
+
+	public static function event_has_valid_end_timestamp() {
+		global $post;
+		
+		if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static function event_get_the_location($format, $maplink) {

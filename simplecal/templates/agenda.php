@@ -38,13 +38,17 @@ if ($events->have_posts()) {
 					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
 				</div>
 				<div class="simplecal_list_item_meta simplecal_list_item_datetime">
-					<?= SimpleCal::event_get_the_date("datetime"); ?>
+					<div class="simplecal_event_meta">
+						<span class="simplecal_event_meta_value">	
+							<?= SimpleCal::event_get_the_date(); ?>
+						</span>
+					</div>
 				</div>
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<?= SimpleCal::event_get_the_date("date"); ?>
+					<?= SimpleCal::event_get_the_date("date","both"); ?>
 				</div>
 				<div class="simplecal_list_item_meta simplecal_list_item_time">
-					<?= SimpleCal::event_get_the_date("time"); ?>
+					<?= SimpleCal::event_get_the_date("time","both"); ?>
 				</div>
 <?php
 		if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
