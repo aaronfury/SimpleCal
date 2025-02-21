@@ -85,14 +85,17 @@ export default function Edit({ attributes, setAttributes }) {
 					<RadioControl
 						label= "Agenda Item Layout"
 						selected= {agendaLayout}
-						disabled= {true}
 						options= {[
 							{
 								label: 'Layout 1',
 								value: 'layout1'
 							},
+							{
+								label: 'Layout 2',
+								value: 'layout2'
+							},
 						]}
-						onChange= {(value) => setAttributes({blockTheme: value})}
+						onChange= {(value) => setAttributes({agendaLayout: value})}
 					/>
 					<ToggleControl
 						label= "Show thumbnails"

@@ -10,8 +10,10 @@ Probably a good time to say this is all unsupported and I wish you all the best 
 I love you all.
 
 ## Major To-Dos
-* Pagination
+* ~~Pagination~~ DONE. AND AWESOME.
 * Default to current month if show previous events is selected
+* Better styling
+* Custom CSS support
 * Filter/search
 * Support for "Doors" time
 * Event pricing

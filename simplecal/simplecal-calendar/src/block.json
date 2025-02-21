@@ -26,7 +26,8 @@
 			"default": "There are no upcoming events."
 		},
 		"agendaLayout": {
-			"type": "integer"
+			"type": "string",
+			"default": "layout1"
 		},
 		"agendaShowThumbnail": {
 			"type": "boolean",

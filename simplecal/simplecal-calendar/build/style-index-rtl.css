@@ -6,6 +6,38 @@
   padding: 4px;
 }
 
+.simplecal_event_meta {
+  display: table;
+}
+.simplecal_event_meta .simplecal_event_meta_row {
+  display: table-row;
+}
+.simplecal_event_meta .simplecal_event_meta_label {
+  display: table-cell;
+  padding-left: 0.5em;
+  text-transform: uppercase;
+}
+.simplecal_event_meta .simplecal_event_meta_label::after {
+  content: ":";
+}
+.simplecal_event_meta .simplecal_event_meta_value {
+  display: table-cell;
+}
+
+.simplecal_events_wrapper {
+  min-height: 200px;
+  max-height: 600px;
+  overflow-y: scroll;
+  scrollbar-color: #a0a0a0 rgba(0, 0, 0, 0);
+  scrollbar-gutter: stable;
+}
+
+.simplecal_no_events {
+  font-style: italic;
+  text-align: center;
+  margin: 1em auto;
+}
+
 /*
 	div.simplecal_themeX
 		h2.simplecal_title
@@ -49,6 +81,7 @@
        column-gap: 0.25em;
   justify-content: center;
   transition: 0.25s all ease-in-out;
+  align-items: center;
   cursor: default;
 }
 .simplecal_theme1 .simplecal_nav_prev.active, .simplecal_theme1 .simplecal_nav_next.active {
@@ -58,6 +91,9 @@
 .simplecal_theme1 .simplecal_nav_prev.active:hover, .simplecal_theme1 .simplecal_nav_next.active:hover {
   font-weight: bold;
 }
+.simplecal_theme1 .simplecal_nav_prev span, .simplecal_theme1 .simplecal_nav_next span {
+  line-height: unset !important;
+}
 .simplecal_theme1 .simplecal_list_year_header, .simplecal_theme1 .simplecal_list_month_header {
   margin: 0.25em 0;
   font-size: 1.5em;
@@ -66,51 +102,69 @@
 .simplecal_theme1 .simplecal_list_month_header {
   font-size: 1.25em;
 }
-.simplecal_theme1 .simplecal_list_item {
+.simplecal_theme1 .simplecal_list_month_header ~ .simplecal_list_item_layout1 {
+  margin-right: 2em;
+}
+
+.simplecal_list_item_layout1 + .simplecal_list_item_layout1 {
+  margin-top: 2em;
+}
+
+.simplecal_list_item_layout1 {
   display: flex;
   flex-flow: row nowrap;
-  margin: 10px 0;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail {
+.simplecal_list_item_layout1 .simplecal_list_item_thumbnail {
   flex: 0 0 100px;
   margin-left: 10px;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_thumbnail img {
+.simplecal_list_item_layout1 .simplecal_list_item_thumbnail img {
   max-width: 100%;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper {
   flex: 1 1 auto;
   display: flex;
   flex-flow: column nowrap;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper a {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper a {
   text-decoration: none;
   color: #1b4a70;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_meta {
-  margin: 0.25em 0;
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_meta {
   display: flex;
   flex-flow: row nowrap;
   -moz-column-gap: 0.5em;
        column-gap: 0.5em;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_title {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_title {
   font-size: 1.25em;
+  font-weight: bold;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
   color: #606060;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_date,
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_time {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
   display: none;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_excerpt p:first-of-type {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_excerpt p:first-of-type {
   margin-top: 0;
 }
-.simplecal_theme1 .simplecal_list_item .simplecal_list_item_content_wrapper .material-symbols-outlined {
+.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .material-symbols-outlined {
   vertical-align: middle;
   font-size: 1em;
 }
-.simplecal_theme1 .simplecal_past_event {
+
+.simplecal_past_event {
   opacity: 0.6;
+}
+
+.simplecal_list_item_layout2 {
+  padding: 0.5em;
+  margin: 1em;
+  border: 1px solid rgba(187, 170, 187, 0.6666666667);
+  border-radius: 8px;
+  display: flex;
+  flex-flow: row nowrap;
+  -moz-column-gap: 0.25em;
+       column-gap: 0.25em;
 }

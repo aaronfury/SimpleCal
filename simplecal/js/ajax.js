@@ -4,7 +4,7 @@ $(document).ready(() => {
 
 		var formData = scGetFormData(instance);
 		
-		if (formData['displayPastEvents'] && formData['page'] == 0) {
+		if (formData.displayPastEvents && formData.page == 0) {
 			$(instance).find('.simplecal_nav_prev').addClass('active');
 		}
 
@@ -22,13 +22,20 @@ $(document).ready(() => {
 	
 			if ($(event.currentTarget).hasClass('simplecal_nav_prev')) {
 				$(instance).data().page--;
+				$(instance).find('.simplecal_nav_prev').removeClass('active');
 			} else {
 				$(instance).data().page++;
+				$(instance).find('.simplecal_nav_next').removeClass('active');
 			}
+			
+			localStorage.setItem('simplecal_page', $(instance).data().page);
 			var formData = scGetFormData($(instance));
 
 			scGetEvents(formData).done((response) => {
-				$(instance).children('.simplecal_events_wrapper').fadeTo(0).html(response.data.output).css('opacity',1);
+				$(instance).children('.simplecal_events_wrapper').fadeOut(function() {
+					$(this).html(response.data.output);
+				}).fadeIn();
+
 				if (response.data.more_next_pages) {
 					$(instance).find('.simplecal_nav_next').addClass('active');
 				} else {
@@ -53,11 +60,12 @@ function scGetFormData(instance) {
 		'displayPastEvents' : $(instance).data('displayPastEvents'),
 		'displayPastEventsDays' : $(instance).data('displayPastEventsDays'),
 		'displayFutureEventsDays' : $(instance).data('displayFutureEventsDays'),
+		'agendaLayout' : $(instance).data('agendaLayout'),
 		'agendaShowMonthYearHeaders' : $(instance).data('agendaShowMonthYearHeaders'),
 		'agendaPostsPerPage' : $(instance).data('agendaPostsPerPage'),
 		'agendaShowThumbnail' : $(instance).data('agendaShowThumbnail'),
 		'agendaShowExcerpt' : $(instance).data('agendaShowExcerpt'),
-		'page' : $(instance).data('page')
+		'page' : localStorage.getItem('simplecal_page') ?? $(instance).data('page') // Whenever the form is enumerated, read the local storage for the page number if it exists. This won't work well if multiple instances are present on a single page, we'll need to assign a unique ID to each instance but not sure how to make that persistent. Later.
 	}
 
 	return formData;

@@ -11,7 +11,7 @@ if ($events->have_posts()) {
 		$start_datetime = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 
-		if ($_POST['agendaShowMonthYearHeaders']) {
+		if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
 			if ($prev_event_year && $prev_event_year != $start_datetime->format('Y')) {
 				echo "<div class='simplecal_list_year_header'>" . $start_datetime->format('Y') . "</div>";
 			}
@@ -23,40 +23,22 @@ if ($events->have_posts()) {
 			}
 		}
 ?>
-		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < time() ? 'simplecal_past_event':''?>">
-<?php
-		if ($_POST["agendaShowThumbnail"]) {
-?>
-			<div class="simplecal_list_item_thumbnail">
-				<img src="<?php the_post_thumbnail_url();?>" />
-			</div>
-<?php
-		}
-?>
-			<div class="simplecal_list_item_content_wrapper">
-				<div class="simplecal_list_item_title">
-					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
-				</div>
-				<div class="simplecal_list_item_meta simplecal_list_item_datetime">
-					<div class="simplecal_event_meta">
-						<span class="simplecal_event_meta_value">	
-							<?= SimpleCal::event_get_the_date(); ?>
-						</span>
-					</div>
-				</div>
+		<div class="simplecal_list_item simplecal_list_item_layout2 <?= $post->simplecal_event_end_timestamp < time() ? 'simplecal_past_event':''?>">
+			<div class="sinmplecal_list_item_container">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<?= SimpleCal::event_get_the_date("date","both"); ?>
+					<?= SimpleCal::event_get_the_date("date","both", "M d"); ?>
 				</div>
 				<div class="simplecal_list_item_meta simplecal_list_item_time">
 					<?= SimpleCal::event_get_the_date("time","both"); ?>
 				</div>
-<?php
-		if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
-?>
+			</div>
+			<div class="simplecal_list_item_container">
+				<div class="simplecal_list_item_title">
+					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
+				</div>
+				<?php if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) { ?>
 				<div class="simplecal_list_item_location">
-<?php
-			if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
-?>
+					<?php if ($post->simplecal_event_venue_name || $post->simplecal_event_city) { ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_location_physical">
 						<div class="simplecal_list_item_meta_icon">
 							<span class="material-symbols-outlined">pin_drop</span>
@@ -65,10 +47,8 @@ if ($events->have_posts()) {
 							<span class="simplecal_list_item_venue_name"><?= $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?= $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list__item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?= $post->simplecal_event_state; ?></span>
 						</div>
 					</div>
-<?php
-			}
-			if ($post->simplecal_event_meeting_link) {
-?>
+					<?php } ?>
+					<?php if ($post->simplecal_event_meeting_link) { ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_location_virtual">
 						<div class="simplecal_list_item_meta_icon">
 							<span class="material-symbols-outlined">camera_video</span>
@@ -77,14 +57,10 @@ if ($events->have_posts()) {
 							<?= ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?>
 						</div>
 					</div>
-<?php
-			}
-?>
+					<?php } ?>
 				</div>
-<?php
-		}
-		if ($post->simplecal_event_website) {
-?>
+				<?php } ?>
+				<?php if ($post->simplecal_event_website) { ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_website">
 						<div class="simplecal_list_item_meta_icon">
 							<span class="material-symbols-outlined">open_in_new</span>
@@ -93,22 +69,28 @@ if ($events->have_posts()) {
 							<?= SimpleCal::get_formatted_website($post->simplecal_event_website); ?>
 						</div>
 					</div>
-<?php
-		}
-		if ($_POST["agendaShowExcerpt"]) {
-?>
+				<?php } ?>		
+				<?php if ($_POST["agendaShowExcerpt"] == 'true') { ?>
 				<div class="simplecal_list_item_excerpt">
 					<?php the_excerpt(); ?>
 				</div>
-<?php
-		}
-?>
-				</div><!-- .simplecal_list_item_content_wrapper -->
-			</div><!-- .simplecal_list_item -->
+				<?php } ?>
+			</div><!-- .simplecal_list_item_content_wrapper -->
+				
+			<?php if ($_POST["agendaShowThumbnail"] == 'true') { ?>
+			<div class="simplecal_list_item_container simplecal_list_item_thumbnail">
+				<img src="<?php the_post_thumbnail_url();?>" />
+			</div>
+			<?php } ?>
+		</div><!-- .simplecal_list_item -->
 <?php
 	}
 ?>
 		</div><!-- .simplecal_block -->
+<?php
+} else {
+?>
+	<p class="simplecal_no_events">There are no events to display.</p>
 <?php
 }
 ?>

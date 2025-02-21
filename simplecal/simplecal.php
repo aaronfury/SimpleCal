@@ -348,7 +348,7 @@ class SimpleCal {
 	}
 
 	function enqueue_styles($hook) {
-		wp_enqueue_style('simplecal_css', plugin_dir_url(__FILE__) . '/templates/style.css');
+		//wp_enqueue_style('simplecal_css', plugin_dir_url(__FILE__) . '/templates/style.css');
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -416,8 +416,9 @@ class SimpleCal {
 		$events = new WP_Query($args);
 		
 		ob_start();
+
 		if ($_POST['displayStyle'] == 'agenda') {
-			include_once(plugin_dir_path(__FILE__) . 'templates/agenda.php');
+			include_once(plugin_dir_path(__FILE__) . 'templates/agenda-' . $_POST['agendaLayout'] . '.php');
 		}
 
 		$output = ob_get_clean();
@@ -521,8 +522,6 @@ class SimpleCal {
 					return $date_string;
 				}
 
-				$date_string .= $span_link;
-
 				if ($starttimestamp->format('ymd') == $endtimestamp->format('ymd')) { // If start and end date are the same
 					if ($date_or_time == 'date') { // If it's only meant to return dates, then just return the start date
 						return $date_string;
@@ -530,12 +529,12 @@ class SimpleCal {
 
 					if (!$post->simplecal_event_all_day || $starttimestamp->format('Hi') != $endtimestamp->format('Hi')) { // If it's not an all-day event and start and end times are different, append the end time
 						if ($date_or_time == 'both') $date_string .= ' ';
-						$date_string .= $endtimestamp->format($time_format);
+						$date_string .= $span_link . $endtimestamp->format($time_format);
 					}
 
 					return $date_string;
 				} else { // If start and end date are different
-					$date_string .= $endtimestamp->format($date_format);
+					$date_string .= $span_link . $endtimestamp->format($date_format);
 					
 					switch ($date_or_time) {
 						case 'date': // If it's only meant to return dates, return only the date portion
