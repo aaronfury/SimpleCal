@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "create-block/simplecal-calendar",
+	"name": "simplecal/calendar",
 	"version": "0.1.0",
 	"title": "SimpleCal Calendar",
 	"category": "widgets",
@@ -28,6 +28,10 @@
 		"agendaLayout": {
 			"type": "string",
 			"default": "layout1"
+		},
+		"agendaShowDayOfWeek": {
+			"type": "boolean",
+			"default": true
 		},
 		"agendaShowThumbnail": {
 			"type": "boolean",

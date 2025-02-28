@@ -11,6 +11,7 @@ I love you all.
 
 ## Major To-Dos
 * ~~Pagination~~ DONE. AND AWESOME.
+* Archive page
 * Default to current month if show previous events is selected
 * Better styling
 * Custom CSS support
@@ -19,6 +20,7 @@ I love you all.
 * Event pricing
 * "Members Event" tag
 * Option to show event only to logged-in users
+* Option to set public and private (logged-in) locations
 * Date (month) selection
 * Calendar view
 * Option to auto-delete old events

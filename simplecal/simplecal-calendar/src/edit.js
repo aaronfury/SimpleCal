@@ -23,6 +23,7 @@ export default function Edit({ attributes, setAttributes }) {
 		blockTheme = 'theme1',
 		agendaLayout = 'layout1',
 		agendaShowThumbnail = false,
+		agendaShowDayOfWeek = true,
 		agendaShowExcerpt = false,
 		agendaPostsPerPage = 10,
 		agendaDisplayPagination = 'both',
@@ -95,13 +96,26 @@ export default function Edit({ attributes, setAttributes }) {
 								value: 'layout2'
 							},
 						]}
-						onChange= {(value) => setAttributes({agendaLayout: value})}
+						onChange= {(value) => {
+								if (value == 'layout2') {
+									setAttributes({agendaShowMonthYearHeaders: false})
+								}
+								setAttributes({agendaLayout: value})
+							}
+						}
 					/>
 					<ToggleControl
 						label= "Show thumbnails"
 						checked= {!!agendaShowThumbnail}
 						onChange= {() => {
 							setAttributes({agendaShowThumbnail: !agendaShowThumbnail})
+						}}
+					/>
+					<ToggleControl
+						label= "Show day of week (Monday, Tuesday, etc.)"
+						checked= {!!agendaShowDayOfWeek}
+						onChange= {() => {
+							setAttributes({agendaShowDayOfWeek: !agendaShowDayOfWeek})
 						}}
 					/>
 					<ToggleControl
@@ -134,6 +148,7 @@ export default function Edit({ attributes, setAttributes }) {
 					<ToggleControl
 						label= "Group events under month and year headers"
 						checked= {!!agendaShowMonthYearHeaders}
+						disabled= {agendaLayout == 'layout2'}
 						onChange= {() => {
 							setAttributes({agendaShowMonthYearHeaders: !agendaShowMonthYearHeaders})
 						}}

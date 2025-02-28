@@ -1,4 +1,4 @@
-.wp-block-create-block-simplecal-calendar {
+.wp-block-simplecal-calendar {
 	color: #323232;
 	padding: 4px;
 }
@@ -21,9 +21,7 @@
 	}
 }
 
-.simplecal_events_wrapper {
-	min-height: 200px;
-	max-height: 600px;
+.simplecal_events_wrapper.simplecal_agenda_layout1 {
 	overflow-y: scroll;
 	scrollbar-color: #a0a0a0 rgba(0,0,0,0);
 	scrollbar-gutter: stable;
@@ -164,12 +162,68 @@
 	opacity: 0.6;
 }
 
-.simplecal_list_item_layout2 {
-	padding: 0.5em;
-	margin: 1em;
-	border: 1px solid #baba;
-	border-radius: 8px;
+.simplecal_events_wrapper.simplecal_agenda_layout2 {
 	display: flex;
-	flex-flow: row nowrap;
-	column-gap: 0.25em;
+	flex-flow: row wrap;
+	gap: 0.5em;
+
+	.simplecal_list_item {
+		padding: 0.5em;
+		border: 1px solid #baba;
+		border-radius: 4px;
+		flex: 1 0 400px;
+
+		@media only screen and (min-width: 768px) {
+			flex: 0 0 calc(50% - 1.5em);
+		}
+		@media only screen and (min-width: 1200px) {
+			flex: 0 0 calc(33% - 1.25em);
+		}
+	}
+
+
+
+	.simplecal_list_item_container + .simplecal_list_item_container {
+		margin-top: 0.5em;
+	}
+
+	.simplecal_list_item_meta {
+		display: flex;
+		flex-flow: row nowrap;
+		gap: 0.25em;
+		align-items: center;
+
+		.simplecal_list_item_meta_data {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-wrap: nowrap;
+		}
+
+		span { line-height: unset !important;}
+	}
+
+	.simplecal_list_item_datetime {
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-between;
+	}
+	.simplecal_list_item_date {
+		font-weight: bold;
+	}
+
+	.simplecal_list_item_time, .simplecal_list_item_location {
+		font-size: 0.8em;
+	}
+
+	.simplecal_list_item_title {
+		font-size: 1.25em;
+
+		a {
+			text-decoration: none;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
 }

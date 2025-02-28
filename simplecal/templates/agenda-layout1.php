@@ -12,19 +12,34 @@ if ($events->have_posts()) {
 		$start_datetime = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 
-		if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
-			if ($prev_event_year && $prev_event_year != $start_datetime->format('Y')) {
-				echo "<div class='simplecal_list_year_header'>" . $start_datetime->format('Y') . "</div>";
+		if (!$prev_event_year) {
+			echo "<div class='simplecal_list_year_wrapper'>";
+			if (!$prev_event_month) {
+				echo "<div class='simplecal_list_month_wrapper'>";
+				if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+					echo "<div class='simplecal_list_month_header" . ($start_datetime->getTimestamp() < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>" . $start_datetime->format('F') . "</div>";
+				}
 			}
-			$prev_event_year = $start_datetime->format('Y'); // Since we want it to skip showing the year header for the first time, we set it regardless of whether it's changed, but we do it after the echo so that it doesn't factor into the first iteration
+		} else {
+			if ("$prev_event_month $prev_event_year" != $start_datetime->format('F Y')) { // If the previous event wasn't in the same month AND year
+				echo "</div><!-- .simplecal_list_month_wrapper -->"; // We always want to close out the month
 
-			if (!$prev_event_month || ("$prev_event_month $prev_event_year" != $start_datetime->format('F Y'))) {
-				$prev_event_month = $start_datetime->format('F'); // Update the previous month marker
-				echo "<div class='simplecal_list_month_header" . (strtotime("$prev_event_month 1, $prev_event_year") < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>$prev_event_month</div>";
+				if ($prev_event_year != $start_datetime->format('Y')) { // If the year doesn't match, let's close that and optionally display the header
+					echo "</div><!-- .simplecal_list_year_wrapper -->\n<div class='simplecal_list_year_wrapper'>";
+					if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+						echo "<div class='simplecal_list_year_header'>" . $start_datetime->format('Y') . "</div>";
+					}
+				}
+				echo "<div class='simplecal_list_month_wrapper'>"; // We always want to open up the month and optionally display the header
+				if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+					echo "<div class='simplecal_list_month_header" . ($start_datetime->getTimestamp() < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>" . $start_datetime->format('F') . "</div>";
+				}
 			}
 		}
+		$prev_event_year = $start_datetime->format('Y'); // Update the marker after it's been evaluated against the current post
+		$prev_event_month = $start_datetime->format('F'); // Update the marker after it's been evaluated against the current post
 ?>
-		<div class="simplecal_list_item simplecal_list_item_layout1 <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
+		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
 <?php
 		if ($_POST["agendaShowThumbnail"] == 'true') {
 ?>

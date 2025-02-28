@@ -2,16 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/block.json":
-/*!************************!*\
-  !*** ./src/block.json ***!
-  \************************/
-/***/ ((module) => {
-
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/simplecal-calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"string","default":"layout1"},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaPostsPerPage":{"type":"integer","default":10},"agendaDisplayPagination":{"type":"string","default":"both"},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php"}');
-
-/***/ }),
-
 /***/ "./src/edit.js":
 /*!*********************!*\
   !*** ./src/edit.js ***!
@@ -22,13 +12,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Edit)
 /* harmony export */ });
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
+
 
 
 
@@ -41,12 +32,11 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @return {Element} Element to render.
  */
-
 function Edit({
   attributes,
   setAttributes
 }) {
-  const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)();
+  const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)();
   const {
     title = 'Calendar of Events',
     eventTags = 'all',
@@ -56,6 +46,7 @@ function Edit({
     blockTheme = 'theme1',
     agendaLayout = 'layout1',
     agendaShowThumbnail = false,
+    agendaShowDayOfWeek = true,
     agendaShowExcerpt = false,
     agendaPostsPerPage = 10,
     agendaDisplayPagination = 'both',
@@ -64,176 +55,169 @@ function Edit({
     displayPastEventsDays = 7,
     displayFutureEventsDays = 30
   } = attributes;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    ...blockProps,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: "Settings",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-          label: "Title",
-          value: title,
-          help: "Leave blank to hide the title",
-          onChange: value => setAttributes({
-            title: value
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-          label: "Display Style",
-          selected: displayStyle,
-          options: [{
-            label: 'Agenda view',
-            value: 'agenda'
-          }, {
-            label: 'Calendar view',
-            value: 'calendar'
-          }],
-          onChange: value => setAttributes({
-            displayStyle: value
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: "Hide calendar when there are no events",
-          checked: !!hideOnNoEvents,
-          onChange: () => {
-            setAttributes({
-              hideOnNoEvents: !hideOnNoEvents
-            });
-          }
-        }), hideOnNoEvents ? null : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-            label: "Text to display when there are no events",
-            value: noEventsText,
-            onChange: value => setAttributes({
-              noEventsText: value
-            })
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-          label: "Theme",
-          disabled: true,
-          selected: blockTheme,
-          options: [{
-            label: 'Theme 1',
-            value: 'theme1'
-          }],
-          onChange: value => setAttributes({
-            blockTheme: value
-          })
-        })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: "Agenda View Settings",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-          label: "Agenda Item Layout",
-          selected: agendaLayout,
-          options: [{
-            label: 'Layout 1',
-            value: 'layout1'
-          }, {
-            label: 'Layout 2',
-            value: 'layout2'
-          }],
-          onChange: value => setAttributes({
-            agendaLayout: value
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: "Show thumbnails",
-          checked: !!agendaShowThumbnail,
-          onChange: () => {
-            setAttributes({
-              agendaShowThumbnail: !agendaShowThumbnail
-            });
-          }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: "Show excerpt of event description",
-          checked: !!agendaShowExcerpt,
-          onChange: () => {
-            setAttributes({
-              agendaShowExcerpt: !agendaShowExcerpt
-            });
-          }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalNumberControl, {
-          label: "Display this number of events at a time",
-          help: "Set to '0' to display all events",
-          min: "0",
-          spinControls: "custom",
-          __next40pxDefaultSize: true,
-          value: agendaPostsPerPage,
-          onChange: value => setAttributes({
-            agendaPostsPerPage: parseInt(value)
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
-          label: "Display pagination at top or bottom of agenda view",
-          value: agendaDisplayPagination,
-          options: [{
-            label: 'Top',
-            value: 'top'
-          }, {
-            label: 'Bottom',
-            value: 'bottom'
-          }, {
-            label: 'Both',
-            value: 'both'
-          }, {
-            label: 'None',
-            value: 'none'
-          }],
-          onChange: value => setAttributes({
-            agendaDisplayPagination: value
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: "Group events under month and year headers",
-          checked: !!agendaShowMonthYearHeaders,
-          onChange: () => {
-            setAttributes({
-              agendaShowMonthYearHeaders: !agendaShowMonthYearHeaders
-            });
-          }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalNumberControl, {
-          label: "Display events for X days in the future",
-          help: "Set to '0' to display all future events",
-          spinControls: "custom",
-          min: "0",
-          __next40pxDefaultSize: true,
-          value: displayFutureEventsDays,
-          onChange: value => setAttributes({
-            displayFutureEventsDays: parseInt(value)
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: "Display past events",
-          checked: !!displayPastEvents,
-          onChange: () => {
-            setAttributes({
-              displayPastEvents: !displayPastEvents
-            });
-          }
-        }), displayPastEvents ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalNumberControl, {
-            label: "Display events for X days in the past",
-            help: "Set to '0' to display all past events",
-            spinControls: "custom",
-            min: "0",
-            __next40pxDefaultSize: true,
-            value: displayPastEventsDays,
-            onChange: value => setAttributes({
-              displayPastEventsDays: parseInt(value)
-            })
-          })
-        }) : null]
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
-      children: title && title != '' ? title : 'SimpleCal Calendar'
-    })]
-  });
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    ...blockProps
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
+    title: "Settings"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
+    label: "Title",
+    value: title,
+    help: "Leave blank to hide the title",
+    onChange: value => setAttributes({
+      title: value
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.RadioControl, {
+    label: "Display Style",
+    selected: displayStyle,
+    options: [{
+      label: 'Agenda view',
+      value: 'agenda'
+    }, {
+      label: 'Calendar view',
+      value: 'calendar'
+    }],
+    onChange: value => setAttributes({
+      displayStyle: value
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Hide calendar when there are no events",
+    checked: !!hideOnNoEvents,
+    onChange: () => {
+      setAttributes({
+        hideOnNoEvents: !hideOnNoEvents
+      });
+    }
+  }), hideOnNoEvents ? null : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
+    label: "Text to display when there are no events",
+    value: noEventsText,
+    onChange: value => setAttributes({
+      noEventsText: value
+    })
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.RadioControl, {
+    label: "Theme",
+    disabled: true,
+    selected: blockTheme,
+    options: [{
+      label: 'Theme 1',
+      value: 'theme1'
+    }],
+    onChange: value => setAttributes({
+      blockTheme: value
+    })
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
+    title: "Agenda View Settings"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.RadioControl, {
+    label: "Agenda Item Layout",
+    selected: agendaLayout,
+    options: [{
+      label: 'Layout 1',
+      value: 'layout1'
+    }, {
+      label: 'Layout 2',
+      value: 'layout2'
+    }],
+    onChange: value => {
+      if (value == 'layout2') {
+        setAttributes({
+          agendaShowMonthYearHeaders: false
+        });
+      }
+      setAttributes({
+        agendaLayout: value
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Show thumbnails",
+    checked: !!agendaShowThumbnail,
+    onChange: () => {
+      setAttributes({
+        agendaShowThumbnail: !agendaShowThumbnail
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Show day of week (Monday, Tuesday, etc.)",
+    checked: !!agendaShowDayOfWeek,
+    onChange: () => {
+      setAttributes({
+        agendaShowDayOfWeek: !agendaShowDayOfWeek
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Show excerpt of event description",
+    checked: !!agendaShowExcerpt,
+    onChange: () => {
+      setAttributes({
+        agendaShowExcerpt: !agendaShowExcerpt
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
+    label: "Display this number of events at a time",
+    help: "Set to '0' to display all events",
+    min: "0",
+    spinControls: "custom",
+    __next40pxDefaultSize: true,
+    value: agendaPostsPerPage,
+    onChange: value => setAttributes({
+      agendaPostsPerPage: parseInt(value)
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.SelectControl, {
+    label: "Display pagination at top or bottom of agenda view",
+    value: agendaDisplayPagination,
+    options: [{
+      label: 'Top',
+      value: 'top'
+    }, {
+      label: 'Bottom',
+      value: 'bottom'
+    }, {
+      label: 'Both',
+      value: 'both'
+    }, {
+      label: 'None',
+      value: 'none'
+    }],
+    onChange: value => setAttributes({
+      agendaDisplayPagination: value
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Group events under month and year headers",
+    checked: !!agendaShowMonthYearHeaders,
+    disabled: agendaLayout == 'layout2',
+    onChange: () => {
+      setAttributes({
+        agendaShowMonthYearHeaders: !agendaShowMonthYearHeaders
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
+    label: "Display events for X days in the future",
+    help: "Set to '0' to display all future events",
+    spinControls: "custom",
+    min: "0",
+    __next40pxDefaultSize: true,
+    value: displayFutureEventsDays,
+    onChange: value => setAttributes({
+      displayFutureEventsDays: parseInt(value)
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Display past events",
+    checked: !!displayPastEvents,
+    onChange: () => {
+      setAttributes({
+        displayPastEvents: !displayPastEvents
+      });
+    }
+  }), displayPastEvents ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
+    label: "Display events for X days in the past",
+    help: "Set to '0' to display all past events",
+    spinControls: "custom",
+    min: "0",
+    __next40pxDefaultSize: true,
+    value: displayPastEventsDays,
+    onChange: value => setAttributes({
+      displayPastEventsDays: parseInt(value)
+    })
+  })) : null)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, title && title != '' ? title : 'SimpleCal Calendar'));
 }
-
-/***/ }),
-
-/***/ "./src/editor.scss":
-/*!*************************!*\
-  !*** ./src/editor.scss ***!
-  \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
 
 /***/ }),
 
@@ -285,6 +269,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/editor.scss":
+/*!*************************!*\
+  !*** ./src/editor.scss ***!
+  \*************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
 /***/ "./src/style.scss":
 /*!************************!*\
   !*** ./src/style.scss ***!
@@ -294,6 +290,16 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
+
+/***/ }),
+
+/***/ "react":
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ ((module) => {
+
+module.exports = window["React"];
 
 /***/ }),
 
@@ -327,13 +333,13 @@ module.exports = window["wp"]["components"];
 
 /***/ }),
 
-/***/ "react/jsx-runtime":
-/*!**********************************!*\
-  !*** external "ReactJSXRuntime" ***!
-  \**********************************/
+/***/ "./src/block.json":
+/*!************************!*\
+  !*** ./src/block.json ***!
+  \************************/
 /***/ ((module) => {
 
-module.exports = window["ReactJSXRuntime"];
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"simplecal/calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"string","default":"layout1"},"agendaShowDayOfWeek":{"type":"boolean","default":true},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaPostsPerPage":{"type":"integer","default":10},"agendaDisplayPagination":{"type":"string","default":"both"},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php"}');
 
 /***/ })
 
@@ -379,7 +385,9 @@ module.exports = window["ReactJSXRuntime"];
 /******/ 			}
 /******/ 			var notFulfilled = Infinity;
 /******/ 			for (var i = 0; i < deferred.length; i++) {
-/******/ 				var [chunkIds, fn, priority] = deferred[i];
+/******/ 				var chunkIds = deferred[i][0];
+/******/ 				var fn = deferred[i][1];
+/******/ 				var priority = deferred[i][2];
 /******/ 				var fulfilled = true;
 /******/ 				for (var j = 0; j < chunkIds.length; j++) {
 /******/ 					if ((priority & 1 === 0 || notFulfilled >= priority) && Object.keys(__webpack_require__.O).every((key) => (__webpack_require__.O[key](chunkIds[j])))) {
@@ -465,7 +473,9 @@ module.exports = window["ReactJSXRuntime"];
 /******/ 		
 /******/ 		// install a JSONP callback for chunk loading
 /******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
-/******/ 			var [chunkIds, moreModules, runtime] = data;
+/******/ 			var chunkIds = data[0];
+/******/ 			var moreModules = data[1];
+/******/ 			var runtime = data[2];
 /******/ 			// add "moreModules" to the modules object,
 /******/ 			// then flag all "chunkIds" as loaded and fire callback
 /******/ 			var moduleId, chunkId, i = 0;
@@ -488,7 +498,7 @@ module.exports = window["ReactJSXRuntime"];
 /******/ 			return __webpack_require__.O(result);
 /******/ 		}
 /******/ 		
-/******/ 		var chunkLoadingGlobal = globalThis["webpackChunksimplecal_calendar"] = globalThis["webpackChunksimplecal_calendar"] || [];
+/******/ 		var chunkLoadingGlobal = self["webpackChunksimplecal_calendar"] = self["webpackChunksimplecal_calendar"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();
