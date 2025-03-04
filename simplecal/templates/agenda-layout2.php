@@ -16,13 +16,13 @@ if ($events->have_posts()) {
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_container simplecal_list_item_datetime">
 					<div class="simplecal_list_item_meta simplecal_list_item_date">
-						<?= SimpleCal::event_get_the_date("date","both", "n/d/y"); ?>
+						<div class="simplecal_list_item_dates"><?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format: 'n/d/y', nbsp_on_null: true); ?></div>
 						<?php if ($_POST['agendaShowDayOfWeek'] == 'true') { ?>
-							 (<?= SimpleCal::event_get_the_date("date","both", "l"); ?>)
+						 <div class="simplecal_list_item_dayofweek"><?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?></div>
 						<?php } ?>
 					</div>
 					<div class="simplecal_list_item_meta simplecal_list_item_time">
-						<?= SimpleCal::event_get_the_date("time","both"); ?>
+						<?= SimpleCal::event_get_the_date(date_or_time:'time',start_or_end:'both',nbsp_on_null:true) ?>
 					</div>
 				</div>
 				<div class="simplecal_list_item_container">

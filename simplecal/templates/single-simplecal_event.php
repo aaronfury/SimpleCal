@@ -5,6 +5,7 @@
 	$post_id = url_to_postid($url);
 	$post = get_post($post_id);
 	global $scplugin;
+	global $pagenow;
 ?>
 <!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
 
@@ -20,10 +21,13 @@
 
 		<!-- wp:spacer {"height":"var:preset|spacing|30","style":{"spacing":{"margin":{"top":"0","bottom":"0"}}}} -->
 		<div style="margin-top:0;margin-bottom:0;height:var(--wp--preset--spacing--30)" aria-hidden="true" class="wp-block-spacer"></div>
-			<h2><?= $scplugin::event_get_the_date(start_or_end:'start'); ?></h2>
 		<!-- /wp:spacer -->
 
 		<!-- wp:post-featured-image {"style":{"spacing":{"margin":{"bottom":"var:preset|spacing|40"}}}} /-->
+
+		<!-- wp:heading {"level":"2"} -->
+		<h2><?= $scplugin::event_get_the_date(start_or_end:'start'); ?></h2>
+		<!-- /wp:heading -->
 	</div>
 	<!-- /wp:group -->
 

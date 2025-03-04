@@ -19,6 +19,11 @@
 	.simplecal_event_meta_value {
 		display: table-cell;
 	}
+
+}
+
+.simplecal_list_item_excerpt {
+	font-size: 1rem;
 }
 
 .simplecal_events_wrapper.simplecal_agenda_layout1 {
@@ -175,13 +180,13 @@
 
 		@media only screen and (min-width: 768px) {
 			flex: 0 0 calc(50% - 1.5em);
+			max-width: calc(50% - 1.5em);
 		}
 		@media only screen and (min-width: 1200px) {
-			flex: 0 0 calc(33% - 1.25em);
+			flex: 0 0 calc(33% - 1.5em);
+			max-width: calc(33% - 1.5em);
 		}
 	}
-
-
 
 	.simplecal_list_item_container + .simplecal_list_item_container {
 		margin-top: 0.5em;
@@ -204,19 +209,34 @@
 
 	.simplecal_list_item_datetime {
 		display: flex;
-		flex-flow: row nowrap;
-		justify-content: space-between;
+		flex-flow: column nowrap;
+		justify-content: flex-start;
 	}
 	.simplecal_list_item_date {
-		font-weight: bold;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: space-between;
+
+		.simplecal_list_item_dates {
+			font-weight: bold;
+		}
+		.simplecal_list_item_dayofweek {
+			font-size: 0.75em;
+		}
 	}
 
-	.simplecal_list_item_time, .simplecal_list_item_location {
+	.simplecal_list_item_time, .simplecal_list_item_location, .simplecal_list_item_website {
 		font-size: 0.8em;
 	}
 
 	.simplecal_list_item_title {
 		font-size: 1.25em;
+		
+		@media only screen and (min-width: 768px) {
+			overflow: hidden;
+			text-wrap: nowrap;
+			text-overflow: ellipsis;
+		}
 
 		a {
 			text-decoration: none;

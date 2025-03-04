@@ -16,6 +16,8 @@ class SimpleCal {
 
 		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
 		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
+
+		add_filter('the_excerpt', [$this, 'cpt_excerpt_length'], 999);
 		
 		if (is_admin()) {
 			if ('edit.php' == $pagenow && 'simplecal_event' == $_GET['post_type']) {
@@ -24,7 +26,7 @@ class SimpleCal {
 				add_action("manage_simplecal_event_posts_custom_column", [$this, 'columns_set_values'], 10, 2);
 				add_action("pre_get_posts", [$this, 'columns_sort']);
 			}
-			if ('post.php' == $pagenow ) {
+			if ( in_array($pagenow,['post.php','post-new.php'])) {
 				add_action('add_meta_boxes', [$this,'cpt_register_metaboxes']);
 				add_action('save_post_simplecal_event', [$this,'cpt_save_meta']);
 			}
@@ -34,7 +36,7 @@ class SimpleCal {
 		} else {
 			add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
 			add_filter('single_template', [$this,'cpt_register_templates']);
-			add_filter('archive_template', [$this,'cpt_register_templates']);
+			add_filter('archive_template', [$this,'cpt_register_templates']);	
 		}
 	}
 
@@ -81,16 +83,16 @@ class SimpleCal {
 				$value = $post_end->format('m/d/Y');
 				break;
 			case 'location':
-				$value = $meta['simplecal_event_venue_name'][0];
+				$value = (array_key_exists('simplecal_event_venue_name',$meta) ? $meta['simplecal_event_venue_name'][0] : null);
 				break;
 			case 'city':
-				$value = $meta['simplecal_event_city'][0];
+				$value = (array_key_exists('simplecal_event_city', $meta) ? $meta['simplecal_event_city'][0] : null);
 				break;
 			case 'state':
-				$value = $meta['simplecal_event_state'][0];
+				$value = (array_key_exists('simplecal_event_state', $meta) ? $meta['simplecal_event_state'][0] : null);
 				break;
 			case 'country':
-				$value = $meta['simplecal_event_country'][0];
+				$value = (array_key_exists('simplecaL_event_country', $meta) ? $meta['simplecal_event_country'][0] : null);
 				break;
 		}
 		echo $value;
@@ -185,6 +187,14 @@ class SimpleCal {
 			return plugin_dir_path(__FILE__) . '../templates/legacy-single-simplecal_event.php';
 		}
 		return $template;
+	}
+
+	function cpt_excerpt_length($excerpt) {
+		global $post;
+		if ('simplecal_event' == $post->post_type) {
+			$excerpt = wp_trim_words(get_the_excerpt(), 40);
+		}
+		return $excerpt;
 	}
 
 	function cpt_register_metaboxes() {
@@ -329,7 +339,7 @@ class SimpleCal {
 			$screen = get_current_screen();
 
 			if (is_object($screen) && 'simplecal_event' == $screen->post_type ){
-				wp_enqueue_script('simplecal_admin_script', plugin_dir_url(dirname(__FILE__)). '../js/admin.js');
+				wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). '../js/admin.js');
 			}
 		}
 		return;
@@ -463,16 +473,22 @@ class SimpleCal {
 	}
 
 	// Retrieve the date from within the loop
-	public static function event_get_the_date(string $date_or_time = 'both', string $start_or_end = "both", string $date_format = 'M d, Y', string $time_format = 'g:i a', string $span_link = ' - ', string $date_time_link = ' at ', ) {
+	public static function event_get_the_date(string $date_or_time = 'both', string $start_or_end = "both", string $date_format = 'M d, Y', string $time_format = 'g:i a', string $span_link = ' - ', string $date_time_link = ' at ', bool $nbsp_on_null = false ) {
 		// TODO: Add support for "doors" time. Maybe a separate function?
 		global $post;
+		$nbsp = '&nbsp;';
 
-		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
-		$starttimestamp = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
-		
-		if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
-			$endtime = $post->simplecal_event_end_timestamp;
-			$endtimestamp = new DateTime($endtime, $post_timezone);
+		if ($post) {
+			$post_timezone = ($post->simplecal_event_timezone) ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
+			$starttimestamp = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
+			
+			if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
+				$endtime = $post->simplecal_event_end_timestamp;
+				$endtimestamp = new DateTime($endtime, $post_timezone);
+			}
+		} else { // This is for block themes and their API-based nonsense
+			$post_timezone = self::$tz;
+			$starttimestamp = new DateTime('now',$post_timezone);
 		}
 
 		$date_string = '';
@@ -486,19 +502,20 @@ class SimpleCal {
 						break;
 					case 'both':
 						$date_string .= $starttimestamp->format($date_format);
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+						if ($post && !$post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
 							$date_string .= $date_time_link;
 						}
 					case 'time':
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
+						if ($post && !$post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
 							$date_string .= $starttimestamp->format($time_format);
 						}
 						break;
 				}
-				return $date_string;
+				
+				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
 			case 'end':
 				if (!isset($endtime)) {
-					return null;
+					return ($nbsp_on_null ? $nbsp : null);
 				}
 
 				switch ($date_or_time) {
@@ -516,7 +533,7 @@ class SimpleCal {
 						}
 						break;
 				}
-				return $date_string;
+				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
 			case 'both':
 				switch ($date_or_time) {
 					case 'date' :
@@ -535,28 +552,30 @@ class SimpleCal {
 				}
 
 				if (!isset($endtime)) {
-					return $date_string;
+					return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
 				}
 
 				if ($starttimestamp->format('ymd') == $endtimestamp->format('ymd')) { // If start and end date are the same
-					if ($date_or_time == 'date') { // If it's only meant to return dates, then just return the start date
-						return $date_string;
+					if ('date' == $date_or_time) { // If it's only meant to return dates, then just return the start date
+						return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
 					}
 
 					if (!$post->simplecal_event_all_day || $starttimestamp->format('Hi') != $endtimestamp->format('Hi')) { // If it's not an all-day event and start and end times are different, append the end time
-						if ($date_or_time == 'both') $date_string .= ' ';
+						if ('both' == $date_or_time) $date_string .= ' ';
 						$date_string .= $span_link . $endtimestamp->format($time_format);
 					}
 
 					return $date_string;
 				} else { // If start and end date are different
-					$date_string .= $span_link . $endtimestamp->format($date_format);
+					if ('time' != $date_or_time) { // Don't include the date if it's set to only return the time.
+						$date_string .= $span_link . $endtimestamp->format($date_format);
+					}
 					
 					switch ($date_or_time) {
 						case 'date': // If it's only meant to return dates, return only the date portion
 							return $date_string;
-						case 'both':
-							if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
+							case 'both':
+								if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
 								$date_string .= ' ';
 							}
 						case 'time':
@@ -567,7 +586,7 @@ class SimpleCal {
 					}
 					
 				}
-			return $date_string;
+				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
 		}
 	}
 
