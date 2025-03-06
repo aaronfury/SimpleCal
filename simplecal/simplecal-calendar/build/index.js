@@ -48,8 +48,11 @@ function Edit({
     agendaShowThumbnail = false,
     agendaShowDayOfWeek = true,
     agendaShowExcerpt = false,
+    agendaExcerptLines = 0,
     agendaPostsPerPage = 10,
     agendaDisplayPagination = 'both',
+    agendaShowAllEventsLink = true,
+    agendaShowAllEventsLinkText = 'View All Events',
     agendaShowMonthYearHeaders = true,
     displayPastEvents = false,
     displayPastEventsDays = 7,
@@ -150,7 +153,17 @@ function Edit({
         agendaShowExcerpt: !agendaShowExcerpt
       });
     }
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
+  }), agendaShowExcerpt ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
+    label: "Limit excerpt to X lines",
+    help: "Set to '0' to display the full excerpt",
+    min: "0",
+    spinControls: "custom",
+    __next40pxDefaultSize: true,
+    value: agendaExcerptLines,
+    onChange: value => setAttributes({
+      agendaExcerptLines: parseInt(value)
+    })
+  })) : null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.__experimentalNumberControl, {
     label: "Display this number of events at a time",
     help: "Set to '0' to display all events",
     min: "0",
@@ -180,6 +193,21 @@ function Edit({
       agendaDisplayPagination: value
     })
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
+    label: "Show 'View All Events' link",
+    checked: !!agendaShowAllEventsLink,
+    onChange: () => {
+      setAttributes({
+        agendaShowAllEventsLink: !agendaShowAllEventsLink
+      });
+    }
+  }), agendaShowAllEventsLink ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.TextControl, {
+    label: "Link test",
+    value: agendaShowAllEventsLinkText,
+    help: "Leave blank for default ('View All Events')",
+    onChange: value => setAttributes({
+      agendaShowAllEventsLinkText: value
+    })
+  })) : null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.ToggleControl, {
     label: "Group events under month and year headers",
     checked: !!agendaShowMonthYearHeaders,
     disabled: agendaLayout == 'layout2',
@@ -339,7 +367,7 @@ module.exports = window["wp"]["components"];
   \************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"simplecal/calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"string","default":"layout1"},"agendaShowDayOfWeek":{"type":"boolean","default":true},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaPostsPerPage":{"type":"integer","default":10},"agendaDisplayPagination":{"type":"string","default":"both"},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"simplecal/calendar","version":"0.1.0","title":"SimpleCal Calendar","category":"widgets","icon":"calendar","description":"Display SimpleCal calendar events in a calendar or agenda view.","example":{},"attributes":{"title":{"type":"string","default":"Calendar of Events"},"displayStyle":{"type":"string","default":"agenda"},"hideOnNoEvents":{"type":"boolean","default":false},"noEventsText":{"type":"string","default":"There are no upcoming events."},"agendaLayout":{"type":"string","default":"layout1"},"agendaShowDayOfWeek":{"type":"boolean","default":true},"agendaShowThumbnail":{"type":"boolean","default":false},"agendaShowExcerpt":{"type":"boolean","default":false},"agendaExcerptLines":{"type":"integer","default":0},"agendaPostsPerPage":{"type":"integer","default":10},"agendaDisplayPagination":{"type":"string","default":"both"},"agendaShowAllEventsLink":{"type":"boolean","default":"true"},"agendaShowAllEventsLinkText":{"type":"string","default":"View All Events"},"agendaShowMonthYearHeaders":{"type":"boolean","default":true},"blockTheme":{"type":"string","default":"theme1"},"displayPastEvents":{"type":"boolean","default":false},"displayPastEventsDays":{"type":"integer","default":7},"displayFutureEventsDays":{"type":"integer","default":0},"eventTags":{"type":"array","default":[]}},"supports":{"html":false},"textdomain":"simplecal-calendar","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php"}');
 
 /***/ })
 

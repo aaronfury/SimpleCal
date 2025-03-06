@@ -96,68 +96,83 @@
 .simplecal_theme1 .simplecal_nav_prev span, .simplecal_theme1 .simplecal_nav_next span {
   line-height: unset !important;
 }
-.simplecal_theme1 .simplecal_list_year_header, .simplecal_theme1 .simplecal_list_month_header {
+.simplecal_theme1 .simplecal_all_events_link {
+  display: block;
+  margin: 1em auto;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  border: 1px solid #a0a0a0;
+  border-radius: 8px;
+  width: -moz-fit-content;
+  width: fit-content;
+  text-align: center;
+  transition: 0.1s all ease-in-out;
+  transform: translateX(0);
+}
+.simplecal_theme1 .simplecal_all_events_link:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.simplecal_past_event {
+  opacity: 0.6;
+}
+
+.simplecal_agenda_layout1 .simplecal_list_item + .simplecal_list_item {
+  margin-top: 1.5em;
+}
+.simplecal_agenda_layout1 .simplecal_list_year_header, .simplecal_agenda_layout1 .simplecal_list_month_header {
   margin: 0.25em 0;
   font-size: 1.5em;
   font-weight: bold;
 }
-.simplecal_theme1 .simplecal_list_month_header {
+.simplecal_agenda_layout1 .simplecal_list_month_header {
   font-size: 1.25em;
+  text-align: center;
 }
-.simplecal_theme1 .simplecal_list_month_header ~ .simplecal_list_item_layout1 {
-  margin-right: 2em;
-}
-
-.simplecal_list_item_layout1 + .simplecal_list_item_layout1 {
-  margin-top: 2em;
-}
-
-.simplecal_list_item_layout1 {
+.simplecal_agenda_layout1 .simplecal_list_item {
   display: flex;
   flex-flow: row nowrap;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid #a0a0a0;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_thumbnail {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_thumbnail {
   flex: 0 0 100px;
   margin-left: 10px;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_thumbnail img {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_thumbnail img {
   max-width: 100%;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper {
   flex: 1 1 auto;
   display: flex;
   flex-flow: column nowrap;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper a {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper a {
   text-decoration: none;
-  color: #1b4a70;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_meta {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_meta {
   display: flex;
   flex-flow: row nowrap;
   -moz-column-gap: 0.5em;
        column-gap: 0.5em;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_title {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_title {
   font-size: 1.25em;
-  font-weight: bold;
+  line-height: 1.25;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
   color: #606060;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_datetime {
   display: none;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .simplecal_list_item_excerpt p:first-of-type {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .simplecal_list_item_excerpt p:first-of-type {
   margin-top: 0;
 }
-.simplecal_list_item_layout1 .simplecal_list_item_content_wrapper .material-symbols-outlined {
+.simplecal_agenda_layout1 .simplecal_list_item .simplecal_list_item_content_wrapper .material-symbols-outlined {
   vertical-align: middle;
   font-size: 1em;
-}
-
-.simplecal_past_event {
-  opacity: 0.6;
 }
 
 .simplecal_events_wrapper.simplecal_agenda_layout2 {
@@ -170,17 +185,19 @@
   border: 1px solid rgba(187, 170, 187, 0.6666666667);
   border-radius: 4px;
   flex: 1 0 400px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 @media only screen and (min-width: 768px) {
   .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item {
-    flex: 0 0 calc(50% - 1.5em);
-    max-width: calc(50% - 1.5em);
+    flex: 0 0 calc(50% - 0.25em);
+    max-width: calc(50% - 0.25em);
   }
 }
 @media only screen and (min-width: 1200px) {
   .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item {
-    flex: 0 0 calc(33% - 1.5em);
-    max-width: calc(33% - 1.5em);
+    flex: 0 0 calc(33% - 0.25em);
+    max-width: calc(33% - 0.25em);
   }
 }
 .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_container + .simplecal_list_item_container {
@@ -207,14 +224,18 @@
 }
 .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_date {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   justify-content: space-between;
 }
 .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_date .simplecal_list_item_dates {
   font-weight: bold;
+  flex: 1 0 auto;
 }
 .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_date .simplecal_list_item_dayofweek {
   font-size: 0.75em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }
 .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_time, .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_location, .simplecal_events_wrapper.simplecal_agenda_layout2 .simplecal_list_item_website {
   font-size: 0.8em;

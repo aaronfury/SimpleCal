@@ -41,6 +41,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"agendaExcerptLines": {
+			"type": "integer",
+			"default": 0
+		},
 		"agendaPostsPerPage": {
 			"type": "integer",
 			"default": 10
@@ -48,6 +52,14 @@
 		"agendaDisplayPagination": {
 			"type": "string",
 			"default": "both"
+		},
+		"agendaShowAllEventsLink": {
+			"type": "boolean",
+			"default": "true"
+		},
+		"agendaShowAllEventsLinkText": {
+			"type": "string",
+			"default": "View All Events"
 		},
 		"agendaShowMonthYearHeaders": {
 			"type": "boolean",

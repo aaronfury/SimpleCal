@@ -4,6 +4,20 @@ if ($events->have_posts()) {
 	$prev_event_month = $prev_event_year = '';
 	$current_time = time();
 	
+	if ($_POST['agendaShowExcerpt'] && $_POST['agendaExcerptLines'] != '0') {
+?>
+		<style>
+			.simplecal_list_item_excerpt {
+				overflow: hidden;
+				display: -webkit-box;
+				-webkit-line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
+				line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
+				-webkit-box-orient: vertical;
+			}
+		</style>
+<?php
+	}
+
 	while ($events->have_posts() ) {
 		$events->the_post();
 		$post_id = get_the_ID();
@@ -65,7 +79,9 @@ if ($events->have_posts()) {
 					<?php } ?>		
 					<?php if ($_POST["agendaShowExcerpt"] == 'true') { ?>
 					<div class="simplecal_list_item_excerpt">
-						<?php the_excerpt(); ?>
+						<?php
+							echo wp_trim_words(get_the_excerpt(), 80);
+						?>
 					</div>
 					<?php } ?>
 				</div><!-- .simplecal_list_item_container -->

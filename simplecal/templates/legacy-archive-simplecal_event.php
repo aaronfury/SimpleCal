@@ -1,29 +1,34 @@
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo('charset'); ?>"/>
-    <?php wp_head(); ?>
-</head>
-
-<body <?php body_class(); ?>>
 <?php
-wp_body_open();
+	get_header();
 
-if (wp_is_block_theme()) {
-    block_template_part('header');
-} else {
-    get_header();
-}
-
-echo 'My content';
-
-if (wp_is_block_theme()) {
-    block_template_part('footer');
-} else {
-    get_footer();
-}
-
-wp_footer();
+	$description = get_the_archive_description();
 ?>
-</body>
-</html>
+
+<?php if ( have_posts() ) : ?>
+
+<header class="page-header alignwide">
+	<h1 class="page-title">Events</h1>
+</header><!-- .page-header -->
+
+	<?php while ( have_posts() ) : the_post(); // standard WordPress loop. ?>
+
+		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+
+		<header class="entry-header">
+			<?php the_title( sprintf( '<h2 class="entry-title default-max-width"><a href="%s">', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
+		</header><!-- .entry-header -->
+
+			<div class="entry-content">
+				<?php the_excerpt(); ?>
+
+				<!-- THIS IS WHERE THE FUN PART GOES -->
+			</div><!-- .entry-content -->
+
+		</article><!-- #post-## -->
+
+	<?php endwhile; // end of the loop. ?>
+<?php
+	endif;
+
+	get_footer();
+?>

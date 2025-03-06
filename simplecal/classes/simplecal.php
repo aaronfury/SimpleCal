@@ -16,8 +16,6 @@ class SimpleCal {
 
 		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
 		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
-
-		add_filter('the_excerpt', [$this, 'cpt_excerpt_length'], 999);
 		
 		if (is_admin()) {
 			if ('edit.php' == $pagenow && 'simplecal_event' == $_GET['post_type']) {
@@ -36,7 +34,8 @@ class SimpleCal {
 		} else {
 			add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
 			add_filter('single_template', [$this,'cpt_register_templates']);
-			add_filter('archive_template', [$this,'cpt_register_templates']);	
+			add_filter('archive_template', [$this,'cpt_register_templates']);
+			add_action('pre_get_posts', [$this, 'cpt_prepare_archive_query']);
 		}
 	}
 
@@ -189,12 +188,10 @@ class SimpleCal {
 		return $template;
 	}
 
-	function cpt_excerpt_length($excerpt) {
-		global $post;
-		if ('simplecal_event' == $post->post_type) {
-			$excerpt = wp_trim_words(get_the_excerpt(), 40);
+	function cpt_prepare_archive_query($query) {
+		if ($query->is_post_type_archive('simplecal_event')) {
+			$query->set('posts_per_page',3);
 		}
-		return $excerpt;
 	}
 
 	function cpt_register_metaboxes() {
@@ -600,24 +597,34 @@ class SimpleCal {
 		}
 	}
 
-	public static function event_get_the_location($format, $maplink) {
-		// TODO: Holy shit this is god-awful code. Just horrendous. Every single thing about this is trash. Fix it. Fix it before anyone sees!
+	public static function event_get_the_location($link_type = 'none') {
 		global $post;
 		
 		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
 			$link = urlencode(implode(", ", array_filter([$post->simplecal_event_venue_name, $post->simplecal_event_street_address, $post->simplecal_event_city, $post->simplecal_event_state, $post->simplecal_event_country], 'strlen')));
+			if ($link) $link = 'https://maps.google.com/maps?q=' . $link;
+			
+			$address = '';
+			$address .= $post->simplecal_event_venue_name ? '<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' : '';
+			$address .= $post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '';
+			$address .= $post->simplecal_event_city ? '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' : '';
+			$address .= $post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '';
+			$address .= $post->simplecal_event_state ? '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' : '';
 
-			switch ($format) {
-			 	case 'eventmeta1' :
-					$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">' . ($maplink == 'linktext' && $link ? '<a href="https://maps.apple.com/q=' . $link . '">' : '') .'<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' .  ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '' ) . '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' . ($post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '') . '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' . ($maplink == 'linktext' && $link ? '</a>' : '') . '</span></div>';
+			switch ($link_type) {
+				case 'address':
+					$data = "<a href='$link' target='_blank'>$address</a>";
 					break;
-				default :
-					$data = '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">IT\'S SOMEWHERE</span></div>';
+				case 'after':
+					$data = "$address (<a href='$link' target='_blank'>Map</a>)";
+					break;
+				default:
+					$data = $address;
 			}
 
 			return $data;
 		} else {
-			return '<div class="simplecal_event_meta_row"><span class="simplecal_event_meta_label">Location</span><span class="simplecal_event_meta_value">NONE</span></div>';
+			return null;
 		}
 	}
 

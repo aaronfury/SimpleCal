@@ -25,8 +25,11 @@ export default function Edit({ attributes, setAttributes }) {
 		agendaShowThumbnail = false,
 		agendaShowDayOfWeek = true,
 		agendaShowExcerpt = false,
+		agendaExcerptLines = 0,
 		agendaPostsPerPage = 10,
 		agendaDisplayPagination = 'both',
+		agendaShowAllEventsLink = true,
+		agendaShowAllEventsLinkText = 'View All Events',
 		agendaShowMonthYearHeaders = true,
 		displayPastEvents = false,
 		displayPastEventsDays = 7,
@@ -125,6 +128,20 @@ export default function Edit({ attributes, setAttributes }) {
 							setAttributes({agendaShowExcerpt: !agendaShowExcerpt})
 						}}
 					/>
+					{ agendaShowExcerpt ?
+						<>
+						<NumberControl
+							label= "Limit excerpt to X lines"
+							help= "Set to '0' to display the full excerpt"
+							min='0'
+							spinControls='custom'
+							__next40pxDefaultSize= {true}
+							value= {agendaExcerptLines}
+							onChange= {(value) => setAttributes({agendaExcerptLines: parseInt(value)})}
+						/>
+						</>
+						: null
+					}
 					<NumberControl
 						label= "Display this number of events at a time"
 						help= "Set to '0' to display all events"
@@ -145,6 +162,24 @@ export default function Edit({ attributes, setAttributes }) {
 						]}
 						onChange= {(value) => setAttributes({agendaDisplayPagination: value})}
 					/>
+					<ToggleControl
+						label= "Show 'View All Events' link"
+						checked= {!!agendaShowAllEventsLink}
+						onChange= {() => {
+							setAttributes({agendaShowAllEventsLink: !agendaShowAllEventsLink})
+						}}
+					/>
+					{ agendaShowAllEventsLink ?
+						<>
+						<TextControl
+							label= "Link test"
+							value= {agendaShowAllEventsLinkText}
+							help= "Leave blank for default ('View All Events')"
+							onChange= {(value) => setAttributes({agendaShowAllEventsLinkText: value})}
+						/>
+						</>
+						: null
+					}
 					<ToggleControl
 						label= "Group events under month and year headers"
 						checked= {!!agendaShowMonthYearHeaders}

@@ -23,7 +23,21 @@
 				}
 			
 				if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
-					echo SimpleCal::event_get_the_location("eventmeta1","linktext"); 
+			?>
+			<div class="simplecal_event_meta_row">
+				<span class="simplecal_event_meta_label">Location</span>
+				<span class="simplecal_event_meta_value"><?= SimpleCal::event_get_the_location(link_type:'after'); ?></span>
+			</div>
+			<?php
+				}
+
+				if ($post->simplecal_event_website) {
+			?>
+			<div class="simplecal_event_meta_row">
+			 	<span class="simplecal_event_meta_label">Website</span>
+				<span class="simplecal_event_meta_value"><?= SimpleCal::get_formatted_website($post->simplecal_event_website); ?></span>
+			</div>
+			<?php
 				}
 			?>
 		</div>

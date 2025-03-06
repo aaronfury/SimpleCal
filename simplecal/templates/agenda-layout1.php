@@ -4,6 +4,20 @@ if ($events->have_posts()) {
 	$prev_event_month = $prev_event_year = '';
 	$current_time = time();
 
+	if ($_POST['agendaShowExcerpt'] && $_POST['agendaExcerptLines'] != '0') {
+?>
+		<style>
+			.simplecal_list_item_excerpt {
+				overflow: hidden;
+				display: -webkit-box;
+				-webkit-line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
+				line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
+				-webkit-box-orient: vertical;
+			}
+		</style>
+<?php
+	}
+
 	while ($events->have_posts() ) {
 		$events->the_post();
 		$post_id = get_the_ID();
@@ -51,7 +65,10 @@ if ($events->have_posts()) {
 ?>
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<?= SimpleCal::event_get_the_date("date","both"); ?>
+					<div class="simplecal_list_item_dates"><?= SimpleCal::event_get_the_date("date","both"); ?></div>
+					<?php if ($_POST['agendaShowDayOfWeek'] == 'true') { ?>
+						 <div class="simplecal_list_item_dayofweek">(<?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
+					<?php } ?>
 				</div>
 				<div class="simplecal_list_item_title">
 					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
@@ -104,18 +121,6 @@ if ($events->have_posts()) {
 			}
 ?>
 				</div>
-<?php
-		}
-		if ($post->simplecal_event_website) {
-?>
-					<div class="simplecal_list_item_meta simplecal_list_item_website">
-						<div class="simplecal_list_item_meta_icon">
-							<span class="material-symbols-outlined">open_in_new</span>
-							</div>
-						<div class="simplecal_list_item_meta_data">
-							<?= SimpleCal::get_formatted_website($post->simplecal_event_website); ?>
-						</div>
-					</div>
 <?php
 		}
 		
