@@ -22,7 +22,7 @@
 			<?php
 				}
 			
-				if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
+				if (SimpleCal::event_get_the_location(check_only:true) && (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in()))) {
 			?>
 			<div class="simplecal_event_meta_row">
 				<span class="simplecal_event_meta_label">Location</span>

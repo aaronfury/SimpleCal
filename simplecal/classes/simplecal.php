@@ -12,7 +12,7 @@ class SimpleCal {
 		add_action('init', [$this, 'cpt_register']);
 		add_action('init', [$this, 'block_register']);
 		add_action('init', [$this, 'block_template_register']);
-		add_action('widgets_init', [$this, 'widget_register']);
+		//add_action('widgets_init', [$this, 'widget_register']); // TODO: Add back in when the widget is ready
 
 		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
 		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
@@ -32,7 +32,7 @@ class SimpleCal {
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
 			// TODO: Add CSS for admin panel
 		} else {
-			add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+			add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
 			add_filter('single_template', [$this,'cpt_register_templates']);
 			add_filter('archive_template', [$this,'cpt_register_templates']);
 			add_action('pre_get_posts', [$this, 'cpt_prepare_archive_query']);
@@ -342,8 +342,11 @@ class SimpleCal {
 		return;
 	}
 
-	function enqueue_styles($hook) {
-		//wp_enqueue_style('simplecal_css', plugin_dir_url(__FILE__) . '/templates/style.css');
+	function enqueue_scripts($hook) {
+		if (is_post_type_archive('simplecal_event')) {
+			wp_enqueue_script('simplecal_ajax', plugins_url('simplecal/js/ajax.js'), ['jquery','json2'],null,['defer',true]);
+			wp_localize_script('simplecal_ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
+		}
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -352,7 +355,7 @@ class SimpleCal {
 	}
 	
 	function block_register() {
-		register_block_type(dirname(__FILE__) . '/../simplecal-calendar/build');
+		register_block_type(dirname(__FILE__) . '/../simplecal-block/build');
 	}
 
 	function block_template_register() {
@@ -397,32 +400,32 @@ class SimpleCal {
 		];
 
 		// Build the query for agenda views
-		if ($_POST['displayStyle'] == 'agenda') {
-			$args = $args + [
+		if (in_array($_POST['displayStyle'],['agenda','archive'])) {
+			$args += [
 				'posts_per_page' => $posts_per_page,
 				'paged' => $page_param,
 			];
 			
 			if ($page >= 0) {
-				$args = $args + [
+				$args += [
 					'meta_value' => date('Y-m-d H:i:s'),
 					'meta_compare' => '>=',
 					'order' => 'ASC'
 				];
 			} else {
-				$args = $args + [
+				$args += [
 					'order' => 'DESC'
 				];
 
 				if (array_key_exists('displayPastEventsDays', $_POST)) {
 					if ($_POST['displayPastEventsDays'] == 0) {
-						$args = $args + [
+						$args += [
 							'meta_value' => date('Y-m-d H:i:s'),
 							'meta_compare' => '<='
 						];
 					} else {
 						$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
-						$args = $args + [
+						$args += [
 							'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
 							'meta_compare' => 'BETWEEN'
 						];
@@ -440,8 +443,13 @@ class SimpleCal {
 		
 		ob_start();
 
-		if ($_POST['displayStyle'] == 'agenda') {
-			include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $_POST['agendaLayout'] . '.php');
+		switch ($_POST['displayStyle']) {
+			case 'agenda':
+				include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $_POST['agendaLayout'] . '.php');
+				break;
+			case 'archive':
+				include_once(plugin_dir_path(__FILE__) . '../templates/template-parts/legacy-archive-loop.php');
+				break;
 		}
 
 		$output = ob_get_clean();
@@ -454,11 +462,11 @@ class SimpleCal {
 			'current_page' => $page,
 			'current_page_param' => $page_param,
 			'more_prev_pages' => $more_prev,
-			'more_next_pages' => $more_next,
-			'query' => $events->request,
-			'query_vars' => $events->query_vars,
-			'query_args' => $args,
-			'filters' => $GLOBALS['wp_filter']
+			'more_next_pages' => $more_next//,
+			//'query' => $events->request,
+			//'query_vars' => $events->query_vars,
+			//'query_args' => $args,
+			//'filters' => $GLOBALS['wp_filter']
 		]);		
 	}
 
@@ -577,7 +585,7 @@ class SimpleCal {
 							}
 						case 'time':
 							if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
-								$date_string .= $endtimestamp->format($time_format);
+								$date_string .= $span_link . $endtimestamp->format($time_format);
 							}
 							break;
 					}
@@ -597,7 +605,8 @@ class SimpleCal {
 		}
 	}
 
-	public static function event_get_the_location($link_type = 'none') {
+
+	public static function event_get_the_location($link_type = 'none', $check_only = false) {
 		global $post;
 		
 		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
@@ -610,6 +619,10 @@ class SimpleCal {
 			$address .= $post->simplecal_event_city ? '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' : '';
 			$address .= $post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '';
 			$address .= $post->simplecal_event_state ? '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' : '';
+
+			if ($check_only) {
+				return $address;
+			}
 
 			switch ($link_type) {
 				case 'address':

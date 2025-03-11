@@ -11,16 +11,18 @@ I love you all.
 
 ## Major To-Dos
 * ~~Pagination~~ DONE. AND AWESOME.
-* Archive page
-* Default to current month if show previous events is selected
+* ~~Archive page~~ DONE. AND MEDIOCRE.
+* ~~Default to current month if show previous events is selected~~
+* Backport to widget
 * Better styling
 * Custom CSS support
 * Filter/search
 * Support for "Doors" time
 * Event pricing
 * "Members Event" tag
+* General tag/category support
 * Option to show event only to logged-in users
-* Option to set public and private (logged-in) locations
+* ~~Option to set public and private (logged-in) locations~~
 * Date (month) selection
 * Calendar view
 * Option to auto-delete old events
