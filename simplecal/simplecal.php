@@ -14,11 +14,11 @@ Text Domain:  simplecal
 */
 
 // TODO: Debugging shortcut... make sure these are commented out or set to "0" (or false) in the production site
-ini_set('display_errors', 1);
+/* ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors','Off');
 ini_set('error_log','php-errors.log');
-error_reporting(E_ALL);
+error_reporting(E_ALL); */
 
 require_once(plugin_dir_path(__FILE__) . 'classes/simplecal.php');
 //require_once(plugin_dir_path(__FILE__) . 'classes/simplecal_widget.php'); // TODO: Add back in when the widget is ready
