@@ -89,7 +89,7 @@
 	"supports": {
         "html": false
 	},
-	"textdomain": "simplecal-calendar",
+	"textdomain": "simplecal-block",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

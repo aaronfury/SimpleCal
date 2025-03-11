@@ -21,7 +21,7 @@ ini_set('error_log','php-errors.log');
 error_reporting(E_ALL);
 
 require_once(plugin_dir_path(__FILE__) . 'classes/simplecal.php');
-require_once(plugin_dir_path(__FILE__) . 'classes/simplecal_widget.php');
+//require_once(plugin_dir_path(__FILE__) . 'classes/simplecal_widget.php'); // TODO: Add back in when the widget is ready
 $scplugin = new SimpleCal();
 
 // TODO: Does this need to be outside the class definition? I can't remember why I did it this way.
