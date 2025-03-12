@@ -218,7 +218,7 @@ function Edit({
           }
         }), agendaShowAllEventsLink ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-            label: "Link test",
+            label: "Link text",
             value: agendaShowAllEventsLinkText,
             help: "Leave blank for default ('View All Events')",
             onChange: value => setAttributes({

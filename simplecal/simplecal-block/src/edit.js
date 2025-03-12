@@ -172,7 +172,7 @@ export default function Edit({ attributes, setAttributes }) {
 					{ agendaShowAllEventsLink ?
 						<>
 						<TextControl
-							label= "Link test"
+							label= "Link text"
 							value= {agendaShowAllEventsLinkText}
 							help= "Leave blank for default ('View All Events')"
 							onChange= {(value) => setAttributes({agendaShowAllEventsLinkText: value})}

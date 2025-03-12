@@ -149,7 +149,8 @@ class SimpleCal {
 			'supports' => [
 				'title',
 				'editor',
-				'thumbnail'
+				'thumbnail',
+				'custom-fields'
 			],
 			'public' => true,
 			'description' => 'Posts that contain information pertaining to an event, meeting, or any other calendar item',

@@ -1,49 +1,49 @@
-$(document).ready(() => {	
-	$('.simplecal').each((i, instance) => {
-		$(instance).data('page',0);
+jQuery(document).ready(() => {	
+	jQuery('.simplecal').each((i, instance) => {
+		jQuery(instance).data('page',0);
 
 		var formData = scGetFormData(instance);
 		
 		if (formData.displayPastEvents && formData.page == 0) {
-			$(instance).find('.simplecal_nav_prev').addClass('active');
+			jQuery(instance).find('.simplecal_nav_prev').addClass('active');
 		}
 
 		scGetEvents(formData).done((response) => {
-			$(instance).children('.simplecal_events_wrapper').html(response.data.output);
+			jQuery(instance).children('.simplecal_events_wrapper').html(response.data.output);
 			if (response.data.more_next_pages) {
-				$(instance).find('.simplecal_nav_next').addClass('active');
+				jQuery(instance).find('.simplecal_nav_next').addClass('active');
 			} else {
-				$(instance).find('.simplecal_nav_next').removeClass('active');
+				jQuery(instance).find('.simplecal_nav_next').removeClass('active');
 			}
 		});
 
-		$(instance).on('click', '.simplecal_nav_prev.active, .simplecal_nav_next.active', (event) => {
-			var instance = $(event.currentTarget).parents('.simplecal');
+		jQuery(instance).on('click', '.simplecal_nav_prev.active, .simplecal_nav_next.active', (event) => {
+			var instance = jQuery(event.currentTarget).parents('.simplecal');
 	
-			if ($(event.currentTarget).hasClass('simplecal_nav_prev')) {
-				$(instance).data().page--;
-				$(instance).find('.simplecal_nav_prev').removeClass('active');
+			if (jQuery(event.currentTarget).hasClass('simplecal_nav_prev')) {
+				jQuery(instance).data().page--;
+				jQuery(instance).find('.simplecal_nav_prev').removeClass('active');
 			} else {
-				$(instance).data().page++;
-				$(instance).find('.simplecal_nav_next').removeClass('active');
+				jQuery(instance).data().page++;
+				jQuery(instance).find('.simplecal_nav_next').removeClass('active');
 			}
 			
-			var formData = scGetFormData($(instance));
+			var formData = scGetFormData(jQuery(instance));
 
 			scGetEvents(formData).done((response) => {
-				$(instance).children('.simplecal_events_wrapper').fadeOut(function() {
-					$(this).html(response.data.output);
+				jQuery(instance).children('.simplecal_events_wrapper').fadeOut(function() {
+					jQuery(this).html(response.data.output);
 				}).fadeIn();
 
 				if (response.data.more_next_pages) {
-					$(instance).find('.simplecal_nav_next').addClass('active');
+					jQuery(instance).find('.simplecal_nav_next').addClass('active');
 				} else {
-					$(instance).find('.simplecal_nav_next').removeClass('active');
+					jQuery(instance).find('.simplecal_nav_next').removeClass('active');
 				}
 				if (response.data.more_prev_pages || (formData['displayPastEvents'] && formData['page'] == 0)) {
-					$(instance).find('.simplecal_nav_prev').addClass('active');
+					jQuery(instance).find('.simplecal_nav_prev').addClass('active');
 				} else {
-					$(instance).find('.simplecal_nav_prev').removeClass('active');
+					jQuery(instance).find('.simplecal_nav_prev').removeClass('active');
 				}
 			});
 		});
@@ -54,26 +54,26 @@ $(document).ready(() => {
 function scGetFormData(instance) {
 	var formData = {
 		'action' : 'simplecal_get_events',
-		'tags': $(instance).data('tags'),
-		'displayStyle' : $(instance).data('displayStyle'),
-		'displayPastEvents' : $(instance).data('displayPastEvents'),
-		'displayPastEventsDays' : $(instance).data('displayPastEventsDays'),
-		'displayFutureEventsDays' : $(instance).data('displayFutureEventsDays'),
-		'agendaLayout' : $(instance).data('agendaLayout'),
-		'agendaShowMonthYearHeaders' : $(instance).data('agendaShowMonthYearHeaders'),
-		'agendaPostsPerPage' : $(instance).data('agendaPostsPerPage'),
-		'agendaShowThumbnail' : $(instance).data('agendaShowThumbnail'),
-		'agendaShowDayOfWeek' : $(instance).data('agendaShowDayOfWeek'),
-		'agendaShowExcerpt' : $(instance).data('agendaShowExcerpt'),
-		'agendaExcerptLines' : $(instance).data('agendaExcerptLines'),
-		'page' : $(instance).data('page')
+		'tags': jQuery(instance).data('tags'),
+		'displayStyle' : jQuery(instance).data('displayStyle'),
+		'displayPastEvents' : jQuery(instance).data('displayPastEvents'),
+		'displayPastEventsDays' : jQuery(instance).data('displayPastEventsDays'),
+		'displayFutureEventsDays' : jQuery(instance).data('displayFutureEventsDays'),
+		'agendaLayout' : jQuery(instance).data('agendaLayout'),
+		'agendaShowMonthYearHeaders' : jQuery(instance).data('agendaShowMonthYearHeaders'),
+		'agendaPostsPerPage' : jQuery(instance).data('agendaPostsPerPage'),
+		'agendaShowThumbnail' : jQuery(instance).data('agendaShowThumbnail'),
+		'agendaShowDayOfWeek' : jQuery(instance).data('agendaShowDayOfWeek'),
+		'agendaShowExcerpt' : jQuery(instance).data('agendaShowExcerpt'),
+		'agendaExcerptLines' : jQuery(instance).data('agendaExcerptLines'),
+		'page' : jQuery(instance).data('page')
 	}
 
 	return formData;
 }
 
 function scGetEvents(formData) {
-	return $.ajax({
+	return jQuery.ajax({
 		type: "post",
 		url: ajaxParams.url,
 		data: formData,
