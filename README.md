@@ -20,6 +20,7 @@ I love you all.
 * Support for "Doors" time
 * Event pricing
 * "Members Event" tag
+* Support for "TBD" events within a month/week
 * General tag/category support
 * Option to show event only to logged-in users
 * ~~Option to set public and private (logged-in) locations~~

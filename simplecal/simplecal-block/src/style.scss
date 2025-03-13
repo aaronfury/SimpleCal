@@ -1,35 +1,5 @@
-.wp-block-simplecal-block {
-	color: #323232;
-	padding: 4px;
-}
-
-.simplecal_event_meta {
-	display: table;
-	.simplecal_event_meta_row {
-		display: table-row;
-	}
-	.simplecal_event_meta_label {
-		display: table-cell;
-		padding-right: 0.5em;
-		text-transform: uppercase;
-		&::after {
-			content: ':';
-		}
-	}
-	.simplecal_event_meta_value {
-		display: table-cell;
-	}
-
-}
-
 .simplecal_list_item_excerpt {
 	font-size: 1rem;
-}
-
-.simplecal_events_wrapper.simplecal_agenda_layout1 {
-	overflow-y: scroll;
-	scrollbar-color: #a0a0a0 rgba(0,0,0,0);
-	scrollbar-gutter: stable;
 }
 
 .simplecal_no_events {
@@ -73,7 +43,8 @@
 	.simplecal_nav_pagination {
 		display: flex;
 		flex-flow: row nowrap;
-		justify-content: space-between;
+		justify-content: space-around;
+		margin: 1em 0;
 	}
 	.simplecal_nav_prev, .simplecal_nav_next {
 		opacity: 0.5;
@@ -104,7 +75,7 @@
 		border-radius: 8px;
 		width: fit-content;
 		text-align: center;
-		transition: 0.1s all ease-in-out;
+		transition: 0.25s all ease-in-out;
 		transform: translateX(0);
 
 		&:hover {
@@ -150,9 +121,9 @@
 			flex: 1 1 auto;
 			display: flex;
 			flex-flow: column nowrap;
-			
-			a {
-				text-decoration: none;
+
+			& > div + div {
+				margin-top: 0.25em;
 			}
 
 			.simplecal_list_item_meta {

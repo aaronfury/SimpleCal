@@ -348,11 +348,13 @@ class SimpleCal {
 			wp_enqueue_script('simplecal_ajax', plugins_url('simplecal/js/ajax.js'), ['jquery','json2'],null,['defer',true]);
 			wp_localize_script('simplecal_ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
 		}
+
+		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'); // TODO: Make this conditional based on page?
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
 	function widget_register() {
-		register_widget('SimpleCal_Widget');
+		//register_widget('SimpleCal_Widget'); // TODO: Add this back when the widget's ready
 	}
 	
 	function block_register() {
@@ -642,13 +644,13 @@ class SimpleCal {
 		}
 	}
 
-	public static function get_formatted_website($url, $link_text = "More information") {
+	public static function get_formatted_website($url, $link_text) {
 		if (preg_match('/^(?:https?:\/\/)?(?:www\.)?(.*\..*)\/?/', $url, $matches)) {
 			$domain = explode('/',$matches[1])[0];
 		} else {
 			$domain = explode('/',$url)[0];
 		}
-		$formatted = "<a href=\"$url\" target=\"_blank\">$domain</a>";
+		$formatted = "<a href=\"$url\" target=\"_blank\">" . ($link_text ?? $domain) . "</a>";
 		return $formatted;
 	}
 

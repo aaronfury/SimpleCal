@@ -92,9 +92,7 @@ if ($events->have_posts()) {
 				</div>
 <?php
 		if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
-?>
-				<div class="simplecal_list_item_location">
-<?php
+
 			if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
 ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_location_physical">
@@ -119,9 +117,6 @@ if ($events->have_posts()) {
 					</div>
 <?php
 			}
-?>
-				</div>
-<?php
 		}
 		
 		if ($_POST["agendaShowExcerpt"] == 'true') {
