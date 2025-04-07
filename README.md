@@ -13,9 +13,12 @@ I love you all.
 * ~~Pagination~~ DONE. AND AWESOME.
 * ~~Archive page~~ DONE. AND MEDIOCRE.
 * ~~Default to current month if show previous events is selected~~
+* Fix the block templates to do things the right way
 * Backport to widget
 * Better styling
 * Custom CSS support
+* Option to add event to calendar
+* Option to highlight upcoming events
 * Filter/search
 * Support for "Doors" time
 * Event pricing

@@ -1,21 +1,25 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "simplecal/calendar",
+	"name": "simplecal/agenda-block",
 	"version": "0.1.0",
-	"title": "SimpleCal Calendar",
+	"title": "SimpleCal Agenda",
 	"category": "widgets",
 	"icon": "calendar",
-	"description": "Display SimpleCal calendar events in a calendar or agenda view.",
+	"description": "Display SimpleCal calendar events in an agenda view.",
 	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "simplecal-agenda-block",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
 	"attributes": {
 		"title": {
 			"type": "string",
 			"default": "Calendar of Events"
-		},
-		"displayStyle": {
-			"type": "string",
-			"default": "agenda"
 		},
 		"hideOnNoEvents": {
 			"type": "boolean",
@@ -85,13 +89,5 @@
 			"type": "array",
 			"default": []
 		}
-	},
-	"supports": {
-        "html": false
-	},
-	"textdomain": "simplecal-block",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"render": "file:./render.php"
+	}
 }

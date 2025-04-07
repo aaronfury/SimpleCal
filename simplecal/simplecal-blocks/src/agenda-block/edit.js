@@ -1,23 +1,12 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
+import { PanelBody, RadioControl, NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
 
 import './editor.scss';
 
-/**
- * The edit function describes the structure of your block in the context of the
- * editor. This represents what the editor will render when the block is used.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
- *
- * @return {Element} Element to render.
- */
 export default function Edit({ attributes, setAttributes }) {
-	const blockProps = useBlockProps();
-
 	const {
 		title = 'Calendar of Events',
 		eventTags = 'all',
-		displayStyle = 'agenda',
 		hideOnNoEvents = false,
 		noEventsText = "There are no upcoming events.",
 		blockTheme = 'theme1',
@@ -37,7 +26,7 @@ export default function Edit({ attributes, setAttributes }) {
 	} = attributes;
 
 	return (
-		<div {...blockProps}>
+		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<PanelBody title="Settings">
 					<TextControl
@@ -45,15 +34,6 @@ export default function Edit({ attributes, setAttributes }) {
 						value= {title}
 						help= "Leave blank to hide the title"
 						onChange= {(value) => setAttributes({title: value})}
-					/>
-					<RadioControl
-						label= "Display Style"
-						selected= {displayStyle}
-						options= {[
-							{label: 'Agenda view', value: 'agenda'},
-							{label: 'Calendar view', value: 'calendar'},
-						]}
-						onChange= {(value) => setAttributes({displayStyle: value})}
 					/>
 					<ToggleControl
 						label= "Hide calendar when there are no events"
@@ -152,7 +132,7 @@ export default function Edit({ attributes, setAttributes }) {
 						onChange= {(value) => setAttributes({agendaPostsPerPage: parseInt(value)})}
 					/>
 					<SelectControl
-						label="Display pagination at top or bottom of agenda view"
+						label= "Display pagination at top or bottom of agenda view"
 						value= {agendaDisplayPagination}
 						options= {[
 							{label: 'Top', value: 'top'},
@@ -220,7 +200,7 @@ export default function Edit({ attributes, setAttributes }) {
 					}
 				</PanelBody>
 			</InspectorControls>
-			<p>{(title && title != '') ? title : 'SimpleCal Calendar'}</p>
+			<p>{(title && title != '') ? title : 'SimpleCal Agenda View'}</p>
 		</div>
 	);
 }

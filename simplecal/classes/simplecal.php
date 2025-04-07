@@ -14,8 +14,8 @@ class SimpleCal {
 		add_action('init', [$this, 'block_template_register']);
 		//add_action('widgets_init', [$this, 'widget_register']); // TODO: Add back in when the widget is ready
 
-		add_action('wp_ajax_simplecal_get_events', [$this, 'ajax_get_events']);
-		add_action('wp_ajax_nopriv_simplecal_get_events', [$this, 'ajax_get_events']);
+		add_action('wp_ajax_simplecal_get_agenda_events', [$this, 'ajax_get_agenda_events']);
+		add_action('wp_ajax_nopriv_simplecal_get_agenda_events', [$this, 'ajax_get_agenda_events']);
 		
 		if (is_admin()) {
 			if ('edit.php' == $pagenow && 'simplecal_event' == $_GET['post_type']) {
@@ -165,6 +165,28 @@ class SimpleCal {
 			'show_in_rest' => true
 		]
 		);
+
+		$meta = [
+			'simplecal_event_start_timestamp' => 'object',
+			'simplecal_event_end_timestamp' => 'object',
+			'simplecal_event_end_all_day' => 'boolean',
+			'simplecal_event_venue_name' => 'string',
+			'simplecal_event_street_adress' => 'string',
+			'simplecal_event_city' => 'string',
+			'simplecal_event_state' => 'string',
+			'simplecal_event_country' => 'string',
+			'simplecal_event_virtual_platform' => 'string',
+			'simplecal_event_meeting_link' => 'string',
+			'simplecal_event_website' => 'string',
+			'simplecal_event_private_location' => 'boolean',
+		];
+
+		foreach ($meta as $field => $type) {
+			register_post_meta('simplecal_event', $field, [
+				'type' => $type,
+				'show_in_rest' => true
+			]);
+		}
 
 		register_rest_field( 'simplecal_event', 'meta', [
 			'get_callback' => function ($data) {
@@ -358,7 +380,19 @@ class SimpleCal {
 	}
 	
 	function block_register() {
-		register_block_type(dirname(__FILE__) . '/../simplecal-block/build');
+		if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
+			wp_register_block_types_from_metadata_collection( __DIR__ . '/../simplecal-blocks/build', __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php' );
+			return;
+		}
+	
+		if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
+			wp_register_block_metadata_collection( __DIR__ . '/../simplecal-blocks/build', __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php' );
+		}
+	
+		$manifest_data = require __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php';
+		foreach ( array_keys( $manifest_data ) as $block_type ) {
+			register_block_type( __DIR__ . "/../simplecal-blocks/build/{$block_type}" );
+		}
 	}
 
 	function block_template_register() {
@@ -387,7 +421,7 @@ class SimpleCal {
 	}
 
 	//// WP AJAX INTERFACE ////
-	public function ajax_get_events() {
+	public function ajax_get_agenda_events() {
 		// Determine the desired page
 		$page = intval((array_key_exists('page', $_POST) ? $_POST['page'] : 0));
 		$posts_per_page = intval((array_key_exists('agendaPostsPerPage', $_POST) ? ($_POST['agendaPostsPerPage'] == 0 ? -1 : $_POST['agendaPostsPerPage']) : 10));
@@ -403,36 +437,34 @@ class SimpleCal {
 		];
 
 		// Build the query for agenda views
-		if (in_array($_POST['displayStyle'],['agenda','archive'])) {
+		$args += [
+			'posts_per_page' => $posts_per_page,
+			'paged' => $page_param,
+		];
+		
+		if ($page >= 0) {
 			$args += [
-				'posts_per_page' => $posts_per_page,
-				'paged' => $page_param,
+				'meta_value' => date('Y-m-d H:i:s'),
+				'meta_compare' => '>=',
+				'order' => 'ASC'
 			];
-			
-			if ($page >= 0) {
-				$args += [
-					'meta_value' => date('Y-m-d H:i:s'),
-					'meta_compare' => '>=',
-					'order' => 'ASC'
-				];
-			} else {
-				$args += [
-					'order' => 'DESC'
-				];
+		} else {
+			$args += [
+				'order' => 'DESC'
+			];
 
-				if (array_key_exists('displayPastEventsDays', $_POST)) {
-					if ($_POST['displayPastEventsDays'] == 0) {
-						$args += [
-							'meta_value' => date('Y-m-d H:i:s'),
-							'meta_compare' => '<='
-						];
-					} else {
-						$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
-						$args += [
-							'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-							'meta_compare' => 'BETWEEN'
-						];
-					}
+			if (array_key_exists('displayPastEventsDays', $_POST)) {
+				if ($_POST['displayPastEventsDays'] == 0) {
+					$args += [
+						'meta_value' => date('Y-m-d H:i:s'),
+						'meta_compare' => '<='
+					];
+				} else {
+					$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
+					$args += [
+						'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+						'meta_compare' => 'BETWEEN'
+					];
 				}
 			}
 		}
@@ -444,17 +476,9 @@ class SimpleCal {
 			$events->posts = array_reverse($events->posts);
 		}
 		
+		// Clear the output buffer, load the appropriate template, capture the buffer as the output
 		ob_start();
-
-		switch ($_POST['displayStyle']) {
-			case 'agenda':
-				include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $_POST['agendaLayout'] . '.php');
-				break;
-			case 'archive':
-				include_once(plugin_dir_path(__FILE__) . '../templates/template-parts/legacy-archive-loop.php');
-				break;
-		}
-
+		include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $_POST['agendaLayout'] . '.php');
 		$output = ob_get_clean();
 		wp_reset_postdata();
 
@@ -628,7 +652,7 @@ class SimpleCal {
 			}
 
 			switch ($link_type) {
-				case 'address':
+				case 'text':
 					$data = "<a href='$link' target='_blank'>$address</a>";
 					break;
 				case 'after':

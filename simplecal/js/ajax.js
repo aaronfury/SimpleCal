@@ -53,9 +53,8 @@ jQuery(document).ready(() => {
 
 function scGetFormData(instance) {
 	var formData = {
-		'action' : 'simplecal_get_events',
+		'action' : 'simplecal_get_agenda_events',
 		'tags': jQuery(instance).data('tags'),
-		'displayStyle' : jQuery(instance).data('displayStyle'),
 		'displayPastEvents' : jQuery(instance).data('displayPastEvents'),
 		'displayPastEventsDays' : jQuery(instance).data('displayPastEventsDays'),
 		'displayFutureEventsDays' : jQuery(instance).data('displayFutureEventsDays'),

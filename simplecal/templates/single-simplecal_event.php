@@ -1,12 +1,3 @@
-<?php
-	// This is some real hacky shit. I see why people hate FSE/Gutenberg even after all this time.
-	global $post;
-	$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-	$post_id = url_to_postid($url);
-	$post = get_post($post_id);
-	global $scplugin;
-	global $pagenow;
-?>
 <!-- wp:template-part {"slug":"header","area":"header","tagName":"header"} /-->
 
 <!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"bottom":"var:preset|spacing|70"}}}} -->
@@ -34,14 +25,15 @@
 				<!-- /wp:html -->
 
 				<!-- wp:heading {"level":"2"} -->
-				<h2 class="wp-block-heading"><?= $scplugin::event_get_the_date(date_or_time:'date',start_or_end:'both'); ?></h2>
+				<h2 class="wp-block-heading">
+					<!-- wp:simplecal/meta-block {"metaField":"eventStartDateTime"} /-->
+				</h2>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:group -->
 		</div>
 		<!-- /wp:group -->
 
-		<?php if (!$post->simplecal_event_all_day) { ?>
 		<!-- wp:group {"layout":{"type":"constrained"}} -->
 		<div class="wp-block-group">
 			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
@@ -51,19 +43,15 @@
 				<!-- /wp:html -->
 
 				<!-- wp:heading {"level":"2"} -->
-				<h2 class="wp-block-heading"><?= $scplugin::event_get_the_date(date_or_time:'time', start_or_end:'both'); ?></h2>
+				<h2 class="wp-block-heading">
+					<!-- wp:simplecal/meta-block {"metaField":"eventEndDateTime"} /-->
+				</h2>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:group -->
 		</div>
 		<!-- /wp:group -->
-		 <?php } ?>
 
-		 <?php
-		if (!$post->simplecal_event_private_location || (($post->simplecal_event_private_location) && is_user_logged_in())) {
-
-			if ($scplugin::event_get_the_location(null, true)) {
-?>
 		<!-- wp:group {"layout":{"type":"constrained"}} -->
 		<div class="wp-block-group">
 			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
@@ -73,16 +61,15 @@
 				<!-- /wp:html -->
 
 				<!-- wp:heading {"level":"3"} -->
-				<h3 class="wp-block-heading"><?= $scplugin::event_get_the_location('after'); ?></h3>
+				<h3 class="wp-block-heading">
+					<!-- wp:simplecal/meta-block {"metaField":"eventFullAddress","linkType":"after"} /-->
+				</h3>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:group -->
 		</div>
 		<!-- /wp:group -->
-<?php
-			}
-			if ($post->simplecal_event_meeting_link) {
-?>
+
 		<!-- wp:group {"layout":{"type":"constrained"}} -->
 		<div class="wp-block-group">
 			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
@@ -92,17 +79,13 @@
 				<!-- /wp:html -->
 
 				<!-- wp:heading {"level":"3"} -->
-				<h3 class="wp-block-heading"><?= ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?></h3>
+				<h3 class="wp-block-heading"><!-- wp:simplecal/meta-block {"metaField":"eventMeetingLink"} /--></h3>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:group -->
 		</div>
 		<!-- /wp:group -->
-<?php
-			}
-		}
-?>
-		<?php if ($post->simplecal_event_website) { ?>
+
 		<!-- wp:group {"layout":{"type":"constrained"}} -->
 		<div class="wp-block-group">
 			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
@@ -112,13 +95,14 @@
 				<!-- /wp:html -->
 		
 				<!-- wp:heading {"level":"3"} -->
-				<h3><?= $scplugin::get_formatted_website($post->simplecal_event_website, null); ?></h3>
+				<h3>
+					<!-- wp:simplecal/meta-block {"metaField":"eventWebsite"} /-->
+				</h3>
 				<!-- /wp:heading -->
 			</div>
 			<!-- /wp:group -->
 		</div>
 		<!-- /wp:group -->
-		 <?php } ?>
 		 
 		 <!-- wp:separator {"style":{"spacing":{"margin":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}}}} -->
 		 <hr class="wp-block-separator has-alpha-channel-opacity" style="margin-top:var(--wp--preset--spacing--40);margin-bottom:var(--wp--preset--spacing--40)"/>
