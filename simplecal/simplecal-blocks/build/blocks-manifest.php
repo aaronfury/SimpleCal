@@ -128,6 +128,9 @@ return array(
 			),
 			'linkType' => array(
 				'type' => 'string'
+			),
+			'blockType' => array(
+				'type' => 'string'
 			)
 		)
 	)

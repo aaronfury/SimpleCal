@@ -1,4 +1,7 @@
 <?php
+
+use function Avifinfo\read;
+
 class SimpleCal {
 	public static $tz;
 	private $tz_string;
@@ -266,18 +269,23 @@ class SimpleCal {
 		echo '<h3>Physical</h3>';
 		$metabox_ids = ["venue_name", "street_address", "city"];
 		foreach ($metabox_ids as $metabox_id) {
-			echo '<label for="event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
+			echo '<label for="simplecal_event_' . $metabox_id . '">' . mb_convert_case(str_replace('_', ' ', $metabox_id), MB_CASE_TITLE, 'UTF-8') . ':</label><br />';
 			$event_meta = $post->{"simplecal_event_{$metabox_id}"};
 			echo '<input type="text" class="fullwidth" name="event_' . $metabox_id . '" id="simplecal_event_' . $metabox_id . '" value="' . $event_meta . '" /><br />';
 		}
 ?>
-		<label for="event_state">State</label><br />
-		<?php $this->state_input("event_state", $post->{"simplecal_event_state"}); ?>
+		<label for="event_country">Country</label><br />
+		<?php $this->country_input($post->{"simplecal_event_country"}, 'event_country', 'simplecal_event_country'); ?>
 		<br />
 		
-		<label for="event_country">Country</label><br />
-		<input type="text" class="fullwidth" name="event_country" id="simplecal_event_country" disabled value="<?php echo $post->{"simplecal_event_country"} ?? "United States of America"; ?>"/>
-		<br />
+		<div id="simplecal_event_state_us_wrapper" style="display:none;">
+			<label for="simplecal_event_state_us">State</label><br />
+			<?php $this->state_input($post->simplecal_event_state, "event_state", "simplecal_event_state_us"); ?>
+		</div>
+		<div id="simplecal_event_state_other_wrapper" style="display:none;">
+			<label for="simplecal_event_state_other">State / County / Province</label><br />
+			<input type="text" name="event_state" id="simplecal_event_state_other" value='<?php echo $post->simplecal_event_state; ?>'/>
+		</div>
 <?php
 		// TODO: Find a way to populate country and state lists for international. https://github.com/dr5hn/countries-states-cities-database seems like an option, combined with some AJAX. Places API is too expensive to offer, and having each person get their own API key seems cumbersome.
 ?>
@@ -350,7 +358,11 @@ class SimpleCal {
 		// Save the selected state to prepopulate it on the next event.
 		// TODO: Implement this for other fields? Or like a favorites list?
 		if ($events_meta['simplecal_event_state']) {
-			update_option('simplecal_last_state', $events_meta['simplecal_event_state']);
+			update_option('simplecal_last_state', $events_meta['simplecal_event_state'], false);
+		}
+
+		if ($events_meta['simplecal_event_country']) {
+			update_option('simplecal_last_country', $events_meta['simplecal_event_country'], false);
 		}
 	}
 	
@@ -360,6 +372,7 @@ class SimpleCal {
 
 			if (is_object($screen) && 'simplecal_event' == $screen->post_type ){
 				wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). '../js/admin.js');
+				wp_enqueue_style('simplecal_admin_script', plugin_dir_url(__FILE__). '../css/admin.css');
 			}
 		}
 		return;
@@ -371,7 +384,7 @@ class SimpleCal {
 			wp_localize_script('simplecal_ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
 		}
 
-		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'); // TODO: Make this conditional based on page?
+		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@36,400,1,0&display=block'); // TODO: Make this conditional based on page?
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -409,7 +422,7 @@ class SimpleCal {
 			[
 				'title' => 'SimpleCal Event',
 				'description' => 'The layout for a single event',
-				'content' => self::get_template_content('single-simplecal_event.php')
+				'content' => self::get_template_content('single-simplecal_event.html')
 			]
 		);
 	}
@@ -668,20 +681,28 @@ class SimpleCal {
 		}
 	}
 
-	public static function get_formatted_website($url, $link_text) {
+	public static function get_formatted_website($url, $link_type = 'text', $link_text = null) {
 		if (preg_match('/^(?:https?:\/\/)?(?:www\.)?(.*\..*)\/?/', $url, $matches)) {
 			$domain = explode('/',$matches[1])[0];
 		} else {
 			$domain = explode('/',$url)[0];
 		}
-		$formatted = "<a href=\"$url\" target=\"_blank\">" . ($link_text ?? $domain) . "</a>";
-		return $formatted;
+
+		$link_text ??= $domain;
+
+		switch ($link_type) {
+			case 'text':
+				return "<a href=\"$url\" title=\"$url\" target=\"_blank\">$link_text</a>";
+			case 'after':
+				return "$url (<a href=\"$url\" title=\"$url\" target=\"_blank\">$link_text</a>)";
+			case 'none': // For consistency in behavior
+			default:
+				return $url;
+		}
 	}
 
-	function get_state_input($dom_name, $field_value) {
-		if (empty($field_value)) {
-			$field_value = get_option('simplecal_last_state','');
-		}
+	function get_state_input($field_value, $dom_name = 'simplecal_state', $dom_id = 'simplecal_state', $addl_attrs = null) {
+		$field_value ??= get_option('simplecal_last_state','');
 
 		$states = [
 			'AL'=>'Alabama',
@@ -737,7 +758,7 @@ class SimpleCal {
 			'WY'=>'Wyoming'
 		];
 
-		$output = "<select name=$dom_name>";
+		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
 		foreach ($states as $code=>$name) {
 			$output .= "<option value=\"$code\"" . ($field_value == $code ? ' selected ' : '') . ">$name</option>";
 		}
@@ -746,18 +767,27 @@ class SimpleCal {
 		return $output;
 	}
 
-	function state_input($dom_name, $field_value) {
-		echo $this->get_state_input($dom_name, $field_value);
+	function state_input($field_value = null, $dom_name = null, $dom_id = null, $addl_attrs = null) {
+		echo $this->get_state_input($field_value, $dom_name, $dom_id, $addl_attrs);
 	}
 
-	function get_country_input($dom_name) {
-		// TODO: Add multinational support, obvs. Duh. But you know, America first.
-		$output = "<select name=$dom_name><option value='US' selected='selected'>United States of America</option></select>";
+	function get_country_input($field_value, $dom_name = 'simplecal_country', $dom_id = 'simplecal_country', $addl_attrs = null) {
+		$field_value ??= get_option('simplecal_last_country', null);
+		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
+
+		// TODO: Check if file exists
+		$file_data = file_get_contents(plugin_dir_path(__FILE__) . '../util/countries.json'); // Built on data from geonames.org. Thanks, GeoNames!
+		$countries = json_decode($file_data);
+
+		foreach ($countries as $code=>$name) {
+			$output .= "<option value='$name' " . ($field_value == $name ? 'selected' : null ) . ">$name</option>";
+		}
+		$output .="</select>";
 		return $output;
 	}
 
-	function country_input($dom_name) {
-		echo $this->get_country_input($dom_name);
+	function country_input($field_value = null, $dom_name = null, $dom_id = null, $addl_attrs = null) {
+		echo $this->get_country_input($field_value, $dom_name, $dom_id, $addl_attrs);
 	}
 
 	function timezone_list() {

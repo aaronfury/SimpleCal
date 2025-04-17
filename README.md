@@ -12,15 +12,16 @@ I love you all.
 ## Major To-Dos
 * ~~Pagination~~ DONE. AND AWESOME.
 * ~~Archive page~~ DONE. AND MEDIOCRE.
-* ~~Default to current month if show previous events is selected~~
-* Fix the block templates to do things the right way
+* ~~Default to current month if show previous events is selected~~ FIXED.
+* ~~Fix the block templates to do things the right way~~ MOSTLY DONE. NEED TO CREATE A NEW CUSTOM BLOCK FOR THE ARCHIVE PAGE QUERY LOOP.
 * Backport to widget
 * Better styling
 * Custom CSS support
-* Option to add event to calendar
+* Option to add event to personal calendar (iCal, etc.)
 * Option to highlight upcoming events
 * Filter/search
 * Support for "Doors" time
+* A choice of mapping services (and maybe embedded maps???)
 * Event pricing
 * "Members Event" tag
 * Support for "TBD" events within a month/week
@@ -31,3 +32,7 @@ I love you all.
 * Calendar view
 * Option to auto-delete old events
 * Infinite Scroll??
+* Sync to/from external calendars (Very unlikely)
+
+## Minor To-Dos
+* Move settings over to a block element instead of the Inspector Panel

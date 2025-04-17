@@ -20,6 +20,16 @@ function compareStartAndEnd() {
 	}
 }
 
+function swapStateInput() {
+	if ($j('#simplecal_event_country').val() != 'United States') {
+		$j('#simplecal_event_state_us_wrapper').hide();
+		$j('#simplecal_event_state_other_wrapper').show();
+	} else {
+		$j('#simplecal_event_state_us_wrapper').show();
+		$j('#simplecal_event_state_other_wrapper').hide();
+	}
+}
+
 $j(document).ready( () => {
 	if ($j('#simplecal_event_all_day').attr('checked')) {
 		let currentTime = new Date();
@@ -33,7 +43,9 @@ $j(document).ready( () => {
 			document.getElementById('simplecal_event_end_datetime').value
 		];
 	}
+
 	compareStartAndEnd();
+	swapStateInput();
 	
 	$j('#simplecal_event_all_day').on('change', (e) => {
 		target = e.target;
@@ -65,6 +77,10 @@ $j(document).ready( () => {
 	});
 
 	$j('#simplecal_event_end_datetime').on('change', () => {
-			compareStartAndEnd();
-		});
+		compareStartAndEnd();
+	});
+
+	$j('#simplecal_event_country').on('change', () => {
+		swapStateInput();
+	});
 });

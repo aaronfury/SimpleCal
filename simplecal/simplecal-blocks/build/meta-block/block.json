@@ -26,6 +26,9 @@
     },
     "linkType": {
       "type": "string"
+    },
+    "blockType": {
+      "type": "string"
     }
   }
 }
