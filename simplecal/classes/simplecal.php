@@ -1,7 +1,5 @@
 <?php
 
-use function Avifinfo\read;
-
 class SimpleCal {
 	public static $tz;
 	private $tz_string;
@@ -277,7 +275,7 @@ class SimpleCal {
 		<label for="event_country">Country</label><br />
 		<?php $this->country_input($post->{"simplecal_event_country"}, 'event_country', 'simplecal_event_country'); ?>
 		<br />
-		
+
 		<div id="simplecal_event_state_us_wrapper" style="display:none;">
 			<label for="simplecal_event_state_us">State</label><br />
 			<?php $this->state_input($post->simplecal_event_state, "event_state", "simplecal_event_state_us"); ?>
