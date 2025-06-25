@@ -29,14 +29,13 @@ class SimpleCal {
 				add_action('add_meta_boxes', [$this,'cpt_register_metaboxes']);
 				add_action('save_post_simplecal_event', [$this,'cpt_save_meta']);
 			}
-			
+
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
 			// TODO: Add CSS for admin panel
 		} else {
 			add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
 			add_filter('single_template', [$this,'cpt_register_templates']);
 			add_filter('archive_template', [$this,'cpt_register_templates']);
-			add_action('pre_get_posts', [$this, 'cpt_prepare_archive_query']);
 		}
 	}
 
@@ -212,12 +211,6 @@ class SimpleCal {
 		return $template;
 	}
 
-	function cpt_prepare_archive_query($query) {
-		if ($query->is_post_type_archive('simplecal_event')) {
-			$query->set('posts_per_page',3);
-		}
-	}
-
 	function cpt_register_metaboxes() {
 		global $post;
 		add_meta_box('event_date_time', 'Event Date and Time', [$this,'cpt_meta_box_datetime'], 'simplecal_event', 'side', 'default');
@@ -369,8 +362,8 @@ class SimpleCal {
 			$screen = get_current_screen();
 
 			if (is_object($screen) && 'simplecal_event' == $screen->post_type ){
-				wp_enqueue_script('simplecal_admin_script', plugin_dir_url(__FILE__). '../js/admin.js');
-				wp_enqueue_style('simplecal_admin_script', plugin_dir_url(__FILE__). '../css/admin.css');
+				wp_enqueue_script('simplecal-admin-script', plugin_dir_url(__FILE__). '../js/admin.js');
+				wp_enqueue_style('simplecal-admin-script', plugin_dir_url(__FILE__). '../css/admin.css');
 			}
 		}
 		return;
@@ -378,8 +371,8 @@ class SimpleCal {
 
 	function enqueue_scripts($hook) {
 		if (is_post_type_archive('simplecal_event')) {
-			wp_enqueue_script('simplecal_ajax', plugins_url('simplecal/js/ajax.js'), ['jquery','json2'],null,['defer',true]);
-			wp_localize_script('simplecal_ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
+			wp_enqueue_script('simplecal-ajax', plugins_url('simplecal/js/ajax.js'), ['jquery','json2'],null,['defer',true]);
+			wp_localize_script('simplecal-ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
 		}
 
 		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@36,400,1,0&display=block'); // TODO: Make this conditional based on page?

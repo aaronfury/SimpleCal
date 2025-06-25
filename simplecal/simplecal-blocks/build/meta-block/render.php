@@ -33,7 +33,30 @@ switch ($block_type) {
 	case 'summary':
 ?>
 		<div <?php echo get_block_wrapper_attributes(['class' => 'simplecal_meta_block_summary']); ?>>
-			<h2>Coming soon</h2>
+			<div class="simplecal_meta_block_row">
+				<div class="simplecal_meta_block_icon" title="Event Date/Time">
+					<span class="material-symbols-outlined">calendar_month</span>
+				</div>
+				<h3>
+					<span><?php echo $meta_field_mapping['eventStartEndDateTime']; ?></span>
+				</h3>
+			</div>
+<?php
+		if (!$post->simplecal_event_private_location || is_user_logged_in()) {
+			if ($scplugin::event_get_the_location(null, true)) {
+?>
+			<div class="simplecal_meta_block_row">
+				<div class="simplecal_meta_block_icon">
+					<span class="material-symbols-outlined">pin_drop</span>
+				</div>
+				<h3>
+					<span><?php echo $meta_field_mapping['eventFullAddress']; ?></span>
+				</h3>
+			</div>
+<?php
+			}
+		}
+?>
 		</div>
 <?php
 		return;

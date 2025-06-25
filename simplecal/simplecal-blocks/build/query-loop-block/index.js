@@ -2,153 +2,78 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/meta-block/block.json":
-/*!***********************************!*\
-  !*** ./src/meta-block/block.json ***!
-  \***********************************/
+/***/ "./src/query-loop-block/block.json":
+/*!*****************************************!*\
+  !*** ./src/query-loop-block/block.json ***!
+  \*****************************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"simplecal/meta-block","version":"0.1.0","title":"SimpleCal Meta Block","category":"text","icon":"index-card","description":"Renders custom post meta for events, both in the single view and in a query loop","example":{},"usesContext":["postId","postType"],"supports":{"html":false},"textdomain":"simplecal-meta-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","attributes":{"metaField":{"type":"string"},"linkType":{"type":"string"},"blockType":{"type":"string"}}}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"simplecal/query-loop-block","version":"0.1.0","title":"SimpleCal Query Loop Block","category":"widgets","icon":"smiley","description":"Creates a custom WP Query Loop to display SimpleCal events in correct order","example":{},"supports":{"html":false},"textdomain":"simplecal-query-loop-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
 
 /***/ }),
 
-/***/ "./src/meta-block/edit.js":
-/*!********************************!*\
-  !*** ./src/meta-block/edit.js ***!
-  \********************************/
+/***/ "./src/query-loop-block/edit.js":
+/*!**************************************!*\
+  !*** ./src/query-loop-block/edit.js ***!
+  \**************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Edit)
 /* harmony export */ });
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./src/meta-block/editor.scss");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./src/query-loop-block/editor.scss");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/**
+ * Retrieves the translation of text.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
+ */
 
 
+/**
+ * React hook that is used to mark the block wrapper element.
+ * It provides all the necessary props like the class name.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
+ */
 
 
-function Edit({
-  attributes,
-  setAttributes
-}) {
-  const {
-    metaField = "Event Detail",
-    linkType,
-    blockType
-  } = attributes;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
-    ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)(),
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: "Settings",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RadioControl, {
-          label: "Block Type",
-          selectd: blockType,
-          options: [{
-            label: "Meta Value (<span> element)",
-            value: "value"
-          }, {
-            label: "Event Summary",
-            value: "summary"
-          }, {
-            label: "Full Event Details",
-            value: "details"
-          }],
-          onChange: value => setAttributes({
-            blockType: value
-          })
-        }), blockType == 'value' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
-            label: "Event meta to display",
-            value: metaField,
-            options: [{
-              label: 'Start Date',
-              value: 'eventStartDate'
-            }, {
-              label: 'Start Time',
-              value: 'eventStartTime'
-            }, {
-              label: 'Start Date & Time',
-              value: 'eventStartDateTime'
-            }, {
-              label: 'End Date',
-              value: 'eventEndDate'
-            }, {
-              label: 'End Time',
-              value: 'eventEndTime'
-            }, {
-              label: 'Start & End Date & Time',
-              value: 'eventStartEndDateTime'
-            }, {
-              label: 'Venue Name',
-              value: 'eventVenueName'
-            }, {
-              label: 'Street Address',
-              value: 'eventStreetAddress'
-            }, {
-              label: 'City',
-              value: 'eventCity'
-            }, {
-              label: 'State',
-              value: 'eventState'
-            }, {
-              label: 'Country',
-              value: 'eventCountry'
-            }, {
-              label: 'Full Address',
-              value: 'eventFullAddress'
-            }, {
-              label: 'Virtual Platform',
-              value: 'eventVirtualPlatform'
-            }, {
-              label: 'Meeting Link',
-              value: 'eventMeetingLink'
-            }, {
-              label: 'Website',
-              value: 'eventWebsite'
-            }],
-            onChange: value => setAttributes({
-              metaField: value
-            })
-          })
-        }) : null, blockType == 'value' && ["eventVenueName", "eventFullAddress", "eventVirtualPlatform", "eventMeetingLink", "eventWebsite"].includes(metaField) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
-            label: "Link meta field to map/meeting/website?",
-            value: linkType,
-            options: [{
-              label: 'None',
-              value: 'none'
-            }, {
-              label: 'Link text',
-              value: 'text'
-            }, {
-              label: 'Link after',
-              value: 'after'
-            }],
-            onChange: value => setAttributes({
-              linkType: value
-            })
-          })
-        }) : null]
-      })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-      children: metaField
-    })]
+/**
+ * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
+ * Those files can contain any CSS code that gets applied to the editor.
+ *
+ * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
+ */
+
+
+/**
+ * The edit function describes the structure of your block in the context of the
+ * editor. This represents what the editor will render when the block is used.
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
+ *
+ * @return {Element} Element to render.
+ */
+
+function Edit() {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
+    ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.useBlockProps)(),
+    children: "SimpleCal Query Loop Block"
   });
 }
 
 /***/ }),
 
-/***/ "./src/meta-block/editor.scss":
-/*!************************************!*\
-  !*** ./src/meta-block/editor.scss ***!
-  \************************************/
+/***/ "./src/query-loop-block/editor.scss":
+/*!******************************************!*\
+  !*** ./src/query-loop-block/editor.scss ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -157,18 +82,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/meta-block/index.js":
-/*!*********************************!*\
-  !*** ./src/meta-block/index.js ***!
-  \*********************************/
+/***/ "./src/query-loop-block/index.js":
+/*!***************************************!*\
+  !*** ./src/query-loop-block/index.js ***!
+  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
 /* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./style.scss */ "./src/meta-block/style.scss");
-/* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./edit */ "./src/meta-block/edit.js");
-/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./block.json */ "./src/meta-block/block.json");
+/* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./style.scss */ "./src/query-loop-block/style.scss");
+/* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./edit */ "./src/query-loop-block/edit.js");
+/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./block.json */ "./src/query-loop-block/block.json");
 /**
  * Registers a new block provided a unique name and an object defining its behavior.
  *
@@ -205,10 +130,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/meta-block/style.scss":
-/*!***********************************!*\
-  !*** ./src/meta-block/style.scss ***!
-  \***********************************/
+/***/ "./src/query-loop-block/style.scss":
+/*!*****************************************!*\
+  !*** ./src/query-loop-block/style.scss ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -237,13 +162,13 @@ module.exports = window["wp"]["blocks"];
 
 /***/ }),
 
-/***/ "@wordpress/components":
-/*!************************************!*\
-  !*** external ["wp","components"] ***!
-  \************************************/
+/***/ "@wordpress/i18n":
+/*!******************************!*\
+  !*** external ["wp","i18n"] ***!
+  \******************************/
 /***/ ((module) => {
 
-module.exports = window["wp"]["components"];
+module.exports = window["wp"]["i18n"];
 
 /***/ }),
 
@@ -367,8 +292,8 @@ module.exports = window["ReactJSXRuntime"];
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
-/******/ 			"meta-block/index": 0,
-/******/ 			"meta-block/style-index": 0
+/******/ 			"query-loop-block/index": 0,
+/******/ 			"query-loop-block/style-index": 0
 /******/ 		};
 /******/ 		
 /******/ 		// no chunk on demand loading
@@ -418,7 +343,7 @@ module.exports = window["ReactJSXRuntime"];
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["meta-block/style-index"], () => (__webpack_require__("./src/meta-block/index.js")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["query-loop-block/style-index"], () => (__webpack_require__("./src/query-loop-block/index.js")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
