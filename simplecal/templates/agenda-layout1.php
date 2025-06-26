@@ -4,14 +4,14 @@ if ($events->have_posts()) {
 	$prev_event_month = $prev_event_year = '';
 	$current_time = time();
 
-	if ($_POST['agendaShowExcerpt'] && $_POST['agendaExcerptLines'] != '0') {
+	if ($excerptShow && $excerptLines != '0') {
 ?>
 		<style>
 			.simplecal_list_item_excerpt {
 				overflow: hidden;
 				display: -webkit-box;
-				-webkit-line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
-				line-clamp: <?= $_POST['agendaExcerptLines']; ?>;
+				-webkit-line-clamp: <?= $excerptLines; ?>;
+				line-clamp: <?= $excerptLines; ?>;
 				-webkit-box-orient: vertical;
 			}
 		</style>
@@ -30,7 +30,7 @@ if ($events->have_posts()) {
 			echo "<div class='simplecal_list_year_wrapper'>";
 			if (!$prev_event_month) {
 				echo "<div class='simplecal_list_month_wrapper'>";
-				if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+				if ($monthYearHeadersShow == 'true') {
 					echo "<div class='simplecal_list_month_header" . ($start_datetime->getTimestamp() < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>" . $start_datetime->format('F') . "</div>";
 				}
 			}
@@ -40,12 +40,12 @@ if ($events->have_posts()) {
 
 				if ($prev_event_year != $start_datetime->format('Y')) { // If the year doesn't match, let's close that and optionally display the header
 					echo "</div><!-- .simplecal_list_year_wrapper -->\n<div class='simplecal_list_year_wrapper'>";
-					if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+					if ($monthYearHeadersShow) {
 						echo "<div class='simplecal_list_year_header'>" . $start_datetime->format('Y') . "</div>";
 					}
 				}
 				echo "<div class='simplecal_list_month_wrapper'>"; // We always want to open up the month and optionally display the header
-				if ($_POST['agendaShowMonthYearHeaders'] == 'true') {
+				if ($monthYearHeadersShow) {
 					echo "<div class='simplecal_list_month_header" . ($start_datetime->getTimestamp() < strtotime("first day of this month midnight") ? ' simplecal_past_event' : '') . "'>" . $start_datetime->format('F') . "</div>";
 				}
 			}
@@ -55,7 +55,7 @@ if ($events->have_posts()) {
 ?>
 		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
 <?php
-		if ($_POST["agendaShowThumbnail"] == 'true') {
+		if ($thumbnailShow == 'true') {
 ?>
 			<div class="simplecal_list_item_thumbnail">
 				<img src="<?php the_post_thumbnail_url();?>" />
@@ -66,7 +66,7 @@ if ($events->have_posts()) {
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
 					<div class="simplecal_list_item_dates"><?= SimpleCal::event_get_the_date("date","both"); ?></div>
-					<?php if ($_POST['agendaShowDayOfWeek'] == 'true') { ?>
+					<?php if ($dayOfWeekShow == 'true') { ?>
 						 <div class="simplecal_list_item_dayofweek">(<?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
 					<?php } ?>
 				</div>
@@ -119,7 +119,7 @@ if ($events->have_posts()) {
 			}
 		}
 		
-		if ($_POST["agendaShowExcerpt"] == 'true') {
+		if ($excerptShow == 'true') {
 ?>
 				<div class="simplecal_list_item_excerpt">
 					<?php the_excerpt(); ?>

@@ -14,14 +14,15 @@ return array(
 			
 		),
 		'supports' => array(
-			'html' => false
+			'html' => false,
+			'interactivity' => true
 		),
 		'textdomain' => 'simplecal-agenda-block',
 		'editorScript' => 'file:./index.js',
 		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php',
-		'viewScript' => 'file:./view.js',
+		'viewScriptModule' => 'file:./view.js',
 		'attributes' => array(
 			'title' => array(
 				'type' => 'string',

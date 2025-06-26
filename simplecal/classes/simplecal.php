@@ -14,9 +14,6 @@ class SimpleCal {
 		add_action('init', [$this, 'block_register']);
 		add_action('init', [$this, 'block_template_register']);
 		//add_action('widgets_init', [$this, 'widget_register']); // TODO: Add back in when the widget is ready
-
-		add_action('wp_ajax_simplecal_get_agenda_events', [$this, 'ajax_get_agenda_events']);
-		add_action('wp_ajax_nopriv_simplecal_get_agenda_events', [$this, 'ajax_get_agenda_events']);
 		
 		if (is_admin()) {
 			if ('edit.php' == $pagenow && 'simplecal_event' == $_GET['post_type']) {
@@ -37,6 +34,8 @@ class SimpleCal {
 			add_filter('single_template', [$this,'cpt_register_templates']);
 			add_filter('archive_template', [$this,'cpt_register_templates']);
 		}
+
+		add_action( 'rest_api_init', [$this, 'api_route_register']);
 	}
 
 	//// CUSTOMIZE COLUMNS FOR THE CPT IN WP-ADMIN ////
@@ -370,12 +369,9 @@ class SimpleCal {
 	}
 
 	function enqueue_scripts($hook) {
-		if (is_post_type_archive('simplecal_event')) {
-			wp_enqueue_script('simplecal-ajax', plugins_url('simplecal/js/ajax.js'), ['jquery','json2'],null,['defer',true]);
-			wp_localize_script('simplecal-ajax', 'ajaxParams', ["url" => admin_url('admin-ajax.php')]);
-		}
-
 		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@36,400,1,0&display=block'); // TODO: Make this conditional based on page?
+
+		wp_enqueue_script('wp-api-fetch'); // TODO: This is a workaround for the limitation that script modules cannot import scripts.
 	}
 
 	//// REGISTER WP BLOCK AND WIDGET ////
@@ -424,12 +420,33 @@ class SimpleCal {
 		return ob_get_clean();
 	}
 
-	//// WP AJAX INTERFACE ////
-	public function ajax_get_agenda_events() {
+	// WordPress API Interface
+	function api_route_register() {
+		register_rest_route(
+			'simplecal/v1',
+			'/events/agenda',
+			[
+				'methods' => 'GET',
+				'callback' => [$this,'api_route_agenda_get']
+			]
+		);
+	}
+
+	function api_route_agenda_get(WP_REST_Request $request) {
 		// Determine the desired page
-		$page = intval((array_key_exists('page', $_POST) ? $_POST['page'] : 0));
-		$posts_per_page = intval((array_key_exists('agendaPostsPerPage', $_POST) ? ($_POST['agendaPostsPerPage'] == 0 ? -1 : $_POST['agendaPostsPerPage']) : 10));
+		$page = $request['page'] ?? 0;
+		$posts_per_page = $request['posts_per_page'] ?? 10;
 		$page_param = ($page < 0 ? -$page : $page + 1);
+
+		// Parse the additional query parameters... TODO: Is this necessary? Why not just parse request directly?
+		$agendaLayout = $request['agendaLayout'] ?? "layout1";
+		$pastEventsShow = $request['pastEventsShows'] ?? true;
+		$pastEventsDays = $request['pastEventsDays'] ?? 0;
+		$excerptShow = $request['excerptShow'] ?? false;
+		$excerptLines = $request['excerptLines'] ?? false;
+		$monthYearHeadersShow = $request['monthYearHeadersShow'] ?? false;
+		$dayOfWeekShow = $request['dayOfWeekShow'] ?? false;
+		$thumbnailShow = $request['thumbnailShow'] ?? false;
 
 		// Build the query parameters
 		$args = [
@@ -457,14 +474,14 @@ class SimpleCal {
 				'order' => 'DESC'
 			];
 
-			if (array_key_exists('displayPastEventsDays', $_POST)) {
-				if ($_POST['displayPastEventsDays'] == 0) {
+			if ($pastEventsShow) {
+				if ($pastEventsDays == 0) {
 					$args += [
 						'meta_value' => date('Y-m-d H:i:s'),
 						'meta_compare' => '<='
 					];
 				} else {
-					$past_event_cutoff = new DateTime("-{$_POST['displayPastEventsDays']} days");
+					$past_event_cutoff = new DateTime("-{$pastEventsDays} days");
 					$args += [
 						'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
 						'meta_compare' => 'BETWEEN'
@@ -479,26 +496,21 @@ class SimpleCal {
 		if ($page < 0 && $events->have_posts()) { // Since "previous events" are searched in descending order from the current date, we flip the array of posts to have them show up in chronological order
 			$events->posts = array_reverse($events->posts);
 		}
-		
-		// Clear the output buffer, load the appropriate template, capture the buffer as the output
+
+		// TODO: Ideally, we'd want to return objects for each post (rather than rendered HTML), but WordPress' Interactivity API is still too immature to handle it well (lack of conditionals, unable to insert innerHTML, etc.)
 		ob_start();
-		include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $_POST['agendaLayout'] . '.php');
+		include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $agendaLayout . '.php');
 		$output = ob_get_clean();
 		wp_reset_postdata();
 
 		$more_prev = ((($page < 0) && ($events->max_num_pages > $page_param)) || $page >= 0);
 		$more_next = ((($page >= 0) && ($events->max_num_pages > $page_param)) || $page < 0);
-		wp_send_json_success([
-			'output' => $output,
-			'current_page' => $page,
-			'current_page_param' => $page_param,
-			'more_prev_pages' => $more_prev,
-			'more_next_pages' => $more_next//,
-			//'query' => $events->request,
-			//'query_vars' => $events->query_vars,
-			//'query_args' => $args,
-			//'filters' => $GLOBALS['wp_filter']
-		]);		
+
+		return [
+			"output" => $output,
+			"morePrevious" => $more_prev,
+			"moreFuture" => $more_next
+		];
 	}
 
 	//// UTILITIES ////
@@ -637,7 +649,7 @@ class SimpleCal {
 	}
 
 
-	public static function event_get_the_location($link_type = 'none', $check_only = false) {
+	public static function event_get_the_location($link_type = 'none', $check_only = false, $as_plain_text = false) {
 		global $post;
 		
 		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
@@ -652,7 +664,11 @@ class SimpleCal {
 			$address .= $post->simplecal_event_state ? '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' : '';
 
 			if ($check_only) {
-				return $address;
+				return !empty($address);
+			}
+
+			if ($as_plain_text) {
+				$address = preg_replace('~<([^<>]*)>~','',$address);
 			}
 
 			switch ($link_type) {

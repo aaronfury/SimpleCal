@@ -1,77 +1,117 @@
-/******/ (() => { // webpackBootstrap
+import * as __WEBPACK_EXTERNAL_MODULE__wordpress_interactivity_8e89b257__ from "@wordpress/interactivity";
+/******/ var __webpack_modules__ = ({
+
+/***/ "@wordpress/interactivity":
+/*!*******************************************!*\
+  !*** external "@wordpress/interactivity" ***!
+  \*******************************************/
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__wordpress_interactivity_8e89b257__;
+
+/***/ })
+
+/******/ });
+/************************************************************************/
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
+/******/ 	}
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		// no module.id needed
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
+/************************************************************************/
+/******/ /* webpack/runtime/make namespace object */
+/******/ (() => {
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/ })();
+/******/ 
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+(() => {
 /*!**********************************!*\
   !*** ./src/agenda-block/view.js ***!
   \**********************************/
-jQuery(document).ready(() => {
-  jQuery('.simplecal').each((i, instance) => {
-    jQuery(instance).data('page', 0);
-    var formData = scGetFormData(instance);
-    if (formData.displayPastEvents && formData.page == 0) {
-      jQuery(instance).find('.simplecal_nav_prev').addClass('active');
-    }
-    scGetEvents(formData).done(response => {
-      jQuery(instance).children('.simplecal_events_wrapper').html(response.data.output);
-      if (response.data.more_next_pages) {
-        jQuery(instance).find('.simplecal_nav_next').addClass('active');
-      } else {
-        jQuery(instance).find('.simplecal_nav_next').removeClass('active');
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/interactivity */ "@wordpress/interactivity");
+
+const apiFetch = window.wp.apiFetch;
+const {
+  state
+} = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.store)('agendaBlock', {
+  state: {
+    output: '',
+    currentPage: 0,
+    morePastEvents: true,
+    moreFutureEvents: true
+  },
+  actions: {
+    getEvents: () => {
+      const {
+        ref
+      } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getElement)();
+      const context = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getContext)();
+      switch (ref.dataset.direction) {
+        case "future":
+          if (!state.moreFutureEvents) {
+            return;
+          }
+          ++state.currentPage;
+          break;
+        case "previous":
+          if (!state.morePastEvents) {
+            return;
+          }
+          --state.currentPage;
+          break;
+        default:
+          break;
       }
-    });
-    jQuery(instance).on('click', '.simplecal_nav_prev.active, .simplecal_nav_next.active', event => {
-      var instance = jQuery(event.currentTarget).parents('.simplecal');
-      if (jQuery(event.currentTarget).hasClass('simplecal_nav_prev')) {
-        jQuery(instance).data().page--;
-        jQuery(instance).find('.simplecal_nav_prev').removeClass('active');
-      } else {
-        jQuery(instance).data().page++;
-        jQuery(instance).find('.simplecal_nav_next').removeClass('active');
-      }
-      var formData = scGetFormData(jQuery(instance));
-      scGetEvents(formData).done(response => {
-        jQuery(instance).children('.simplecal_events_wrapper').fadeOut(function () {
-          jQuery(this).html(response.data.output);
-        }).fadeIn();
-        if (response.data.more_next_pages) {
-          jQuery(instance).find('.simplecal_nav_next').addClass('active');
-        } else {
-          jQuery(instance).find('.simplecal_nav_next').removeClass('active');
-        }
-        if (response.data.more_prev_pages || formData['displayPastEvents'] && formData['page'] == 0) {
-          jQuery(instance).find('.simplecal_nav_prev').addClass('active');
-        } else {
-          jQuery(instance).find('.simplecal_nav_prev').removeClass('active');
-        }
+      const queryArgs = `page=${state.currentPage.toString()}&postsPerPage=${context.postsPerPage}&agendaLayout=${context.agendaLayout}&monthYearHeadersShow=${context.monthYearHeadersShow}&dayOfWeekShow=${context.dayOfWeekShow}&thumbnailShow=${context.thumbnailShow}&excerptShow=${context.excerptShow}&excerptLines=${context.excerptLines}&pastEventsShow=${context.pastEventsShow}&pastEventsDays=${context.pastEventsDays}&futureEventsDays=${context.futureEventsDays}`;
+      apiFetch({
+        // TODO: It sure would be nice to use addQueryArgs to build the path, but WordPress doesn't support adding scripts to script modules yet; that's also why apiFetch is being called in a janky way
+        path: `/simplecal/v1/events/agenda/?${queryArgs}`
+      }).then(response => {
+        state.output = response.output;
+        state.morePastEvents = response.morePrevious;
+        state.moreFutureEvents = response.moreFuture;
       });
-    });
-  });
+    }
+  },
+  callbacks: {
+    updateAgenda: () => {
+      const {
+        ref
+      } = (0,_wordpress_interactivity__WEBPACK_IMPORTED_MODULE_0__.getElement)();
+      ref.innerHTML = state.output;
+    }
+  }
 });
-function scGetFormData(instance) {
-  var formData = {
-    'action': 'simplecal_get_agenda_events',
-    'tags': jQuery(instance).data('tags'),
-    'displayPastEvents': jQuery(instance).data('displayPastEvents'),
-    'displayPastEventsDays': jQuery(instance).data('displayPastEventsDays'),
-    'displayFutureEventsDays': jQuery(instance).data('displayFutureEventsDays'),
-    'agendaLayout': jQuery(instance).data('agendaLayout'),
-    'agendaShowMonthYearHeaders': jQuery(instance).data('agendaShowMonthYearHeaders'),
-    'agendaPostsPerPage': jQuery(instance).data('agendaPostsPerPage'),
-    'agendaShowThumbnail': jQuery(instance).data('agendaShowThumbnail'),
-    'agendaShowDayOfWeek': jQuery(instance).data('agendaShowDayOfWeek'),
-    'agendaShowExcerpt': jQuery(instance).data('agendaShowExcerpt'),
-    'agendaExcerptLines': jQuery(instance).data('agendaExcerptLines'),
-    'page': jQuery(instance).data('page')
-  };
-  return formData;
-}
-function scGetEvents(formData) {
-  return jQuery.ajax({
-    type: "post",
-    url: ajaxParams.url,
-    data: formData,
-    dataType: 'json',
-    encode: true
-  });
-}
-/******/ })()
-;
+})();
+
+
 //# sourceMappingURL=view.js.map
