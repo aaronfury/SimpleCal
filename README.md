@@ -14,6 +14,8 @@ I love you all.
 * ~~Archive page~~ DONE. AND MEDIOCRE.
 * ~~Default to current month if show previous events is selected~~ FIXED.
 * ~~Fix the block templates to do things the right way~~ MOSTLY DONE. NEED TO CREATE A NEW CUSTOM BLOCK FOR THE ARCHIVE PAGE QUERY LOOP.
+* ~~Refactor to use WP API rather than AJAX~~
+* Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 * Backport to widget
 * Better styling
 * Custom CSS support
@@ -36,3 +38,6 @@ I love you all.
 
 ## Minor To-Dos
 * Move settings over to a block element instead of the Inspector Panel
+* Option to display metadata icons
+* Option to display thumbnail to the right or the left in agenda view
+* Option to display month/year "headers" in agenda layout 2

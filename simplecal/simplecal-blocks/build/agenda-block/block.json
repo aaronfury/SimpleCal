@@ -9,14 +9,15 @@
   "description": "Display SimpleCal calendar events in an agenda view.",
   "example": {},
   "supports": {
-    "html": false
+    "html": false,
+    "interactivity": true
   },
   "textdomain": "simplecal-agenda-block",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
   "render": "file:./render.php",
-  "viewScript": "file:./view.js",
+  "viewScriptModule": "file:./view.js",
   "attributes": {
     "title": {
       "type": "string",
