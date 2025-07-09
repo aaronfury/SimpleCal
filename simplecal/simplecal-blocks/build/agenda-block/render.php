@@ -2,15 +2,15 @@
 	<div
 		class="simplecal simplecal_<?= $attributes['blockTheme']; ?> <?= 'simplecal_' . $attributes['agendaLayout']; ?>"
 		<?= wp_interactivity_data_wp_context([
-			"pastEventsShow" => empty($attributes['displayPastEvents']),
+			"pastEventsShow" => $attributes['displayPastEvents'],
 			"pastEventsDays" => $attributes['displayPastEventsDays'],
 			"futureEventsDays" => $attributes['displayFutureEventsDays'],
 			"agendaLayout" => $attributes['agendaLayout'],
-			"monthYearHeadersShow" => empty($attributes['agendaShowMonthYearHeaders']),
-			"dayOfWeekShow" => empty($attributes['agendaShowDayOfWeek']),
+			"monthYearHeadersShow" => $attributes['agendaShowMonthYearHeaders'],
+			"dayOfWeekShow" => $attributes['agendaShowDayOfWeek'],
 			"postsPerPage" => $attributes['agendaPostsPerPage'],
 			"thumbnailShow" => $attributes['agendaShowThumbnail'],
-			"excerptShow" => empty($attributes['agendaShowExcerpt']),
+			"excerptShow" => $attributes['agendaShowExcerpt'],
 			"excerptLines" => $attributes['agendaExcerptLines']
 		]); ?>
 		data-wp-interactive="agendaBlock"

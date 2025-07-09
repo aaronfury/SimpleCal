@@ -270,7 +270,7 @@ class SimpleCal {
 
 		<div id="simplecal_event_state_us_wrapper" style="display:none;">
 			<label for="simplecal_event_state_us">State</label><br />
-			<?php $this->state_input($post->simplecal_event_state, "event_state", "simplecal_event_state_us"); ?>
+			<?php $this->state_input($post->simplecal_event_state, "event_state_us", "simplecal_event_state_us"); ?>
 		</div>
 		<div id="simplecal_event_state_other_wrapper" style="display:none;">
 			<label for="simplecal_event_state_other">State / County / Province</label><br />
@@ -330,7 +330,7 @@ class SimpleCal {
 			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format(DATE_ATOM);
 		endforeach;
 
-		$metas = ['timezone', 'all_day', 'private_location', 'venue_name', 'street_address', 'city', 'state', 'country', 'virtual_platform','meeting_link', 'website'];
+		$metas = ['timezone', 'all_day', 'private_location', 'venue_name', 'street_address', 'city', 'country', 'virtual_platform','meeting_link', 'website'];
 		foreach ($metas as $meta) {
 			if (isset($_POST['event_' . $meta])) {
 				$events_meta['simplecal_event_' . $meta] = $_POST['event_' . $meta];
@@ -338,6 +338,8 @@ class SimpleCal {
 				$events_meta['simplecal_event_' . $meta] = NULL;
 			}
 		}
+
+		$events_meta['simplecal_event_state'] = ($events_meta['simplecal_event_country'] == 'United States' ? $_POST['event_state_us'] : $_POST['event_state']);
 
 		foreach ($events_meta as $key => $value) {
 			$value = implode(',', (array)$value);
@@ -427,7 +429,8 @@ class SimpleCal {
 			'/events/agenda',
 			[
 				'methods' => 'GET',
-				'callback' => [$this,'api_route_agenda_get']
+				'callback' => [$this,'api_route_agenda_get'],
+				'permission_callback' => '__return_true'
 			]
 		);
 	}
@@ -779,7 +782,8 @@ class SimpleCal {
 	}
 
 	function get_country_input($field_value, $dom_name = 'simplecal_country', $dom_id = 'simplecal_country', $addl_attrs = null) {
-		$field_value ??= get_option('simplecal_last_country', null);
+		if (empty($field_value)) { $field_value = get_option('simplecal_last_country', null);} // Apparently null colaescing assignment (??=) doesn't work when the variable is passed?
+
 		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
 
 		// TODO: Check if file exists

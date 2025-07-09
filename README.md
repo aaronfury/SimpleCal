@@ -40,3 +40,4 @@ I love you all.
 * Move settings over to a block element instead of the Inspector Panel
 * Option to display metadata icons
 * Option to display thumbnail to the right or the left in agenda view
+* Option to display month/year "headers" in agenda layout 2

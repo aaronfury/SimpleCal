@@ -1,5 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RadioControl, NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
+import { PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
 
 import './editor.scss';
 
@@ -96,9 +96,9 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 					<ToggleControl
 						label= "Show day of week (Monday, Tuesday, etc.)"
-						checked= {!!agendaShowDayOfWeek}
-						onChange= {() => {
-							setAttributes({agendaShowDayOfWeek: !agendaShowDayOfWeek})
+						checked= {agendaShowDayOfWeek}
+						onChange= {(newValue) => {
+							setAttributes({agendaShowDayOfWeek: newValue})
 						}}
 					/>
 					<ToggleControl
