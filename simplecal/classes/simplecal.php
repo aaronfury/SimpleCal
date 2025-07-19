@@ -438,7 +438,7 @@ class SimpleCal {
 	function api_route_agenda_get(WP_REST_Request $request) {
 		// Determine the desired page
 		$page = $request['page'] ?? 0;
-		$posts_per_page = $request['posts_per_page'] ?? 10;
+		$posts_per_page = $request['per_page'] ?? 10;
 		$page_param = ($page < 0 ? -$page : $page + 1);
 
 		// Parse the additional query parameters... TODO: Is this necessary? Why not just parse request directly?
