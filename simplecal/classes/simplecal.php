@@ -718,7 +718,9 @@ class SimpleCal {
 	}
 
 	function get_state_input($field_value, $dom_name = 'simplecal_state', $dom_id = 'simplecal_state', $addl_attrs = null) {
-		$field_value ??= get_option('simplecal_last_state','');
+		if (empty($field_value)) {
+			$field_value = get_option('simplecal_last_state','');
+		}
 
 		$states = [
 			'AL'=>'Alabama',
@@ -775,6 +777,7 @@ class SimpleCal {
 		];
 
 		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
+		$output .= "<option>--</option>";
 		foreach ($states as $code=>$name) {
 			$output .= "<option value=\"$code\"" . ($field_value == $code ? ' selected ' : '') . ">$name</option>";
 		}
