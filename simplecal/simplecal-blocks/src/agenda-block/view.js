@@ -26,11 +26,23 @@ const { state } = store( 'agendaBlock', {
 					break;
 			}
 
-			const queryArgs = `page=${state.currentPage.toString()}&per_page=${context.postsPerPage}&agendaLayout=${context.agendaLayout}&monthYearHeadersShow=${context.monthYearHeadersShow}&dayOfWeekShow=${context.dayOfWeekShow}&thumbnailShow=${context.thumbnailShow}&excerptShow=${context.excerptShow}&excerptLines=${context.excerptLines}&pastEventsShow=${context.pastEventsShow}&pastEventsDays=${context.pastEventsDays}&futureEventsDays=${context.futureEventsDays}`;
+			const queryArgs = [
+				`page=${state.currentPage.toString()}`,
+				`per_page=${context.postsPerPage}`,
+				`agendaLayout=${context.agendaLayout}`,
+				`monthYearHeadersShow=${context.monthYearHeadersShow}`,
+				`dayOfWeekShow=${context.dayOfWeekShow}`,
+				`thumbnailShow=${context.thumbnailShow}`,
+				`excerptShow=${context.excerptShow}`,
+				`excerptLines=${context.excerptLines}`,
+				`pastEventsShow=${context.pastEventsShow}`,
+				`pastEventsDays=${context.pastEventsDays}`,
+				`futureEventsDays=${context.futureEventsDays}`
+			];
 
 			apiFetch({
 				// TODO: It sure would be nice to use addQueryArgs to build the path, but WordPress doesn't support adding scripts to script modules yet; that's also why apiFetch is being called in a janky way
-				path: `/simplecal/v1/events/agenda/?${queryArgs}`
+				path: `/simplecal/v1/events/agenda/?${queryArgs.join('&')}`
 			}).then(
 				(response) => {
 					state.output = response.output;

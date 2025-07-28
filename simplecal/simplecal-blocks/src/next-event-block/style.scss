@@ -1,0 +1,49 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.simplecal_hide {
+	display: none;
+}
+
+.simplecal_strong {
+	font-weight: bold;
+}
+.simplecal_center_text {
+	text-align: center;
+}
+
+.simplecal_next_event_meta {
+	display: flex;
+	flex-flow: row nowrap;
+	gap: 0.5em;
+
+	.simplecal_next_event_label {
+		width: 3.5em;
+	}
+
+	& + & {
+		margin-top: 0.5em;
+	}
+}
+
+.simplecal_all_events_link {
+	display: block;
+	margin: 1em auto;
+	padding: 0.5em 1em;
+	text-decoration: none;
+	border: 1px solid #a0a0a0;
+	border-radius: 8px;
+	width: fit-content;
+	text-align: center;
+	transition: 0.25s all ease-in-out;
+	transform: translateX(0);
+
+	&:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+	}
+}

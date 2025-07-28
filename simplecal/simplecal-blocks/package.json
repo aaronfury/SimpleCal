@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"@wordpress/api-fetch": "^7.26.0",
+		"@wordpress/icons": "^10.27.0",
 		"@wordpress/interactivity": "^6.26.0",
 		"@wordpress/url": "^4.26.0"
 	}

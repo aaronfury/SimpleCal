@@ -16,7 +16,7 @@ export default function Edit({ attributes, setAttributes }) {
 				<PanelBody title="Settings">
 					<RadioControl
 						label= "Block Type"
-						selectd= {blockType}
+						selected= {blockType}
 						options= {[
 							{
 								label: "Meta Value (<span> element)",

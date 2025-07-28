@@ -135,5 +135,83 @@ return array(
 				'type' => 'string'
 			)
 		)
+	),
+	'next-event-block' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'name' => 'simplecal/next-event-block',
+		'version' => '0.1.0',
+		'title' => 'SimpleCal Next Event Block',
+		'category' => 'widgets',
+		'icon' => 'schedule',
+		'description' => 'Displays information about the chronologically-next event.',
+		'example' => array(
+			
+		),
+		'supports' => array(
+			'html' => false,
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true
+			),
+			'color' => array(
+				'button' => true,
+				'heading' => true
+			)
+		),
+		'textdomain' => 'simplecal-next-event-block',
+		'editorScript' => 'file:./index.js',
+		'editorStyle' => 'file:./index.css',
+		'style' => 'file:./style-index.css',
+		'render' => 'file:./render.php',
+		'viewScriptModule' => 'file:./view.js',
+		'attributes' => array(
+			'hideOnNoEvent' => array(
+				'type' => 'boolean',
+				'default' => false
+			),
+			'blockTitle' => array(
+				'type' => 'string',
+				'default' => 'Next Event'
+			),
+			'showEventTitle' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'linkEventTitle' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'showIcons' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'showLabels' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'boldLabels' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'showLocation' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'showAllEventsLink' => array(
+				'type' => 'boolean',
+				'default' => true
+			),
+			'cornerRadius' => array(
+				'type' => 'integer',
+				'default' => 0
+			),
+			'tags' => array(
+				'type' => 'array',
+				'default' => array(
+					
+				)
+			)
+		)
 	)
 );

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "simplecal/next-event-block",
+  "version": "0.1.0",
+  "title": "SimpleCal Next Event Block",
+  "category": "widgets",
+  "icon": "schedule",
+  "description": "Displays information about the chronologically-next event.",
+  "example": {},
+  "supports": {
+    "html": false,
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "color": {
+      "button": true,
+      "heading": true
+    }
+  },
+  "textdomain": "simplecal-next-event-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php",
+  "viewScriptModule": "file:./view.js",
+  "attributes": {
+    "hideOnNoEvent": {
+      "type": "boolean",
+      "default": false
+    },
+    "blockTitle": {
+      "type": "string",
+      "default": "Next Event"
+    },
+    "showEventTitle": {
+      "type": "boolean",
+      "default": true
+    },
+    "linkEventTitle": {
+      "type": "boolean",
+      "default": true
+    },
+    "showIcons": {
+      "type": "boolean",
+      "default": true
+    },
+    "showLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "boldLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "showLocation": {
+      "type": "boolean",
+      "default": true
+    },
+    "showAllEventsLink": {
+      "type": "boolean",
+      "default": true
+    },
+    "cornerRadius": {
+      "type": "integer",
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "default": []
+    }
+  }
+}
