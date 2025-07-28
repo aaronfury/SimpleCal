@@ -340,7 +340,10 @@ class SimpleCal {
 			}
 		}
 
-		$events_meta['simplecal_event_state'] = ($events_meta['simplecal_event_country'] == 'United States' ? $_POST['event_state_us'] : $_POST['event_state']);
+		// TODO: Need a better way to determine whether to save the physical location meta if ONLY the state is set, since it is auto-populated from the simplecal_last_state WP Option, it always has a value, even for online-only events. For now, we will require that another physical location has a value before we save the state.
+		if (!empty($events_meta['venue_name'].$events_meta['street_address'].$events_meta['city'])) {
+			$events_meta['simplecal_event_state'] = ($events_meta['simplecal_event_country'] == 'United States' ? $_POST['event_state_us'] : $_POST['event_state']);
+		}
 
 		foreach ($events_meta as $key => $value) {
 			$value = implode(',', (array)$value);
