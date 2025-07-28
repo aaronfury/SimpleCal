@@ -17,6 +17,7 @@ I love you all.
 * ~~Refactor to use WP API rather than AJAX~~
 * Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 * Backport to widget
+* Create a compact layout for agenda view
 * Option to delete events on uninstall
 * Better styling
 * Custom CSS support

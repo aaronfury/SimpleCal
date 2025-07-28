@@ -1,1 +1,26 @@
-.material-symbols-outlined{vertical-align:sub!important}.wp-block-create-block-meta-block{background-color:#21759b;color:#fff;padding:2px}.simplecal_meta_block_row{align-items:center;display:flex;flex-flow:row nowrap;gap:.5em}.simplecal_meta_block_row h2,.simplecal_meta_block_row h3{margin:0}.simplecal_meta_block_row+.simplecal_meta_block_row{margin-top:16px}
+/*!**************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/meta-block/style.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************/
+.material-symbols-outlined {
+  vertical-align: sub !important;
+}
+
+.wp-block-create-block-meta-block {
+  background-color: #21759b;
+  color: #fff;
+  padding: 2px;
+}
+
+.simplecal_meta_block_row {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0.5em;
+  align-items: center;
+}
+.simplecal_meta_block_row h2, .simplecal_meta_block_row h3 {
+  margin: 0;
+}
+
+.simplecal_meta_block_row + .simplecal_meta_block_row {
+  margin-top: 16px;
+}

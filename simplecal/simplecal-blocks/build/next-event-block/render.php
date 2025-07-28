@@ -6,6 +6,9 @@
 	$label_opening_tag = '<div class="simplecal_next_event_label' . ($attributes['boldLabels'] ? ' simplecal_strong' : null) . ($attributes['showLabels'] ? null : ' simplecal_hide') . '">';
 	$icon_opening_tag = '<div class="simplecal_next_event_icon' . ($attributes['showIcons'] ? null : ' simplecal_hide') . '">';
 
+	$now = date_create();
+	$now->setTimezone(wp_timezone());
+
 	// Build the query parameters
 	$args = [
 		'post_type' => 'simplecal_event',
@@ -13,7 +16,7 @@
 		'posts_per_page' => 1,
 		'orderby' => 'meta_value',
 		'meta_key' => 'simplecal_event_start_timestamp',
-		'meta_value' => date('Y-m-d H:i:s'),
+		'meta_value' => $now->format('Y-m-d H:i:s'),
 		'meta_type' => 'DATETIME',
 		'meta_compare' => '>=',
 		'order' => 'ASC'
