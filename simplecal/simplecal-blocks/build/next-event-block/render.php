@@ -20,7 +20,7 @@
 	];
 
 	if ($filter_tags) {
-		$args['tag__in'] = $filter_tags;
+		$args['tag_slug__in'] = $filter_tags;
 	}
 		
 	// Build the query for calendar views

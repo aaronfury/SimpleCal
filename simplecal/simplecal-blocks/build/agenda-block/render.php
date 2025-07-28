@@ -11,7 +11,8 @@
 			"postsPerPage" => $attributes['agendaPostsPerPage'],
 			"thumbnailShow" => $attributes['agendaShowThumbnail'],
 			"excerptShow" => $attributes['agendaShowExcerpt'],
-			"excerptLines" => $attributes['agendaExcerptLines']
+			"excerptLines" => $attributes['agendaExcerptLines'],
+			"eventTags" => $attributes['eventTags']
 		]); ?>
 		data-wp-interactive="agendaBlock"
 	>

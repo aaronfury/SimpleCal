@@ -160,6 +160,7 @@ class SimpleCal {
 			'rewrite' => ['slug' => 'events', 'with_front' => false],
 			'rest_base' => 'simplecal_event',
     		'rest_controller_class' => 'WP_REST_Posts_Controller',
+			'taxonomies' => ['post_tag'],
 			'has_archive' => 'events',
 			'show_in_rest' => true
 		]
@@ -445,6 +446,7 @@ class SimpleCal {
 		$agendaLayout = $request['agendaLayout'] ?? "layout1";
 		$pastEventsShow = $request['pastEventsShows'] ?? true;
 		$pastEventsDays = $request['pastEventsDays'] ?? 0;
+		$eventTags = array_filter(explode(',', $request['eventTags']));
 		$excerptShow = $request['excerptShow'] ?? false;
 		$excerptLines = $request['excerptLines'] ?? false;
 		$monthYearHeadersShow = $request['monthYearHeadersShow'] ?? false;
@@ -459,6 +461,10 @@ class SimpleCal {
 			'meta_key' => 'simplecal_event_start_timestamp',
 			'meta_type' => 'DATETIME'
 		];
+
+		if ($eventTags) {
+			$args['tag_slug__in'] = $eventTags;
+		}
 
 		// Build the query for agenda views
 		$args += [

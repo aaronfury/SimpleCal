@@ -1,12 +1,12 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
+import { FormTokenField, PanelBody, RadioControl, __experimentalNumberControl as NumberControl, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
 
 import './editor.scss';
 
 export default function Edit({ attributes, setAttributes }) {
 	const {
 		title = 'Calendar of Events',
-		eventTags = 'all',
+		eventTags,
 		hideOnNoEvents = false,
 		noEventsText = "There are no upcoming events.",
 		blockTheme = 'theme1',
@@ -198,6 +198,16 @@ export default function Edit({ attributes, setAttributes }) {
 						</>
 						: null
 					}
+				</PanelBody>
+				<PanelBody title="Filters">
+					<FormTokenField
+						__next40pxDefaultSize
+						label= "Filter on tags"
+						help= "The query will only include upcoming events that have the following tags"
+						value= {eventTags}
+						onChange= {(value) => setAttributes({eventTags : value})}
+						
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<p>{(title && title != '') ? title : 'SimpleCal Agenda View'}</p>

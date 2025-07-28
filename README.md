@@ -13,7 +13,7 @@ I love you all.
 * ~~Pagination~~ DONE. AND AWESOME.
 * ~~Archive page~~ DONE. AND MEDIOCRE.
 * ~~Default to current month if show previous events is selected~~ FIXED.
-* ~~Fix the block templates to do things the right way~~ MOSTLY DONE. NEED TO CREATE A NEW CUSTOM BLOCK FOR THE ARCHIVE PAGE QUERY LOOP.
+* ~~Fix the block templates to do things the right way~~ DONE.
 * ~~Refactor to use WP API rather than AJAX~~
 * Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 * Backport to widget
@@ -28,7 +28,7 @@ I love you all.
 * Event pricing
 * "Members Event" tag
 * Support for "TBD" events within a month/week
-* General tag/category support
+* ~~General tag support~~ DONE.
 * Option to show event only to logged-in users
 * ~~Option to set public and private (logged-in) locations~~
 * Date (month) selection
