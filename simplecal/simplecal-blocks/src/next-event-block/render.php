@@ -6,8 +6,7 @@
 	$label_opening_tag = '<div class="simplecal_next_event_label' . ($attributes['boldLabels'] ? ' simplecal_strong' : null) . ($attributes['showLabels'] ? null : ' simplecal_hide') . '">';
 	$icon_opening_tag = '<div class="simplecal_next_event_icon' . ($attributes['showIcons'] ? null : ' simplecal_hide') . '">';
 
-	$now = date_create();
-	$now->setTimezone(wp_timezone());
+	$now = new DateTime('now', wp_timezone());
 
 	// Build the query parameters
 	$args = [
@@ -17,7 +16,7 @@
 		'orderby' => 'meta_value',
 		'meta_key' => 'simplecal_event_start_timestamp',
 		'meta_value' => $now->format('Y-m-d H:i:s'),
-		'meta_type' => 'DATETIME',
+		//'meta_type' => 'DATETIME', For some reason, this produces inconsistent results on a live (GoDaddy) server. Not sure why, but it seems to work fine without it, soooo....
 		'meta_compare' => '>=',
 		'order' => 'ASC'
 	];
@@ -25,7 +24,7 @@
 	if ($filter_tags) {
 		$args['tag_slug__in'] = $filter_tags;
 	}
-		
+	
 	// Build the query for calendar views
 	$next_event = new WP_Query($args);
 
