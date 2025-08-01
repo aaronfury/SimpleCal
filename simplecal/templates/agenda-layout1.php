@@ -120,7 +120,7 @@ if ($events->have_posts()) {
 		}
 
 		$postTags = get_the_tags();
-		if ($tagsShow && $postTags == 'true') {
+		if ($tagsShow == 'true' && $postTags) {
 ?>
 			<div class="simplecal_list_item_meta simplecal_list_item_tags">
 				<div class="simplecal_list_item_meta_icon">
