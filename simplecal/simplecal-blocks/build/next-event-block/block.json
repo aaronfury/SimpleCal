@@ -24,7 +24,6 @@
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
   "render": "file:./render.php",
-  "viewScriptModule": "file:./view.js",
   "attributes": {
     "hideOnNoEvent": {
       "type": "boolean",

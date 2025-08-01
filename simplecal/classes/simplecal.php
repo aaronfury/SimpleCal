@@ -450,6 +450,7 @@ class SimpleCal {
 		$pastEventsShow = $request['pastEventsShows'] ?? true;
 		$pastEventsDays = $request['pastEventsDays'] ?? 0;
 		$eventTags = array_filter(explode(',', $request['eventTags']));
+		$tagsShow = $request['tagsShow'] ?? false;
 		$excerptShow = $request['excerptShow'] ?? false;
 		$excerptLines = $request['excerptLines'] ?? false;
 		$monthYearHeadersShow = $request['monthYearHeadersShow'] ?? false;

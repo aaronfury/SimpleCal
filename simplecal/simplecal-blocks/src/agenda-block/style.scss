@@ -12,6 +12,26 @@
 	margin: 1em auto;
 }
 
+.simplecal_tag_list {
+	display: flex;
+	flex-flow: row wrap;
+	gap: 0.5em;
+
+	.simplecal_tag {
+		padding: 0.25em;
+		background: var(--wp--preset--color--accent-6);
+		border-radius: 4px;
+		font-size: 0.8em;
+	}
+
+	.simplecal_tag_compact {
+		padding: 0.25em;
+		background: var(--wp--preset--color--accent-6);
+		border-radius: 4px;
+		font-size: 0.8em;
+	}
+}
+
 /*
 	div.simplecal_themeX
 		h2.simplecal_title
@@ -137,8 +157,8 @@
 			}
 	
 			.simplecal_list_item_title {
-				font-size: 1.25em;
 				line-height: 1.25;
+				margin: 0.25em 0;
 			}
 			.simplecal_list_item_datetime {
 				color: #606060;
@@ -242,6 +262,71 @@
 		}
 	}
 }
+
+.simplecal_agenda_layout3 {
+	.simplecal_list_item + .simplecal_list_item {
+		margin-top: 1em;
+	}
+
+	.simplecal_list_year_header, .simplecal_list_month_header {
+		margin: 0.25em 0;
+		font-size: 1em;
+		font-weight: bold;
+	}
+	.simplecal_list_month_header {
+		font-size: 1.25em;
+		text-align: center;
+	}
+
+	.simplecal_list_item {
+		display: flex;
+		flex-flow: row nowrap;
+		padding-bottom: 1em;
+		border-bottom: 1px solid #a0a0a0;
+	
+		.simplecal_list_item_thumbnail {
+			flex: 0 0 64px;
+			margin-right: 8px;
+			img {
+				max-width: 100%;
+			}
+		}
+		.simplecal_list_item_content_wrapper {
+			flex: 1 1 auto;
+			display: flex;
+			flex-flow: column nowrap;
+
+			& > div + div {
+				margin-top: 0.25em;
+			}
+
+			.simplecal_list_item_meta {
+				display: flex;
+				flex-flow: row nowrap;
+				column-gap: 0.25em;
+				font-size: 0.9em;
+			}
+	
+			.simplecal_list_item_title {
+				line-height: 1.25;
+				margin: 0.25em 0;
+			}
+			.simplecal_list_item_datetime {
+				color: #606060;
+			}
+			.simplecal_list_item_datetime {
+				display: none;
+			}
+	
+			.simplecal_list_item_excerpt {
+				p:first-of-type {
+					margin-top: 0;
+				}
+			}
+		}
+	}
+}
+
 
 .simplecal_archive {
 	.simplecal_list_item + .simplecal_list_item {

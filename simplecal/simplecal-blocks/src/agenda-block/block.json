@@ -9,6 +9,14 @@
 	"description": "Display SimpleCal calendar events in an agenda view.",
 	"example": {},
 	"supports": {
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"color": {
+			"button": true,
+			"heading": true
+		},
 		"html": false,
 		"interactivity": true
 	},
@@ -50,6 +58,10 @@
 		"agendaExcerptLines": {
 			"type": "integer",
 			"default": 0
+		},
+		"agendaShowTags": {
+			"type": "boolean",
+			"default": false
 		},
 		"agendaPostsPerPage": {
 			"type": "integer",

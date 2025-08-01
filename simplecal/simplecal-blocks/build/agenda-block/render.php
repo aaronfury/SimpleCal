@@ -12,11 +12,12 @@
 			"thumbnailShow" => $attributes['agendaShowThumbnail'],
 			"excerptShow" => $attributes['agendaShowExcerpt'],
 			"excerptLines" => $attributes['agendaExcerptLines'],
+			"tagsShow" => $attributes['agendaShowTags'],
 			"eventTags" => $attributes['eventTags']
 		]); ?>
 		data-wp-interactive="agendaBlock"
 	>
-		<?php if ($attributes['title']) { ?><h2 class="simplecal_title"><?= $attributes['title']; ?></h2><?php } ?>
+		<?php if ($attributes['title']) { ?><h2 class="simplecal_block_title"><?= $attributes['title']; ?></h2><?php } ?>
 		<?php if (in_array($attributes['agendaDisplayPagination'], ['top','both'])) { ?>
 		<div class="simplecal_nav_pagination">
 			<div class="simplecal_nav_prev" data-wp-on--click="actions.getEvents" data-wp-class--active="state.morePastEvents" data-direction="previous">

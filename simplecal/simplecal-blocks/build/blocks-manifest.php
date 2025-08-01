@@ -14,6 +14,14 @@ return array(
 			
 		),
 		'supports' => array(
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true
+			),
+			'color' => array(
+				'button' => true,
+				'heading' => true
+			),
 			'html' => false,
 			'interactivity' => true
 		),
@@ -55,6 +63,10 @@ return array(
 			'agendaExcerptLines' => array(
 				'type' => 'integer',
 				'default' => 0
+			),
+			'agendaShowTags' => array(
+				'type' => 'boolean',
+				'default' => false
 			),
 			'agendaPostsPerPage' => array(
 				'type' => 'integer',
@@ -164,7 +176,6 @@ return array(
 		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php',
-		'viewScriptModule' => 'file:./view.js',
 		'attributes' => array(
 			'hideOnNoEvent' => array(
 				'type' => 'boolean',

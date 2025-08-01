@@ -38,7 +38,8 @@ const { state } = store( 'agendaBlock', {
 				`pastEventsShow=${context.pastEventsShow}`,
 				`pastEventsDays=${context.pastEventsDays}`,
 				`futureEventsDays=${context.futureEventsDays}`,
-				`eventTags=${context.eventTags}`
+				`eventTags=${context.eventTags}`,
+				`tagsShow=${context.tagsShow}`
 			];
 
 			apiFetch({
