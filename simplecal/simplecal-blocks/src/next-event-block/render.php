@@ -36,7 +36,7 @@
 <?php
 		if ($attributes['blockTitle']) {
 ?>
-	<h2><?= $attributes['blockTitle']; ?></h2>
+	<h2 style="simplecal_block_title"><?= $attributes['blockTitle']; ?></h2>
 	<hr />
 <?php
 		}
