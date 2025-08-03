@@ -708,7 +708,9 @@ class SimpleCal {
 			$domain = explode('/',$url)[0];
 		}
 
-		$link_text ??= $domain;
+		if (empty($link_text)) {
+				$link_text = $domain;
+		}
 
 		switch ($link_type) {
 			case 'text':

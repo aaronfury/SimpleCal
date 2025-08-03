@@ -37,6 +37,7 @@ I love you all.
 * Option to auto-delete old events
 * Infinite Scroll??
 * Sync to/from external calendars (Very unlikely)
+* Recurring events
 
 ## Minor To-Dos
 * Move settings over to a block element instead of the Inspector Panel
