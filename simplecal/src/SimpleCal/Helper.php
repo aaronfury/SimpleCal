@@ -279,7 +279,7 @@ class Helper {
 		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
 
 		// TODO: Check if file exists
-		$file_data = file_get_contents($plugin->path . '/util/countries.json'); // Built on data from geonames.org. Thanks, GeoNames!
+		$file_data = file_get_contents(Plugin::$path . '/util/countries.json'); // Built on data from geonames.org. Thanks, GeoNames!
 		$countries = json_decode($file_data);
 
 		foreach ($countries as $code=>$name) {
