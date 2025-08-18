@@ -36,7 +36,7 @@
 <?php
 		if ($attributes['blockTitle']) {
 ?>
-	<h2><?= $attributes['blockTitle']; ?></h2>
+	<h2 style="simplecal_block_title"><?= $attributes['blockTitle']; ?></h2>
 	<hr />
 <?php
 		}
@@ -60,7 +60,7 @@
 			Date:
 		</div>
 		<div class="simplecal_next_event_data">
-			<?= SimpleCal::event_get_the_date("date","start"); ?>
+			<?= SimpleCal\Helper::event_get_the_date("date","start"); ?>
 		</div>
 	</div>
 	<div class="simplecal_next_event_meta">
@@ -71,7 +71,7 @@
 			Time:
 		</div>
 		<div class="simplecal_next_event_data">
-			<?= SimpleCal::event_get_the_date("time","start"); ?>
+			<?= SimpleCal\Helper::event_get_the_date("time","start"); ?>
 		</div>
 	</div>
 <?php

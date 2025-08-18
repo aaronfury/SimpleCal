@@ -1,8 +1,13 @@
 <?php
+namespace SimpleCal;
 
-class SimpleCal {
+class Plugin {
 	public static $tz;
+	public static $path = WP_PLUGIN_DIR . '/simplecal';
+	public static $url = WP_PLUGIN_URL . '/simplecal';
+
 	private $tz_string;
+	protected $contents;
 	
 	public function __construct() {
 		global $pagenow;
@@ -70,8 +75,8 @@ class SimpleCal {
 
 	function columns_set_values($column_name, $post_id) {
 		$meta = get_post_meta($post_id);
-		$post_start = new DateTime($meta['simplecal_event_start_timestamp'][0]);
-		$post_end = new DateTime($meta['simplecal_event_end_timestamp'][0]);
+		$post_start = new \DateTime($meta['simplecal_event_start_timestamp'][0]);
+		$post_end = new \DateTime($meta['simplecal_event_end_timestamp'][0]);
 
 		switch  ($column_name) {
 			case 'startDate':
@@ -159,7 +164,7 @@ class SimpleCal {
 			'menu_icon' => 'dashicons-calendar-alt',
 			'rewrite' => ['slug' => 'events', 'with_front' => false],
 			'rest_base' => 'simplecal_event',
-    		'rest_controller_class' => 'WP_REST_Posts_Controller',
+			'rest_controller_class' => 'WP_REST_Posts_Controller',
 			'taxonomies' => ['post_tag'],
 			'has_archive' => 'events',
 			'show_in_rest' => true
@@ -203,10 +208,10 @@ class SimpleCal {
 		global $post;
 	
 		if (is_post_type_archive('simplecal_event')) {
-			return plugin_dir_path(__FILE__) . '../templates/legacy-archive-simplecal_event.php';
+			return $this->path . '/templates/legacy-archive-simplecal_event.php';
 		}
 		if ('simplecal_event' === $post->post_type) {
-			return plugin_dir_path(__FILE__) . '../templates/legacy-single-simplecal_event.php';
+			return $this->path . '/templates/legacy-single-simplecal_event.php';
 		}
 		return $template;
 	}
@@ -226,9 +231,9 @@ class SimpleCal {
 		$metabox_ids = ["start", "end"]; // Cycle through the start and end time metaboxes for the event
 		foreach ($metabox_ids as $key) {
 			if ($post->{"simplecal_event_{$key}_timestamp"}) {
-				$timestamp = new DateTime($post->{"simplecal_event_{$key}_timestamp"}); // Pull the meta in Unix timestamp format and set it as a DateTime object
+				$timestamp = new \DateTime($post->{"simplecal_event_{$key}_timestamp"}); // Pull the meta in Unix timestamp format and set it as a DateTime object
 			} else {
-				$timestamp = new DateTime('now', self::$tz); // Pull the meta in Unix timestamp format and set it as a DateTime object
+				$timestamp = new \DateTime('now', self::$tz); // Pull the meta in Unix timestamp format and set it as a DateTime object
 				$timestamp->setTime($timestamp->format('H'),0,0,0); // Reset the hours and seconds on the timestamp to 00
 			}
 			
@@ -241,7 +246,7 @@ class SimpleCal {
 		$post_timezone = $timestamp->getTimezone(); // Just use the last $timestamp object, presumably from the end_timestamp
 
 		//$timezones = DateTimeZone::listIdentifiers();
-		$timezone_list = $this->timezone_list();
+		$timezone_list = Helper::timezone_list();
 		
 		echo '<h3>Timezone</h3>';
 		echo '<input type="text" list="timezones" id="event_timezone" name="event_timezone" value="' . ($post->simplecal_event_timezone ?? $this->tz_string) . '"><br />';
@@ -266,12 +271,12 @@ class SimpleCal {
 		}
 ?>
 		<label for="event_country">Country</label><br />
-		<?php $this->country_input($post->simplecal_event_country, 'event_country', 'simplecal_event_country'); ?>
+		<?php Helper::country_input($post->simplecal_event_country, 'event_country', 'simplecal_event_country'); ?>
 		<br />
 
 		<div id="simplecal_event_state_us_wrapper" style="display:none;">
 			<label for="simplecal_event_state_us">State</label><br />
-			<?php $this->state_input($post->simplecal_event_state, "event_state_us", "simplecal_event_state_us"); ?>
+			<?php Helper::state_input($post->simplecal_event_state, "event_state_us", "simplecal_event_state_us"); ?>
 		</div>
 		<div id="simplecal_event_state_other_wrapper" style="display:none;">
 			<label for="simplecal_event_state_other">State / County / Province</label><br />
@@ -327,7 +332,7 @@ class SimpleCal {
 
 		$metabox_ids = ['start', 'end']; // Cycle through the start and end timestamps for the event
 		foreach ($metabox_ids as $key) : // Format the fields and parse them as a DateTime object, then output the Unix timestamp to be saved to the event's meta
-			$timestamp = new DateTime($_POST["event_{$key}_datetime"], ($_POST['event_timezone'] ? new DateTimeZone($_POST['event_timezone']) : self::$tz));
+			$timestamp = new \DateTime($_POST["event_{$key}_datetime"], ($_POST['event_timezone'] ? new \DateTimeZone($_POST['event_timezone']) : self::$tz));
 			$events_meta["simplecal_event_{$key}_timestamp"] = $timestamp->format(DATE_ATOM);
 		endforeach;
 
@@ -367,8 +372,8 @@ class SimpleCal {
 			$screen = get_current_screen();
 
 			if (is_object($screen) && 'simplecal_event' == $screen->post_type ){
-				wp_enqueue_script('simplecal-admin-script', plugin_dir_url(__FILE__). '../js/admin.js');
-				wp_enqueue_style('simplecal-admin-script', plugin_dir_url(__FILE__). '../css/admin.css');
+				wp_enqueue_script('simplecal-admin-script', self::$url . '/js/admin.js');
+				wp_enqueue_style('simplecal-admin-script', self::$url . '/css/admin.css');
 			}
 		}
 		return;
@@ -387,30 +392,30 @@ class SimpleCal {
 	
 	function block_register() {
 		if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
-			wp_register_block_types_from_metadata_collection( __DIR__ . '/../simplecal-blocks/build', __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php' );
+			\wp_register_block_types_from_metadata_collection( self::$path . '/simplecal-blocks/build', self::$path . '/simplecal-blocks/build/blocks-manifest.php' );
 			return;
 		}
 	
 		if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
-			wp_register_block_metadata_collection( __DIR__ . '/../simplecal-blocks/build', __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php' );
+			\wp_register_block_metadata_collection( self::$path . '/simplecal-blocks/build', self::$path . '/simplecal-blocks/build/blocks-manifest.php' );
 		}
 	
-		$manifest_data = require __DIR__ . '/../simplecal-blocks/build/blocks-manifest.php';
+		$manifest_data = require self::$path . '/simplecal-blocks/build/blocks-manifest.php';
 		foreach ( array_keys( $manifest_data ) as $block_type ) {
-			register_block_type( __DIR__ . "/../simplecal-blocks/build/{$block_type}" );
+			register_block_type( self::$path . "/simplecal-blocks/build/{$block_type}" );
 		}
 	}
 
 	function block_template_register() {
-		register_block_template(
+		\register_block_template(
 			'simplecal//archive-simplecal_event',
 			[
 				'title' => 'SimpleCal Archive',
 				'description' => 'An agenda-style view of SimpleCal events',
-				'content' => self::get_template_content('archive-simplecal_event.php')
+				'content' => self::get_template_content('archive-simplecal_event.html')
 			]
 		);
-		register_block_template(
+		\register_block_template(
 			'simplecal//single-simplecal_event',
 			[
 				'title' => 'SimpleCal Event',
@@ -422,7 +427,7 @@ class SimpleCal {
 
 	function get_template_content($template) {
 		ob_start();
-		include __DIR__ . "/../templates/{$template}";
+		include __DIR__ . "/../../templates/{$template}";
 		return ob_get_clean();
 	}
 
@@ -439,7 +444,7 @@ class SimpleCal {
 		);
 	}
 
-	function api_route_agenda_get(WP_REST_Request $request) {
+	function api_route_agenda_get(\WP_REST_Request $request) {
 		// Determine the desired page
 		$page = $request['page'] ?? 0;
 		$posts_per_page = $request['per_page'] ?? 10;
@@ -494,7 +499,7 @@ class SimpleCal {
 						'meta_compare' => '<='
 					];
 				} else {
-					$past_event_cutoff = new DateTime("-{$pastEventsDays} days");
+					$past_event_cutoff = new \DateTime("-{$pastEventsDays} days");
 					$args += [
 						'meta_value' => [$past_event_cutoff->format('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
 						'meta_compare' => 'BETWEEN'
@@ -504,7 +509,7 @@ class SimpleCal {
 		}
 
 		// Build the query for calendar views
-		$events = new WP_Query($args);
+		$events = new \WP_Query($args);
 
 		if ($page < 0 && $events->have_posts()) { // Since "previous events" are searched in descending order from the current date, we flip the array of posts to have them show up in chronological order
 			$events->posts = array_reverse($events->posts);
@@ -512,7 +517,7 @@ class SimpleCal {
 
 		// TODO: Ideally, we'd want to return objects for each post (rather than rendered HTML), but WordPress' Interactivity API is still too immature to handle it well (lack of conditionals, unable to insert innerHTML, etc.)
 		ob_start();
-		include_once(plugin_dir_path(__FILE__) . '../templates/agenda-' . $agendaLayout . '.php');
+		include_once(self::$path . '/templates/agenda-' . $agendaLayout . '.php');
 		$output = ob_get_clean();
 		wp_reset_postdata();
 
@@ -524,329 +529,6 @@ class SimpleCal {
 			"morePrevious" => $more_prev,
 			"moreFuture" => $more_next
 		];
-	}
-
-	//// UTILITIES ////
-	
-	// Filter events for a given month and year
-	public function get_events_calendar($month, $year) {
-
-	}
-
-	// Retrieve the date from within the loop
-	public static function event_get_the_date(string $date_or_time = 'both', string $start_or_end = "both", string $date_format = 'M d, Y', string $time_format = 'g:i a', string $span_link = ' - ', string $date_time_link = ' at ', bool $nbsp_on_null = false ) {
-		// TODO: Add support for "doors" time. Maybe a separate function?
-		global $post;
-		$nbsp = '&nbsp;';
-
-		if ($post) {
-			$post_timezone = ($post->simplecal_event_timezone) ? new DateTimeZone($post->simplecal_event_timezone) : self::$tz;
-			$starttimestamp = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
-			
-			if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
-				$endtime = $post->simplecal_event_end_timestamp;
-				$endtimestamp = new DateTime($endtime, $post_timezone);
-			}
-		} else { // This is for block themes and their API-based nonsense
-			$post_timezone = self::$tz;
-			$starttimestamp = new DateTime('now',$post_timezone);
-		}
-
-		$date_string = '';
-
-		// Formatting is too different to mess with nested switches and whatnot
-		switch ($start_or_end) {
-			case 'start':
-				switch ($date_or_time) {
-					case 'date' :
-						$date_string .= $starttimestamp->format($date_format);
-						break;
-					case 'both':
-						$date_string .= $starttimestamp->format($date_format);
-						if ($post && !$post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-							$date_string .= $date_time_link;
-						}
-					case 'time':
-						if ($post && !$post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-							$date_string .= $starttimestamp->format($time_format);
-						}
-						break;
-				}
-				
-				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
-			case 'end':
-				if (!isset($endtime)) {
-					return ($nbsp_on_null ? $nbsp : null);
-				}
-
-				switch ($date_or_time) {
-					case 'date' :
-						$date_string .= $endtimestamp->format($date_format);
-						break;
-					case 'both':
-						$date_string .= $endtimestamp->format($date_format);
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
-							$date_string .= $date_time_link;
-						}
-					case 'time':
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
-							$date_string .= $endtimestamp->format($time_format);
-						}
-						break;
-				}
-				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
-			case 'both':
-				switch ($date_or_time) {
-					case 'date' :
-						$date_string .= $starttimestamp->format($date_format);
-						break;
-					case 'both':
-						$date_string .= $starttimestamp->format($date_format);
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
-							$date_string .= ' ';
-						}
-					case 'time':
-						if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the start time
-							$date_string .= $starttimestamp->format($time_format);
-						}
-						break;
-				}
-
-				if (!isset($endtime)) {
-					return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
-				}
-
-				if ($starttimestamp->format('ymd') == $endtimestamp->format('ymd')) { // If start and end date are the same
-					if ('date' == $date_or_time) { // If it's only meant to return dates, then just return the start date
-						return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
-					}
-
-					if (!$post->simplecal_event_all_day || $starttimestamp->format('Hi') != $endtimestamp->format('Hi')) { // If it's not an all-day event and start and end times are different, append the end time
-						if ('both' == $date_or_time) $date_string .= ' ';
-						$date_string .= $span_link . $endtimestamp->format($time_format);
-					}
-
-					return $date_string;
-				} else { // If start and end date are different
-					if ('time' != $date_or_time) { // Don't include the date if it's set to only return the time.
-						$date_string .= $span_link . $endtimestamp->format($date_format);
-					}
-					
-					switch ($date_or_time) {
-						case 'date': // If it's only meant to return dates, return only the date portion
-							return $date_string;
-							case 'both':
-								if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, append date-time separation
-								$date_string .= ' ';
-							}
-						case 'time':
-							if (! $post->simplecal_event_all_day) { // If it's *not* an all-day event, include the end time
-								$date_string .= $span_link . $endtimestamp->format($time_format);
-							}
-							break;
-					}
-					
-				}
-				return ($nbsp_on_null && !$date_string ? $nbsp : $date_string);
-		}
-	}
-
-	public static function event_has_valid_end_timestamp() {
-		global $post;
-		
-		if ($post->simplecal_event_end_timestamp && ($post->simplecal_event_start_timestamp != $post->simplecal_event_end_timestamp)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-
-	public static function event_get_the_location($link_type = 'none', $check_only = false, $as_plain_text = false) {
-		global $post;
-		
-		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
-			$link = urlencode(implode(", ", array_filter([$post->simplecal_event_venue_name, $post->simplecal_event_street_address, $post->simplecal_event_city, $post->simplecal_event_state, $post->simplecal_event_country], 'strlen')));
-			if ($link) $link = 'https://maps.google.com/maps?q=' . $link;
-			
-			$address = '';
-			$address .= $post->simplecal_event_venue_name ? '<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' : '';
-			$address .= $post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '';
-			$address .= $post->simplecal_event_city ? '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' : '';
-			$address .= $post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '';
-			$address .= $post->simplecal_event_state ? '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' : '';
-
-			if ($check_only) {
-				return !empty($address);
-			}
-
-			if ($as_plain_text) {
-				$address = preg_replace('~<([^<>]*)>~','',$address);
-			}
-
-			switch ($link_type) {
-				case 'text':
-					$data = "<a href='$link' target='_blank'>$address</a>";
-					break;
-				case 'after':
-					$data = "$address (<a href='$link' target='_blank'>Map</a>)";
-					break;
-				default:
-					$data = $address;
-			}
-
-			return $data;
-		} else {
-			return null;
-		}
-	}
-
-	public static function get_formatted_website($url, $link_type = 'text', $link_text = null) {
-		if (preg_match('/^(?:https?:\/\/)?(?:www\.)?(.*\..*)\/?/', $url, $matches)) {
-			$domain = explode('/',$matches[1])[0];
-		} else {
-			$domain = explode('/',$url)[0];
-		}
-
-		if (empty($link_text)) {
-				$link_text = $domain;
-		}
-
-		switch ($link_type) {
-			case 'text':
-				return "<a href=\"$url\" title=\"$url\" target=\"_blank\">$link_text</a>";
-			case 'after':
-				return "$url (<a href=\"$url\" title=\"$url\" target=\"_blank\">$link_text</a>)";
-			case 'none': // For consistency in behavior
-			default:
-				return $url;
-		}
-	}
-
-	function get_state_input($field_value, $dom_name = 'simplecal_state', $dom_id = 'simplecal_state', $addl_attrs = null) {
-		if (empty($field_value)) {
-			$field_value = get_option('simplecal_last_state','');
-		}
-
-		$states = [
-			'AL'=>'Alabama',
-			'AK'=>'Alaska',
-			'AZ'=>'Arizona',
-			'AR'=>'Arkansas',
-			'CA'=>'California',
-			'CO'=>'Colorado',
-			'CT'=>'Connecticut',
-			'DE'=>'Delaware',
-			'DC'=>'District of Columbia',
-			'FL'=>'Florida',
-			'GA'=>'Georgia',
-			'HI'=>'Hawaii',
-			'ID'=>'Idaho',
-			'IL'=>'Illinois',
-			'IN'=>'Indiana',
-			'IA'=>'Iowa',
-			'KS'=>'Kansas',
-			'KY'=>'Kentucky',
-			'LA'=>'Louisiana',
-			'ME'=>'Maine',
-			'MD'=>'Maryland',
-			'MA'=>'Massachusetts',
-			'MI'=>'Michigan',
-			'MN'=>'Minnesota',
-			'MS'=>'Mississippi',
-			'MO'=>'Missouri',
-			'MT'=>'Montana',
-			'NE'=>'Nebraska',
-			'NV'=>'Nevada',
-			'NH'=>'New Hampshire',
-			'NJ'=>'New Jersey',
-			'NM'=>'New Mexico',
-			'NY'=>'New York',
-			'NC'=>'North Carolina',
-			'ND'=>'North Dakota',
-			'OH'=>'Ohio',
-			'OK'=>'Oklahoma',
-			'OR'=>'Oregon',
-			'PA'=>'Pennsylvania',
-			'RI'=>'Rhode Island',
-			'SC'=>'South Carolina',
-			'SD'=>'South Dakota',
-			'TN'=>'Tennessee',
-			'TX'=>'Texas',
-			'UT'=>'Utah',
-			'VT'=>'Vermont',
-			'VA'=>'Virginia',
-			'WA'=>'Washington',
-			'WV'=>'West Virginia',
-			'WI'=>'Wisconsin',
-			'WY'=>'Wyoming'
-		];
-
-		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
-		$output .= "<option>--</option>";
-		foreach ($states as $code=>$name) {
-			$output .= "<option value=\"$code\"" . ($field_value == $code ? ' selected ' : '') . ">$name</option>";
-		}
-
-		$output .= "</select>";
-		return $output;
-	}
-
-	function state_input($field_value = null, $dom_name = null, $dom_id = null, $addl_attrs = null) {
-		echo $this->get_state_input($field_value, $dom_name, $dom_id, $addl_attrs);
-	}
-
-	function get_country_input($field_value, $dom_name = 'simplecal_country', $dom_id = 'simplecal_country', $addl_attrs = null) {
-		if (empty($field_value)) { $field_value = get_option('simplecal_last_country', null);} // Apparently null colaescing assignment (??=) doesn't work when the variable is passed?
-
-		$output = "<select name='$dom_name' id='$dom_id' $addl_attrs>";
-
-		// TODO: Check if file exists
-		$file_data = file_get_contents(plugin_dir_path(__FILE__) . '../util/countries.json'); // Built on data from geonames.org. Thanks, GeoNames!
-		$countries = json_decode($file_data);
-
-		foreach ($countries as $code=>$name) {
-			$output .= "<option value='$name' " . ($field_value == $name ? 'selected' : null ) . ">$name</option>";
-		}
-		$output .="</select>";
-		return $output;
-	}
-
-	function country_input($field_value = null, $dom_name = null, $dom_id = null, $addl_attrs = null) {
-		echo $this->get_country_input($field_value, $dom_name, $dom_id, $addl_attrs);
-	}
-
-	function timezone_list() {
-		static $timezones = null;
-		
-		if ($timezones === null) {
-			$timezones = [];
-			$offsets = [];
-			$now = new DateTime('now', new DateTimeZone('UTC'));
-			
-			foreach (DateTimeZone::listIdentifiers() as $timezone) {
-				$now->setTimezone(new DateTimeZone($timezone));
-				$offsets[] = $offset = $now->getOffset();
-				$timezones[$timezone] = '(' . $this->format_GMT_offset($offset) . ') ' . $this->format_timezone_name($timezone);
-			}
-			
-			array_multisort($offsets, $timezones);
-		}
-		
-		return $timezones;
-	}
-	
-	function format_GMT_offset($offset) {
-		$hours = intval($offset / 3600);
-		$minutes = abs(intval($offset % 3600 / 60));
-		return 'GMT' . ($offset!==false ? sprintf('%+03d:%02d', $hours, $minutes) : '');
-	}
-	
-	function format_timezone_name($name) {
-		$name = str_replace('/', '- ', $name);
-		$name = str_replace('_', ' ', $name);
-		$name = str_replace('St ', 'St. ', $name);
-		return $name;
 	}
 }
 ?>
