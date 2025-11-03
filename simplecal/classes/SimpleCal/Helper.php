@@ -1,7 +1,6 @@
 <?php
 
 namespace SimpleCal;
-global $plugin;
 
 class Helper {
 

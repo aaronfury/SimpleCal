@@ -40,7 +40,7 @@ I love you all.
 * Recurring events
 
 ## Minor To-Dos
-* Move settings over to a block element instead of the Inspector Panel
+* Figure out a way to persist agenda page across page navigation (without annoying URL anchors)
 * Option to display metadata icons
 * Option to display thumbnail to the right or the left in agenda view
 * Option to display month/year "headers" in agenda layout 2

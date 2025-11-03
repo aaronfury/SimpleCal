@@ -35,7 +35,7 @@
 			?>
 			<div class="simplecal_event_meta_row">
 			 	<span class="simplecal_event_meta_label">Website</span>
-				<span class="simplecal_event_meta_value"><?= SimpleCal\Helper::get_formatted_website($post->simplecal_event_website); ?></span>
+				<span class="simplecal_event_meta_value"><?= SimpleCal\Helper::get_formatted_website($post->simplecal_event_website); ?> | <?= $post->simplecal_event_website; ?></span>
 			</div>
 			<?php
 				}

@@ -112,7 +112,7 @@ if ($events->have_posts()) {
 							<span class="material-symbols-outlined">camera_video</span>
 						</div>
 						<div class="simplecal_list_item_meta_data">
-							<?= ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?>
+							<?= ($post->simplecal_event_meeting_link ? SimpleCal\Helper::get_formatted_website($post->simplecal_event_meeting_link, "text", $post->simplecal_event_virtual_platform) : null) ?>
 						</div>
 					</div>
 <?php
