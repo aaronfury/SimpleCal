@@ -14,7 +14,7 @@ function render_block_page() {
 <?php while (have_posts()) {the_post();} ?>
 <?= $template; ?>
 <h1>TITLE: <?php the_title(); ?>
-<h2>DATE: <?php SimpleCal::event_get_the_date("date"); ?>
+<h2>DATE: <?php SimpleCal\Helper::event_get_the_date("date"); ?>
 <main><?php the_content(); ?></main>
 <?php wp_footer(); ?>
 </body>
@@ -27,7 +27,7 @@ function render_classic_page() {
 	while (have_posts()) {
 		the_post();
 		global $post;
-		include(dirname(__FILE__) .'/template-parts/content-single.php');
+		include(SimpleCal\Plugin::$path .'/template-parts/content-single.php');
 	}
 	get_footer();
 }

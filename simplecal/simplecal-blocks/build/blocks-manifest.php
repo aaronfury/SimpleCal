@@ -46,7 +46,7 @@ return array(
 			),
 			'agendaLayout' => array(
 				'type' => 'string',
-				'default' => 'layout1'
+				'default' => 'list'
 			),
 			'agendaShowDayOfWeek' => array(
 				'type' => 'boolean',

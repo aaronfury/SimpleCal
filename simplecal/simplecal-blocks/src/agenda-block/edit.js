@@ -11,7 +11,7 @@ export default function Edit({ attributes, setAttributes }) {
 		hideOnNoEvents = false,
 		noEventsText = "There are no upcoming events.",
 		blockTheme = 'theme1',
-		agendaLayout = 'layout1',
+		agendaLayout = 'list',
 		agendaShowThumbnail = false,
 		agendaShowDayOfWeek = true,
 		agendaShowExcerpt = false,
@@ -51,7 +51,7 @@ export default function Edit({ attributes, setAttributes }) {
 					</HStack>
 				</HStack>
 			: null}
-			{agendaLayout == 'layout1' && <>
+			{agendaLayout == 'list' && <>
 				<Flex direction='column' gap='5'>
 					{[...Array(3)].map((x,i) =>
 					<FlexItem>
@@ -88,7 +88,7 @@ export default function Edit({ attributes, setAttributes }) {
 					)}
 				</Flex>
 			</>}
-			{agendaLayout == 'layout3' && <>
+			{agendaLayout == 'compactlist' && <>
 				<Flex direction='column' gap='3'>
 					{[...Array(3)].map((x,i) =>
 						<FlexItem>
@@ -183,21 +183,21 @@ export default function Edit({ attributes, setAttributes }) {
 						options= {[
 							{
 								label: 'List',
-								value: 'layout1'
+								value: 'list'
 							},
 							{
 								label: 'Compact List',
-								value: 'layout3'
+								value: 'compactlist'
 							},
 							{
 								label: 'Grid',
-								value: 'layout2'
+								value: 'grid'
 							}
 						]}
 						onChange= {(value) => {
-								if (value == 'layout2') {
+								if (value == 'grid') {
 									setAttributes({agendaShowMonthYearHeaders: false})
-								} else if (value == 'layout3') {
+								} else if (value == 'compactlist') {
 									setAttributes({agendaShowMonthYearHeaders: false})
 									setAttributes({agendaShowExcerpt: false})
 								}
@@ -232,7 +232,7 @@ export default function Edit({ attributes, setAttributes }) {
 						onChange= {() => {
 							setAttributes({agendaShowExcerpt: !agendaShowExcerpt})
 						}}
-						disabled= {agendaLayout == 'layout3'}
+						disabled= {agendaLayout == 'compactlist'}
 					/>
 					{ agendaShowExcerpt &&
 						<>
@@ -287,7 +287,7 @@ export default function Edit({ attributes, setAttributes }) {
 					<ToggleControl
 						label= 'Group events under month and year headers'
 						checked= {!!agendaShowMonthYearHeaders}
-						disabled= {agendaLayout != 'layout1'}
+						disabled= {agendaLayout != 'list'}
 						onChange= {() => {
 							setAttributes({agendaShowMonthYearHeaders: !agendaShowMonthYearHeaders})
 						}}

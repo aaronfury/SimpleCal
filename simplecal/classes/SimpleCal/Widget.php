@@ -1,5 +1,7 @@
 <?php
-class SimpleCal_Widget extends WP_Widget {
+namespace SimpleCal;
+
+class Widget extends \WP_Widget {
 	// TODO: Make this a wrapper that calls the block render? Prepopulates $attributes from the widget settings and then just includes render.php?
 	public function __construct() {
 		parent::__construct(

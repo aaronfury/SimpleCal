@@ -41,7 +41,7 @@
     },
     "agendaLayout": {
       "type": "string",
-      "default": "layout1"
+      "default": "list"
     },
     "agendaShowDayOfWeek": {
       "type": "boolean",

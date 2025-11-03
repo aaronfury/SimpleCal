@@ -8,7 +8,7 @@ if ($events->have_posts()) {
 		$events->the_post();
 		$post_id = get_the_ID();
 
-		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : SimpleCal::$tz;
+		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : SimpleCal\Plugin::$tz;
 		$start_datetime = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 
@@ -36,7 +36,7 @@ if ($events->have_posts()) {
 		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<div class="simplecal_list_item_dates"><?= SimpleCal::event_get_the_date("date","both"); ?></div>
+					<div class="simplecal_list_item_dates"><?= SimpleCal\Helper::event_get_the_date("date","both"); ?></div>
 				</div>
 				<div class="simplecal_list_item_title">
 					<a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
@@ -47,14 +47,14 @@ if ($events->have_posts()) {
 						<span class="material-symbols-outlined">schedule</span>
 					</div>
 					<div class="simplecal_list_item_meta_data">
-						<?= SimpleCal::event_get_the_date("time","both"); ?>
+						<?= SimpleCal\Helper::event_get_the_date("time","both"); ?>
 					</div>
 				</div>
 				<?php } ?>
 				<div class="simplecal_list_item_meta simplecal_list_item_datetime">
 					<div class="simplecal_event_meta">
 						<span class="simplecal_event_meta_value">	
-							<?= SimpleCal::event_get_the_date(); ?>
+							<?= SimpleCal\Helper::event_get_the_date(); ?>
 						</span>
 					</div>
 				</div>

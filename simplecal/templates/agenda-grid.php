@@ -22,7 +22,7 @@ if ($events->have_posts()) {
 		$events->the_post();
 		$post_id = get_the_ID();
 		
-		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : SimpleCal::$tz;
+		$post_timezone = $post->simplecal_event_timezone ? new DateTimeZone($post->simplecal_event_timezone) : SimpleCal\Plugin::$tz;
 		$start_datetime = new DateTime($post->simplecal_event_start_timestamp, $post_timezone);
 		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 ?>
@@ -30,13 +30,13 @@ if ($events->have_posts()) {
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_container simplecal_list_item_datetime">
 					<div class="simplecal_list_item_meta simplecal_list_item_date">
-						<div class="simplecal_list_item_dates"><?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format: 'n/d/y', nbsp_on_null: true); ?></div>
+						<div class="simplecal_list_item_dates"><?= SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format: 'n/d/y', nbsp_on_null: true); ?></div>
 						<?php if ($dayOfWeekShow == 'true') { ?>
-						 <div class="simplecal_list_item_dayofweek"><?= SimpleCal::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?></div>
+						 <div class="simplecal_list_item_dayofweek"><?= SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?></div>
 						<?php } ?>
 					</div>
 					<div class="simplecal_list_item_meta simplecal_list_item_time">
-						<?= SimpleCal::event_get_the_date(date_or_time:'time',start_or_end:'both',nbsp_on_null:true) ?>
+						<?= SimpleCal\Helper::event_get_the_date(date_or_time:'time',start_or_end:'both',nbsp_on_null:true) ?>
 					</div>
 				</div>
 				<div class="simplecal_list_item_container">
@@ -73,7 +73,7 @@ if ($events->have_posts()) {
 								<span class="material-symbols-outlined">open_in_new</span>
 								</div>
 							<div class="simplecal_list_item_meta_data">
-								<?= SimpleCal::get_formatted_website($post->simplecal_event_website); ?>
+								<?= SimpleCal\Helper::get_formatted_website($post->simplecal_event_website); ?>
 							</div>
 						</div>
 					<?php } ?>		
