@@ -18,7 +18,7 @@ I love you all.
 * Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 * Backport to widget
 * ~~Create a compact layout for agenda view~~ DONE.
-* Option to delete events on uninstall
+* ~~Option to delete events on uninstall~~ DONE.
 * Better styling
 * Custom CSS support
 * Option to add event to personal calendar (iCal, etc.)
