@@ -25,9 +25,9 @@ use SimpleCal\Plugin;
 spl_autoload_register('simplecal_autoloader');
 
 function simplecal_autoloader($class_name) {
-	if ( false !== strpos( $class_name, 'SimpleCal' ) ) {
-		$classes_dir = realpath( plugin_dir_path( __FILE__ ) ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
-		$class_file = str_replace( '\\', DIRECTORY_SEPARATOR, $class_name ) . '.php';
+	if (false !== strpos($class_name, 'SimpleCal')) {
+		$classes_dir = realpath(plugin_dir_path( __FILE__ )) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
+		$class_file = str_replace('\\', DIRECTORY_SEPARATOR, $class_name) . '.php';
 		require_once $classes_dir . $class_file;
 	}
 }
@@ -43,8 +43,7 @@ function simplecal_init() {
 //add_shortcode('simplecal', [$plugin, 'render_shortcode']);
 
 if (is_admin()) {
-	// TODO: Load an instance of the Settings class? Probably a better way to do this.
+	new SimpleCal\Settings();
 }
 
 ?>
-

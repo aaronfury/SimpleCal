@@ -50,11 +50,11 @@ class PostTypeEvent {
 			'show_in_rest' => true,
 			'menu_position' => 5,
 			'menu_icon' => 'dashicons-calendar-alt', // TODO: Replace with custom SVG icon
-			'rewrite' => ['slug' => 'events', 'with_front' => false],
+			'rewrite' => ['slug' => get_option('simplecal_slug'), 'with_front' => false],
 			'rest_base' => 'simplecal_event',
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
 			'taxonomies' => ['post_tag'],
-			'has_archive' => 'events',
+			'has_archive' => get_option('simplecal_slug'),
 			'show_in_rest' => true
 		]);
 
