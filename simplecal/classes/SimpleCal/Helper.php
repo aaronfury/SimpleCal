@@ -3,8 +3,7 @@
 namespace SimpleCal;
 
 class Helper {
-
-// Filter events for a given month and year
+	// Filter events for a given month and year
 	public static function get_events_calendar($month, $year) {
 
 	}
