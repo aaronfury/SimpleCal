@@ -66,6 +66,7 @@ class PostTypeRecurring {
 			'taxonomies' => ['post_tag'],
 			'show_in_rest' => true
 		]);
+		flush_rewrite_rules();
 
 		$meta = [
 			'simplecal_start_timestamp' => 'object',
