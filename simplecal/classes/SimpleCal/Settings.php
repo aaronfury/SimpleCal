@@ -27,6 +27,7 @@ class Settings {
 
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'settings_init']);
+        add_action('plugin_action_links_' . plugin_basename(Plugin::$path . '/simplecal.php'), [$this, 'add_settings_link']);
     }
 
     public function add_admin_menu() {
@@ -121,6 +122,12 @@ class Settings {
             'simplecal',
             'simplecal_main_section'
         );
+    }
+
+    public function add_settings_link($links) {
+        $settings_link = '<a href="' . admin_url('options-general.php?page=simplecal') . '">Settings</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 
 	// Field callbacks
