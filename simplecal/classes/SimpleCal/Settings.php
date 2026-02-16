@@ -11,7 +11,7 @@ if (! defined('ABSPATH')) {
  * Registers options used by the plugin and provides an admin UI under Settings → SimpleCal.
  */
 class Settings {
-    private $options_defaults = [
+    public static $options_defaults = [
         'simplecal_slug' => 'events',
         'simplecal_custom_css' => '',
         'simplecal_auto_delete_past_events' => 0,
@@ -44,31 +44,31 @@ class Settings {
         register_setting('simplecal_settings_group', 'simplecal_slug', [
             'type' => 'string',
             'sanitize_callback' => [$this, 'sanitize_text'],
-            'default' => $this->options_defaults['simplecal_slug'],
+            'default' => self::$options_defaults['simplecal_slug'],
         ]);
 
         register_setting('simplecal_settings_group', 'simplecal_custom_css', [
             'type' => 'string',
             'sanitize_callback' => [$this, 'sanitize_css'],
-            'default' => $this->options_defaults['simplecal_custom_css'],
+            'default' => self::$options_defaults['simplecal_custom_css'],
         ]);
 
         register_setting('simplecal_settings_group', 'simplecal_auto_delete_past_events', [
             'type' => 'boolean',
             'sanitize_callback' => [$this, 'sanitize_checkbox'],
-            'default' => $this->options_defaults['simplecal_auto_delete_past_events'],
+            'default' => self::$options_defaults['simplecal_auto_delete_past_events'],
         ]);
 
         register_setting('simplecal_settings_group', 'simplecal_auto_delete_past_events_days', [
             'type' => 'integer',
             'sanitize_callback' => [$this, 'sanitize_positive_int'],
-            'default' => $this->options_defaults['simplecal_auto_delete_past_events_days'],
+            'default' => self::$options_defaults['simplecal_auto_delete_past_events_days'],
         ]);
 
         register_setting('simplecal_settings_group', 'simplecal_delete_data_on_uninstall', [
             'type' => 'boolean',
             'sanitize_callback' => [$this, 'sanitize_checkbox'],
-            'default' => $this->options_defaults['simplecal_delete_data_on_uninstall'],
+            'default' => self::$options_defaults['simplecal_delete_data_on_uninstall'],
         ]);
 
         // Section
@@ -125,31 +125,31 @@ class Settings {
 
 	// Field callbacks
     public function field_slug() {
-        $value = get_option('simplecal_slug', $this->options_defaults['simplecal_slug']);
+        $value = get_option('simplecal_slug', self::$options_defaults['simplecal_slug']);
         echo '<input type="text" name="simplecal_slug" value="' . esc_attr($value) . '" class="regular-text" />';
         echo '<p class="description">The "slug" for SimpleCal event URLs. The default is "events", so the URL to an event would resemble "https://yoursite.com/events/EventTitle" and the archive would be at "https://yoursite.com/events/".</p>';
     }
 
     public function field_custom_css() {
-        $value = get_option('simplecal_custom_css', $this->options_defaults['simplecal_custom_css']);
+        $value = get_option('simplecal_custom_css', self::$options_defaults['simplecal_custom_css']);
         echo '<textarea name="simplecal_custom_css" rows="8" class="large-text code" disabled>' . esc_textarea($value) . '</textarea>';
         echo '<p class="description"><em>Coming soon!</em> Add custom CSS applied to the calendar and single event layouts.</p>';
     }
 
     public function field_auto_delete_toggle() {
-        $value = (int) get_option('simplecal_auto_delete_past_events', $this->options_defaults['simplecal_auto_delete_past_events']);
+        $value = (int) get_option('simplecal_auto_delete_past_events', self::$options_defaults['simplecal_auto_delete_past_events']);
         echo '<label><input type="checkbox" name="simplecal_auto_delete_past_events" value="1" ' . checked(1, $value, false) . ' disabled /> Enable automatic deletion of past events</label>';
         echo '<p class="description"><em>Coming soon!</em> When enabled, SimpleCal will remove events older than the configured number of days.</p>';
     }
 
     public function field_auto_delete_days() {
-        $value = (int) get_option('simplecal_auto_delete_past_events_days', $this->options_defaults['simplecal_auto_delete_past_events_days']);
+        $value = (int) get_option('simplecal_auto_delete_past_events_days', self::$options_defaults['simplecal_auto_delete_past_events_days']);
         echo '<input type="number" min="0" name="simplecal_auto_delete_past_events_days" value="' . esc_attr($value) . '" class="small-text" disabled/>';
         echo '<p class="description"><em>Coming soon!</em> How many days after an event\'s end to wait before deleting it (only used if Auto-delete is enabled).</p>';
     }
 
     public function field_delete_on_uninstall() {
-        $value = (int) get_option('simplecal_delete_data_on_uninstall', $this->options_defaults['simplecal_delete_data_on_uninstall']);
+        $value = (int) get_option('simplecal_delete_data_on_uninstall', self::$options_defaults['simplecal_delete_data_on_uninstall']);
         echo '<label><input type="checkbox" name="simplecal_delete_data_on_uninstall" value="1" ' . checked(1, $value, false) . ' /> Remove plugin data on uninstall</label>';
         echo '<p class="description">If checked, uninstall will remove events, post meta, and SimpleCal options.</p>';
     }

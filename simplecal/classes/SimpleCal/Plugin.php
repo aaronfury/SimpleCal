@@ -27,6 +27,12 @@ class Plugin {
 		}
 
 		add_action( 'rest_api_init', [$this, 'api_route_register']);
+
+		if (!get_option('simplecal_slug')) {
+			add_action('init', function() {
+				update_option('simplecal_slug', Settings::$options_defaults['simplecal_slug']);;
+			});
+		}
 	}
 
 	function enqueue_admin_scripts($hook) {

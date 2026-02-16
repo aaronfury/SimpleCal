@@ -9,35 +9,38 @@ Probably a good time to say this is all unsupported and I wish you all the best 
 
 I love you all.
 
-## Major To-Dos
+## Major To-Dos (Prioritized)
 - ~~Pagination~~ DONE. AND AWESOME.
 - ~~Archive page~~ DONE. AND MEDIOCRE.
 - ~~Default to current month if show previous events is selected~~ FIXED.
 - ~~Fix the block templates to do things the right way~~ DONE.
 - ~~Refactor to use WP API rather than AJAX~~
-- Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
-- Backport to widget
 - ~~Create a compact layout for agenda view~~ DONE.
 - ~~Option to delete events on uninstall~~ DONE.
+- ~~General tag support~~ DONE.
+- ~~Option to set public and private (logged-in) locations~~
+- Make the block theme version fully modern with the REST API (i.e. render in React, not PHP)
+- Recurring events
+- Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 - Better styling
-- Custom CSS support
+	- Conditional Logic on the single-event view to format start date and time
+	- Options on the single-event view to format labels/icons
+- Option to auto-delete old events
+- Backport to widget
 - Option to add event to personal calendar (iCal, etc.)
 - Option to highlight upcoming events
+- Support for "TBD" events within a month/week
 - Filter/search
 - Support for "Doors" time
-- A choice of mapping services (and maybe embedded maps???)
 - Event pricing
 - "Members Event" tag
-- Support for "TBD" events within a month/week
-- ~~General tag support~~ DONE.
 - Option to show event only to logged-in users
-- ~~Option to set public and private (logged-in) locations~~
+- A choice of mapping services (and maybe embedded maps???)
 - Date (month) selection
 - Calendar view
-- Option to auto-delete old events
 - Infinite Scroll??
 - Sync to/from external calendars (Very unlikely)
-- Recurring events
+- Custom CSS support (Not really *necessary* since everything is classed and the WP CSS editor can be used)
 
 ## Minor To-Dos
 - Figure out a way to persist agenda page across page navigation (without annoying URL anchors)
