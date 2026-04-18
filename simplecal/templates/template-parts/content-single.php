@@ -7,7 +7,7 @@
 			<div class="simplecal_event_meta_row">
 				<span class="simplecal_event_meta_label">Start</span>
 				<span class="simplecal_event_meta_value">
-					<?= SimpleCal\Helper::event_get_the_date("both","start","l M d, Y"); ?>
+					<?php echo SimpleCal\Helper::event_get_the_date("both","start","l M d, Y"); ?>
 				</span>
 			</div>
 			<?php
@@ -16,7 +16,7 @@
 			<div class="simplecal_event_meta_row">
 				<span class="simplecal_event_meta_label">End</span>
 				<span class="simplecal_event_meta_value">
-					<?= SimpleCal\Helper::event_get_the_date("both","end","l M d, Y"); ?>
+					<?php echo SimpleCal\Helper::event_get_the_date("both","end","l M d, Y"); ?>
 				</span>
 			</div>
 			<?php
@@ -26,7 +26,7 @@
 			?>
 			<div class="simplecal_event_meta_row">
 				<span class="simplecal_event_meta_label">Location</span>
-				<span class="simplecal_event_meta_value"><?= SimpleCal\Helper::event_get_the_location(link_type:'after'); ?></span>
+				<span class="simplecal_event_meta_value"><?php echo SimpleCal\Helper::event_get_the_location(link_type:'after'); ?></span>
 			</div>
 			<?php
 				}
@@ -35,7 +35,7 @@
 			?>
 			<div class="simplecal_event_meta_row">
 			 	<span class="simplecal_event_meta_label">Website</span>
-				<span class="simplecal_event_meta_value"><?= SimpleCal\Helper::get_formatted_website($post->simplecal_event_website); ?> | <?= $post->simplecal_event_website; ?></span>
+				<span class="simplecal_event_meta_value"><?php echo SimpleCal\Helper::get_formatted_website($post->simplecal_event_website); ?> | <?php echo $post->simplecal_event_website; ?></span>
 			</div>
 			<?php
 				}

@@ -116,7 +116,7 @@ return array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,
 		'name' => 'simplecal/meta-block',
-		'version' => '0.1.0',
+		'version' => '0.2.0',
 		'title' => 'SimpleCal Meta Block',
 		'category' => 'text',
 		'icon' => 'index-card',
@@ -129,7 +129,19 @@ return array(
 			'postType'
 		),
 		'supports' => array(
-			'html' => false
+			'html' => false,
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true
+			),
+			'color' => array(
+				'link' => true
+			),
+			'typography' => array(
+				'fontSize' => true,
+				'lineHeight' => true,
+				'textAlign' => true
+			)
 		),
 		'textdomain' => 'simplecal-meta-block',
 		'editorScript' => 'file:./index.js',
@@ -138,13 +150,25 @@ return array(
 		'render' => 'file:./render.php',
 		'attributes' => array(
 			'metaField' => array(
+				'type' => 'string',
+				'default' => 'eventStartDateTime'
+			),
+			'metaDateFormat' => array(
+				'type' => 'string',
+				'default' => 'shortDateAndTime'
+			),
+			'metaDateCustomFormat' => array(
+				'type' => 'string'
+			),
+			'metaTimeCustomFormat' => array(
 				'type' => 'string'
 			),
 			'linkType' => array(
 				'type' => 'string'
 			),
 			'blockType' => array(
-				'type' => 'string'
+				'type' => 'string',
+				'default' => 'value'
 			)
 		)
 	),

@@ -19,6 +19,9 @@ class Plugin {
 		add_action('init', [$this, 'block_template_register']);
 		//add_action('widgets_init', [$this, 'widget_register']); // TODO: Add back in when the widget is ready
 		
+		add_action('enqueue_block_editor_assets', [$this, 'enqueue_event_query_variation_script']);
+		add_filter('pre_render_block', [$this, 'set_query_for_events_query_block'], 10, 2);
+		
 		if (is_admin()) {
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
 			// TODO: Add CSS for admin panel
@@ -51,6 +54,25 @@ class Plugin {
 		wp_enqueue_style('material-symbols', '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@36,400,1,0&display=block'); // TODO: Make this conditional based on page?
 
 		wp_enqueue_script('wp-api-fetch'); // TODO: This is a workaround for the limitation that script modules cannot import scripts.
+	}
+
+	function enqueue_event_query_variation_script() {
+		wp_enqueue_script('simplecal-register-query-block-variation', plugin_dir_url(__FILE__). '../../js/registerQueryBlockVariation.js', ['wp-blocks']);
+	}
+
+	function set_query_for_events_query_block($block_content, $block) {
+		if ($block['blockName'] === 'core/query' && $block['attrs']['namespace'] === 'simplecal/event-query-loop') {
+			add_filter('query_loop_block_query_vars', function($query_vars) use ($block) {
+				$query_vars['post_type'] = 'simplecal_event';
+				$query_vars['orderby'] = 'meta_value';
+				$query_vars['meta_key'] = 'simplecal_event_start_timestamp';
+				$query_vars['meta_type'] = 'DATETIME';
+				$query_vars['order'] = 'ASC';
+				return $query_vars;
+			});
+		}
+		
+		return $block_content;
 	}
 	
 	//// REGISTER WP BLOCK AND WIDGET ////

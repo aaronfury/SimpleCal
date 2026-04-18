@@ -7,6 +7,8 @@ It probably supports calendar views and agenda views, and it may even display de
 
 Probably a good time to say this is all unsupported and I wish you all the best with implementing this in your environment.
 
+SimpleCal will always be fully FOSS.
+
 I love you all.
 
 ## Major To-Dos (Prioritized)
@@ -19,8 +21,9 @@ I love you all.
 - ~~Option to delete events on uninstall~~ DONE.
 - ~~General tag support~~ DONE.
 - ~~Option to set public and private (logged-in) locations~~
-- Make the block theme version fully modern with the REST API (i.e. render in React, not PHP)
 - Recurring events
+- Add "Add to Google Calendar" option
+- Make the block theme version fully modern with the REST API (i.e. render in React, not PHP)
 - Split plugin into a block theme and a classic version... no sense in trying to support both in a single plugin
 - Better styling
 	- Conditional Logic on the single-event view to format start date and time

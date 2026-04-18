@@ -10,8 +10,8 @@ if ($events->have_posts()) {
 			.simplecal_list_item_excerpt {
 				overflow: hidden;
 				display: -webkit-box;
-				-webkit-line-clamp: <?= $excerptLines; ?>;
-				line-clamp: <?= $excerptLines; ?>;
+				-webkit-line-clamp: <?php echo $excerptLines; ?>;
+				line-clamp: <?php echo $excerptLines; ?>;
 				-webkit-box-orient: vertical;
 			}
 		</style>
@@ -53,7 +53,7 @@ if ($events->have_posts()) {
 		$prev_event_year = $start_datetime->format('Y'); // Update the marker after it's been evaluated against the current post
 		$prev_event_month = $start_datetime->format('F'); // Update the marker after it's been evaluated against the current post
 ?>
-		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
+		<div class="simplecal_list_item <?php echo $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
 <?php
 		if ($thumbnailShow == 'true') {
 ?>
@@ -65,9 +65,9 @@ if ($events->have_posts()) {
 ?>
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<div class="simplecal_list_item_dates"><?= SimpleCal\Helper::event_get_the_date("date","both"); ?></div>
+					<div class="simplecal_list_item_dates"><?php echo SimpleCal\Helper::event_get_the_date("date","both"); ?></div>
 					<?php if ($dayOfWeekShow == 'true') { ?>
-						 <div class="simplecal_list_item_dayofweek">(<?= SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
+						 <div class="simplecal_list_item_dayofweek">(<?php echo SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
 					<?php } ?>
 				</div>
 				<h3 class="simplecal_list_item_title">
@@ -79,14 +79,14 @@ if ($events->have_posts()) {
 						<span class="material-symbols-outlined">schedule</span>
 					</div>
 					<div class="simplecal_list_item_meta_data">
-						<?= SimpleCal\Helper::event_get_the_date("time","both"); ?>
+						<?php echo SimpleCal\Helper::event_get_the_date("time","both"); ?>
 					</div>
 				</div>
 				<?php } ?>
 				<div class="simplecal_list_item_meta simplecal_list_item_datetime">
 					<div class="simplecal_event_meta">
 						<span class="simplecal_event_meta_value">	
-							<?= SimpleCal\Helper::event_get_the_date(); ?>
+							<?php echo SimpleCal\Helper::event_get_the_date(); ?>
 						</span>
 					</div>
 				</div>
@@ -100,7 +100,7 @@ if ($events->have_posts()) {
 							<span class="material-symbols-outlined">pin_drop</span>
 						</div>
 						<div class="simplecal_list_item_meta_data">
-							<span class="simplecal_list_item_venue_name"><?= $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?= $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list_item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?= $post->simplecal_event_state; ?></span>
+							<span class="simplecal_list_item_venue_name"><?php echo $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?php echo $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list_item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?php echo $post->simplecal_event_state; ?></span>
 						</div>
 					</div>
 <?php
@@ -112,7 +112,7 @@ if ($events->have_posts()) {
 							<span class="material-symbols-outlined">camera_video</span>
 						</div>
 						<div class="simplecal_list_item_meta_data">
-							<?= ($post->simplecal_event_meeting_link ? SimpleCal\Helper::get_formatted_website($post->simplecal_event_meeting_link, "text", $post->simplecal_event_virtual_platform) : null) ?>
+							<?php echo ($post->simplecal_event_meeting_link ? SimpleCal\Helper::get_formatted_website($post->simplecal_event_meeting_link, "text", $post->simplecal_event_virtual_platform) : null) ?>
 						</div>
 					</div>
 <?php

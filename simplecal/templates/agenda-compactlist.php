@@ -10,8 +10,8 @@ if ($events->have_posts()) {
 			.simplecal_list_item_excerpt {
 				overflow: hidden;
 				display: -webkit-box;
-				-webkit-line-clamp: <?= $excerptLines; ?>;
-				line-clamp: <?= $excerptLines; ?>;
+				-webkit-line-clamp: <?php echo $excerptLines; ?>;
+				line-clamp: <?php echo $excerptLines; ?>;
 				-webkit-box-orient: vertical;
 			}
 		</style>
@@ -27,7 +27,7 @@ if ($events->have_posts()) {
 		$end_datetime = new DateTime($post->simplecal_event_end_timestamp, $post_timezone);
 
 ?>
-		<div class="simplecal_list_item <?= $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
+		<div class="simplecal_list_item <?php echo $post->simplecal_event_end_timestamp < $current_time ? 'simplecal_past_event':''?>">
 <?php
 		if ($thumbnailShow == 'true') {
 ?>
@@ -39,13 +39,13 @@ if ($events->have_posts()) {
 ?>
 			<div class="simplecal_list_item_content_wrapper">
 				<div class="simplecal_list_item_meta simplecal_list_item_date">
-					<div class="simplecal_list_item_dates"><?= SimpleCal\Helper::event_get_the_date("date","start"); ?></div>
+					<div class="simplecal_list_item_dates"><?php echo SimpleCal\Helper::event_get_the_date("date","start"); ?></div>
 					<?php if ($dayOfWeekShow == 'true') { ?>
-						 <div class="simplecal_list_item_dayofweek">(<?= SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
+						 <div class="simplecal_list_item_dayofweek">(<?php echo SimpleCal\Helper::event_get_the_date(date_or_time:'date',start_or_end:'both',date_format:'l',nbsp_on_null:true); ?>)</div>
 					<?php } ?>
 					<?php if (!$post->simplecal_event_all_day) { ?>
 						<div class="simplecal_list_item_time">
-							at <?= SimpleCal\Helper::event_get_the_date("time","start"); ?>
+							at <?php echo SimpleCal\Helper::event_get_the_date("time","start"); ?>
 						</div>
 					<?php } ?>
 				</div>
@@ -59,7 +59,7 @@ if ($events->have_posts()) {
 ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_location_physical">
 						<div class="simplecal_list_item_meta_data">
-							<span class="simplecal_list_item_venue_name"><?= $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?= $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list_item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?= $post->simplecal_event_state; ?></span>
+							<span class="simplecal_list_item_venue_name"><?php echo $post->simplecal_event_venue_name; ?></span><?php if ($post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state)) {?><span class="simplecal_list_item_venue_separator">, </span><?php } ?><span class="simplecal_list_item_city"><?php echo $post->simplecal_event_city; ?></span><?php if ($post->simplecal_event_city && $post->simplecal_event_state) {?><span class="simplecal_list_item_city_separator">, </span><?php } ?><span class="simplecal_list_item_state"><?php echo $post->simplecal_event_state; ?></span>
 						</div>
 					</div>
 <?php
@@ -68,7 +68,7 @@ if ($events->have_posts()) {
 ?>
 					<div class="simplecal_list_item_meta simplecal_list_item_location_virtual">
 						<div class="simplecal_list_item_meta_data">
-							<?= ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?>
+							<?php echo ($post->simplecal_event_meeting_link ? "<a href='{$post->simplecal_event_meeting_link}' target='_blank'>" : null) . $post->simplecal_event_virtual_platform . ($post->simplecal_event_meeting_link ? '</a>' : null) ?>
 						</div>
 					</div>
 <?php

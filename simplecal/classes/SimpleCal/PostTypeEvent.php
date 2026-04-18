@@ -9,8 +9,6 @@ class PostTypeEvent {
 		// register CPT on init
 		add_action('init', [$this, 'cpt_register']);
 
-		// REST exposure of meta is registered within cpt_register
-
 		// Admin-specific hooks for columns and metaboxes
 		if (is_admin()) {
 			if ('edit.php' == $pagenow && isset($_GET['post_type']) && 'simplecal_event' == $_GET['post_type']) {

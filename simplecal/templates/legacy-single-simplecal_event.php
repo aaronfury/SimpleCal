@@ -12,7 +12,7 @@ function render_block_page() {
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <?php while (have_posts()) {the_post();} ?>
-<?= $template; ?>
+<?php echo $template; ?>
 <h1>TITLE: <?php the_title(); ?>
 <h2>DATE: <?php SimpleCal\Helper::event_get_the_date("date"); ?>
 <main><?php the_content(); ?></main>

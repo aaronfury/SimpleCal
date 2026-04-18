@@ -24,8 +24,8 @@ class Widget extends \WP_Widget {
 		$title = !empty($instance['title']) ? $instance['title'] : 'Calendar';
 ?>
 		<p>
-		<label for="<?= esc_attr($this->get_field_id('title')); ?>">Title:</label> 
-		<input class="widefat" id="<?= esc_attr($this->get_field_id('title')); ?>" name="<?= esc_attr($this->get_field_name('title')); ?>" type="text" value="<?= esc_attr($title); ?>">
+		<label for="<?php echo esc_attr($this->get_field_id('title')); ?>">Title:</label> 
+		<input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($title); ?>">
 		</p>
 		<?php 
 	}

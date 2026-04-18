@@ -1,7 +1,7 @@
-<div <?= get_block_wrapper_attributes(['data-hide-on-no-events' => $attributes['hideOnNoEvents']]); ?>>
+<div <?php echo get_block_wrapper_attributes(['data-hide-on-no-events' => $attributes['hideOnNoEvents']]); ?>>
 	<div
-		class="simplecal simplecal_<?= $attributes['blockTheme']; ?> <?= 'simplecal_' . $attributes['agendaLayout']; ?>"
-		<?= wp_interactivity_data_wp_context([
+		class="simplecal simplecal_<?php echo $attributes['blockTheme']; ?> <?php echo 'simplecal_' . $attributes['agendaLayout']; ?>"
+		<?php echo wp_interactivity_data_wp_context([
 			"pastEventsShow" => $attributes['displayPastEvents'],
 			"pastEventsDays" => $attributes['displayPastEventsDays'],
 			"futureEventsDays" => $attributes['displayFutureEventsDays'],
@@ -17,7 +17,7 @@
 		]); ?>
 		data-wp-interactive="agendaBlock"
 	>
-		<?php if ($attributes['title']) { ?><h2 class="simplecal_block_title"><?= $attributes['title']; ?></h2><?php } ?>
+		<?php if ($attributes['title']) { ?><h2 class="simplecal_block_title"><?php echo $attributes['title']; ?></h2><?php } ?>
 		<?php if (in_array($attributes['agendaDisplayPagination'], ['top','both'])) { ?>
 		<div class="simplecal_nav_pagination">
 			<div class="simplecal_nav_prev" data-wp-on--click="actions.getEvents" data-wp-class--active="state.morePastEvents" data-direction="previous">
@@ -34,7 +34,7 @@
 			</div>
 		</div>
 		<?php } ?>
-		<div class="simplecal_events_wrapper simplecal_agenda_<?= $attributes['agendaLayout']; ?>" data-wp-init="actions.getEvents" data-wp-watch="callbacks.updateAgenda">
+		<div class="simplecal_events_wrapper simplecal_agenda_<?php echo $attributes['agendaLayout']; ?>" data-wp-init="actions.getEvents" data-wp-watch="callbacks.updateAgenda">
 		</div>
 		<?php if (in_array($attributes['agendaDisplayPagination'], ['bottom','both'])) { ?>
 		<div class="simplecal_nav_pagination">
@@ -53,7 +53,7 @@
 		</div>
 		<?php } ?>	
 		<?php if ($attributes['agendaShowAllEventsLink']) { ?>
-			<a class="simplecal_all_events_link" href="<?= get_post_type_archive_link('simplecal_event'); ?>"><?= $attributes['agendaShowAllEventsLinkText']; ?> </a>
+			<a class="simplecal_all_events_link" href="<?php echo get_post_type_archive_link('simplecal_event'); ?>"><?php echo $attributes['agendaShowAllEventsLinkText']; ?> </a>
 		<?php } ?>
 
 	</div>

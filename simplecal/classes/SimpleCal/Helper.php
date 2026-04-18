@@ -137,7 +137,7 @@ class Helper {
 	}
 
 
-	public static function event_get_the_location($link_type = 'none', $check_only = false, $as_plain_text = false) {
+	public static function event_get_the_location($link_type = 'none', $check_only = false, $as_plain_text = false, $include_venue = true) {
 		global $post;
 		
 		if ($post->simplecal_event_venue_name || $post->simplecal_event_city) {
@@ -145,8 +145,10 @@ class Helper {
 			if ($link) $link = 'https://maps.google.com/maps?q=' . $link;
 			
 			$address = '';
-			$address .= $post->simplecal_event_venue_name ? '<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' : '';
-			$address .= $post->simplecal_event_venue_name && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '';
+			$address .= $post->simplecal_event_venue_name && $include_venue ? '<span class="simplecal_list_item_venue_name">' . $post->simplecal_event_venue_name . '<span>' : '';
+			$address .= $post->simplecal_event_venue_name && $include_venue && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_venue_separator">, </span>' : '';
+			$address .= $post->simplecal_event_street_address ? '<span class="simplecal_list_item_street_address">' . $post->simplecal_event_street_address . '</span>' : '';
+			$address .= $post->simplecal_event_street_address && ($post->simplecal_event_city || $post->simplecal_event_state) ? '<span class="simplecal_list_item_street_address_separator">, </span>' : '';
 			$address .= $post->simplecal_event_city ? '<span class="simplecal_list_item_city">' . $post->simplecal_event_city . '</span>' : '';
 			$address .= $post->simplecal_event_city && $post->simplecal_event_state ? '<span class="simplecal_list__item_city_separator">, </span>' : '';
 			$address .= $post->simplecal_event_state ? '<span class="simplecal_list_item_state">' . $post->simplecal_event_state . '</span>' : '';

@@ -2,34 +2,93 @@
 namespace SimpleCal;
 
 global $post;
-//global $scplugin;
-$meta_field = $attributes['metaField'] ?? null;
-$link_type = $attributes['linkType'] ?? null;
-$block_type = $attributes['blockType'] ?? 'details';
+$meta_field = $attributes['metaField'] ?? '';
+$meta_date_format = $attributes['metaDateFormat'] ?? 'shortDateAndTime';
+$meta_date_custom_format = $attributes['metaDateCustomFormat'] ?? '';
+$meta_time_custom_format = $attributes['metaTimeCustomFormat'] ?? '';
+$link_type = $attributes['linkType'] ?? 'none';
+$block_type = $attributes['blockType'] ?? '';
 
-$meta_field_mapping = [
-	'eventStartDate' => Helper::event_get_the_date('date','start'),
-	'eventStartTime' => Helper::event_get_the_date('time','start'),
-	'eventStartDateTime' => Helper::event_get_the_date('both','start'),
-	'eventEndDate' => Helper::event_get_the_date('date','end'),
-	'eventEndTime' => Helper::event_get_the_date('time','end'),
-	'eventEndDateTime' => Helper::event_get_the_date('both','end'),
-	'eventStartEndDateTime' => Helper::event_get_the_date('both','both'),
-	'eventVenueName' => $post->simplecal_event_venue_name,
-	'eventStreetAddress' => $post->simplecal_event_street_address,
-	'eventCity' => $post->simplecal_event_city,
-	'eventState' => $post->simplecal_event_state,
-	'eventCountry' => $post->simplecal_event_country,
-	'eventFullAddress' => Helper::event_get_the_location($link_type),
-	'eventWebsite' => Helper::get_formatted_website($post->simplecal_event_website, $link_type),
-	'eventVirtualPlatform' => $post->simplecal_event_virtual_platform,
-	'eventMeetingLink' => Helper::get_formatted_website($post->simplecal_event_meeting_link, $link_type, $post->simplecal_event_virtual_platform)
+$date_format_mapping = [
+	'dayOfWeek' => ['date_or_time' => 'date', 'date_format' => 'l', 'time_format' => ''],
+	'shortDate' => ['date_or_time' => 'date', 'date_format' => 'n/j/y', 'time_format' => ''],
+	'longDate' => ['date_or_time' => 'date', 'date_format' => 'F j, Y', 'time_format' => ''],
+	'time' => ['date_or_time' => 'time', 'date_format' => '', 'time_format' => 'g:i a'],
+	'dayOfWeekAndTime' => ['date_or_time' => 'both', 'date_format' => 'l', 'time_format' => 'g:i a'],
+	'shortDateAndTime' => ['date_or_time' => 'both',  'date_format' => 'n/j/y', 'time_format' => 'g:i a'],
+	'longDateAndTime' => ['date_or_time' => 'both', 'date_format' => 'F j, Y', 'time_format' => 'g:i a'],
+	'custom' => ['date_or_time' => ($meta_date_custom_format && $meta_time_custom_format ? 'both' : ($meta_date_custom_format ? 'date' : 'time')),'date_format' => $meta_date_custom_format, 'time_format' => $meta_time_custom_format]
 ];
+
+$date_format = $date_format_mapping[$meta_date_format];
+
+// If we're only pulling a single value, no sense in evaluating all of them... just get the one we need
+if ($block_type === 'value') {
+	switch ($meta_field) {
+		case 'eventStartDateTime':
+			$value = Helper::event_get_the_date($date_format['date_or_time'],'start',$date_format['date_format'], $date_format['time_format']);
+			break;
+		case 'eventEndDateTime':
+			$value = Helper::event_get_the_date($date_format['date_or_time'],'end',$date_format['date_format'], $date_format['time_format']);
+			break;
+		case 'eventStartEndDateTime':
+			$value = Helper::event_get_the_date($date_format['date_or_time'],'both',$date_format['date_format'], $date_format['time_format']);
+			break;
+		case 'eventVenueName':
+			$value = $post->simplecal_event_venue_name;
+			break;
+		case 'eventStreetAddress':
+			$value = $post->simplecal_event_street_address;
+			break;
+		case 'eventCity':
+			$value = $post->simplecal_event_city;
+			break;
+		case 'eventState':
+			$value = $post->simplecal_event_state;
+			break;
+		case 'eventCountry':
+			$value = $post->simplecal_event_country;
+			break;
+		case 'eventFullAddressWithVenue':
+			$value = Helper::event_get_the_location($link_type);
+			break;
+		case 'eventFullAddress':
+			$value = Helper::event_get_the_location(link_type: $link_type, include_venue: false);
+			break;
+		case 'eventWebsite':
+			$value = Helper::get_formatted_website($post->simplecal_event_website, $link_type);
+			break;
+		case 'eventVirtualPlatform':
+			$value = $post->simplecal_event_virtual_platform;
+			break;
+		case 'eventMeetingLink':
+			$value = Helper::get_formatted_website($post->simplecal_event_meeting_link, $link_type, $post->simplecal_event_virtual_platform);
+			break;
+
+	}
+} else {
+	$meta_field_mapping = [
+		'eventStartDateTime' => Helper::event_get_the_date($date_format['date_or_time'],'start',$date_format['date_format'], $date_format['time_format']),
+		'eventEndDateTime' => Helper::event_get_the_date($date_format['date_or_time'],'end',$date_format['date_format'], $date_format['time_format']),
+		'eventStartEndDateTime' => Helper::event_get_the_date($date_format['date_or_time'],'both',$date_format['date_format'], $date_format['time_format']),
+		'eventVenueName' => $post->simplecal_event_venue_name,
+		'eventStreetAddress' => $post->simplecal_event_street_address,
+		'eventCity' => $post->simplecal_event_city,
+		'eventState' => $post->simplecal_event_state,
+		'eventCountry' => $post->simplecal_event_country,
+		'eventFullAddress' => Helper::event_get_the_location($link_type),
+		'eventWebsite' => Helper::get_formatted_website($post->simplecal_event_website, $link_type),
+		'eventVirtualPlatform' => $post->simplecal_event_virtual_platform,
+		'eventMeetingLink' => Helper::get_formatted_website($post->simplecal_event_meeting_link, $link_type, $post->simplecal_event_virtual_platform)
+	];
+}
 
 switch ($block_type) {
 	case 'value':
 ?>
-		<span <?php echo get_block_wrapper_attributes(); ?>><?= $meta_field_mapping[$meta_field]; ?></span>
+		<span <?php echo get_block_wrapper_attributes(); ?>>
+			<?php echo $value; ?>
+		</span>
 <?php
 		return;
 	case 'summary':
