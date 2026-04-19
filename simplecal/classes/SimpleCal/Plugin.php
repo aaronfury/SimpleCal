@@ -57,22 +57,51 @@ class Plugin {
 	}
 
 	function enqueue_event_query_variation_script() {
-		wp_enqueue_script('simplecal-register-query-block-variation', plugin_dir_url(__FILE__). '../../js/registerQueryBlockVariation.js', ['wp-blocks']);
+		$asset_file = self::$path . '/simplecal-blocks/build/query-block-variation/index.asset.php';
+		
+		if (!file_exists($asset_file)) {
+			return;
+		}
+
+		$asset = require $asset_file;
+
+		wp_enqueue_script(
+			'simplecal-query-variation-settings',
+			self::$url . '/simplecal-blocks/build/query-block-variation/index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+		//wp_enqueue_script('simplecal-register-query-block-variation', plugin_dir_url(__FILE__). '../../js/registerQueryBlockVariation.js', ['wp-blocks']);
 	}
 
-	function set_query_for_events_query_block($block_content, $block) {
-		if ($block['blockName'] === 'core/query' && $block['attrs']['namespace'] === 'simplecal/event-query-loop') {
-			add_filter('query_loop_block_query_vars', function($query_vars) use ($block) {
-				$query_vars['post_type'] = 'simplecal_event';
-				$query_vars['orderby'] = 'meta_value';
-				$query_vars['meta_key'] = 'simplecal_event_start_timestamp';
-				$query_vars['meta_type'] = 'DATETIME';
-				$query_vars['order'] = 'ASC';
-				return $query_vars;
-			});
+	function set_query_for_events_query_block($pre_render, $parsed_block) {
+		if ($parsed_block['blockName'] !== 'core/query' || $parsed_block['attrs']['namespace'] !== 'simplecal/event-query-loop') {
+			return $pre_render;
 		}
+
+		$query_attrs = $parsed_block['attrs']['query'] ?? [];
+		$per_page = isset( $query_attrs['perPage'] ) ? (int) $query_attrs['perPage'] : 5;
+		$order = ( isset( $query_attrs['order'] ) && 'DESC' === strtoupper( $query_attrs['order'] ) ) ? 'DESC' : 'ASC';
+		$upcoming_only = ! empty( $query_attrs['hidePastEvents'] );
+
+		add_filter('query_loop_block_query_vars', function($query_vars) use ($per_page, $order, $upcoming_only) {
+			$query_vars['post_type'] = 'simplecal_event';
+			$query_vars['posts_per_page'] = $per_page;
+			$query_vars['orderby'] = 'meta_value';
+			$query_vars['meta_key'] = 'simplecal_event_start_timestamp';
+			$query_vars['meta_type'] = 'DATETIME';
+			$query_vars['order'] = $order;
+
+			if ($upcoming_only) {
+				$query_vars['meta_value'] = date('Y-m-d H:i:s');
+				$query_vars['meta_compare'] = '>=';
+			}
+
+			return $query_vars;
+		});
 		
-		return $block_content;
+		return $pre_render;
 	}
 	
 	//// REGISTER WP BLOCK AND WIDGET ////
