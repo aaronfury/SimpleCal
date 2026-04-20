@@ -32,7 +32,7 @@ wp.domReady( () => {
 		scope: [ 'inserter' ],
 		innerBlocks: [
 			[ 'core/post-template', {}, [
-				[ 'core/post-title', { placeholder: 'Event Title' } ],
+				[ 'core/post-title', { placeholder: 'Event Title', isLink: true } ],
 				[ 'simplecal/meta-block', { metaField: 'eventStartEndDateTime' } ],
 				[ 'simplecal/meta-block', { metaField: 'eventFullAddressWithVenue', linkType: 'text' } ],
 				[ 'core/post-excerpt', { placeholder: 'Event Description' } ],

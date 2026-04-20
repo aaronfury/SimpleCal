@@ -86,7 +86,7 @@ if ($block_type === 'value') {
 switch ($block_type) {
 	case 'value':
 ?>
-		<span <?php echo get_block_wrapper_attributes(); ?>>
+		<span <?php echo get_block_wrapper_attributes(['class' => 'simplecal_meta_block_value']); ?>>
 			<?php echo $value; ?>
 		</span>
 <?php

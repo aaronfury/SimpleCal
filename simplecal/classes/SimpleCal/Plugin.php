@@ -15,12 +15,7 @@ class Plugin {
 		self::$tz = wp_timezone();
 		$this->tz_string = wp_timezone_string();
 
-		add_action('init', [$this, 'block_register']);
-		add_action('init', [$this, 'block_template_register']);
 		//add_action('widgets_init', [$this, 'widget_register']); // TODO: Add back in when the widget is ready
-		
-		add_action('enqueue_block_editor_assets', [$this, 'enqueue_event_query_variation_script']);
-		add_filter('pre_render_block', [$this, 'set_query_for_events_query_block'], 10, 2);
 		
 		if (is_admin()) {
 			add_action('admin_enqueue_scripts', [$this,'enqueue_admin_scripts']);
@@ -56,98 +51,8 @@ class Plugin {
 		wp_enqueue_script('wp-api-fetch'); // TODO: This is a workaround for the limitation that script modules cannot import scripts.
 	}
 
-	function enqueue_event_query_variation_script() {
-		$asset_file = self::$path . '/simplecal-blocks/build/query-block-variation/index.asset.php';
-		
-		if (!file_exists($asset_file)) {
-			return;
-		}
-
-		$asset = require $asset_file;
-
-		wp_enqueue_script(
-			'simplecal-query-variation-settings',
-			self::$url . '/simplecal-blocks/build/query-block-variation/index.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-		//wp_enqueue_script('simplecal-register-query-block-variation', plugin_dir_url(__FILE__). '../../js/registerQueryBlockVariation.js', ['wp-blocks']);
-	}
-
-	function set_query_for_events_query_block($pre_render, $parsed_block) {
-		if ($parsed_block['blockName'] !== 'core/query' || $parsed_block['attrs']['namespace'] !== 'simplecal/event-query-loop') {
-			return $pre_render;
-		}
-
-		$query_attrs = $parsed_block['attrs']['query'] ?? [];
-		$per_page = isset( $query_attrs['perPage'] ) ? (int) $query_attrs['perPage'] : 5;
-		$order = ( isset( $query_attrs['order'] ) && 'DESC' === strtoupper( $query_attrs['order'] ) ) ? 'DESC' : 'ASC';
-		$upcoming_only = ! empty( $query_attrs['hidePastEvents'] );
-
-		add_filter('query_loop_block_query_vars', function($query_vars) use ($per_page, $order, $upcoming_only) {
-			$query_vars['post_type'] = 'simplecal_event';
-			$query_vars['posts_per_page'] = $per_page;
-			$query_vars['orderby'] = 'meta_value';
-			$query_vars['meta_key'] = 'simplecal_event_start_timestamp';
-			$query_vars['meta_type'] = 'DATETIME';
-			$query_vars['order'] = $order;
-
-			if ($upcoming_only) {
-				$query_vars['meta_value'] = date('Y-m-d H:i:s');
-				$query_vars['meta_compare'] = '>=';
-			}
-
-			return $query_vars;
-		});
-		
-		return $pre_render;
-	}
-	
-	//// REGISTER WP BLOCK AND WIDGET ////
 	function widget_register() {
 		//register_widget('SimpleCal_Widget'); // TODO: Add this back when the widget's ready
-	}
-	
-	function block_register() {
-		if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
-			\wp_register_block_types_from_metadata_collection( self::$path . '/simplecal-blocks/build', self::$path . '/simplecal-blocks/build/blocks-manifest.php' );
-			return;
-		}
-	
-		if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
-			\wp_register_block_metadata_collection( self::$path . '/simplecal-blocks/build', self::$path . '/simplecal-blocks/build/blocks-manifest.php' );
-		}
-	
-		$manifest_data = require self::$path . '/simplecal-blocks/build/blocks-manifest.php';
-		foreach ( array_keys( $manifest_data ) as $block_type ) {
-			register_block_type( self::$path . "/simplecal-blocks/build/{$block_type}" );
-		}
-	}
-
-	function block_template_register() {
-		\register_block_template(
-			'simplecal//archive-simplecal_event',
-			[
-				'title' => 'SimpleCal Archive',
-				'description' => 'An agenda-style view of SimpleCal events',
-				'content' => self::get_template_content('archive-simplecal_event.html')
-			]
-		);
-		\register_block_template(
-			'simplecal//single-simplecal_event',
-			[
-				'title' => 'SimpleCal Event',
-				'description' => 'The layout for a single event',
-				'content' => self::get_template_content('single-simplecal_event.html')
-			]
-		);
-	}
-
-	function get_template_content($template) {
-		ob_start();
-		include __DIR__ . "/../../templates/{$template}";
-		return ob_get_clean();
 	}
 
 	// WordPress API Interface
