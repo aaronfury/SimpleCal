@@ -116,7 +116,7 @@ return array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,
 		'name' => 'simplecal/meta-block',
-		'version' => '0.2.0',
+		'version' => '0.2.1',
 		'title' => 'SimpleCal Meta Block',
 		'category' => 'text',
 		'icon' => 'index-card',
@@ -164,6 +164,10 @@ return array(
 			'metaField' => array(
 				'type' => 'string',
 				'default' => 'eventStartDateTime'
+			),
+			'metaDisplayAs' => array(
+				'type' => 'string',
+				'default' => 'div'
 			),
 			'metaDateFormat' => array(
 				'type' => 'string',

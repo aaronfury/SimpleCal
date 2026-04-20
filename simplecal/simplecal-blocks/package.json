@@ -15,12 +15,12 @@
 		"start": "wp-scripts start --blocks-manifest --experimental-modules"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.14.1"
+		"@wordpress/scripts": "^32.0.0"
 	},
 	"dependencies": {
-		"@wordpress/api-fetch": "^7.26.0",
-		"@wordpress/icons": "^10.27.0",
-		"@wordpress/interactivity": "^6.26.0",
-		"@wordpress/url": "^4.26.0"
+		"@wordpress/api-fetch": "^7.44.0",
+		"@wordpress/icons": "^12.2.0",
+		"@wordpress/interactivity": "^6.44.0",
+		"@wordpress/url": "^4.44.0"
 	}
 }

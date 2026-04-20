@@ -13,7 +13,6 @@ if (! defined('ABSPATH')) {
 class Settings {
 	public static $options_defaults = [
 		'simplecal_slug' => 'events',
-		'simplecal_custom_css' => '',
 		'simplecal_auto_delete_past_events' => 0,
 		'simplecal_auto_delete_past_events_days' => 30,
 		'simplecal_delete_data_on_uninstall' => 0,
@@ -46,12 +45,6 @@ class Settings {
 			'type' => 'string',
 			'sanitize_callback' => [$this, 'sanitize_text'],
 			'default' => self::$options_defaults['simplecal_slug'],
-		]);
-
-		register_setting('simplecal_settings_group', 'simplecal_custom_css', [
-			'type' => 'string',
-			'sanitize_callback' => [$this, 'sanitize_css'],
-			'default' => self::$options_defaults['simplecal_custom_css'],
 		]);
 
 		register_setting('simplecal_settings_group', 'simplecal_auto_delete_past_events', [
@@ -87,14 +80,6 @@ class Settings {
 			'simplecal_slug',
 			'Slug for Event Posts',
 			[$this, 'field_slug'],
-			'simplecal',
-			'simplecal_main_section'
-		);
-
-		add_settings_field(
-			'simplecal_custom_css',
-			'Custom CSS',
-			[$this, 'field_custom_css'],
 			'simplecal',
 			'simplecal_main_section'
 		);
@@ -137,12 +122,6 @@ class Settings {
 		echo '<p class="description">The "slug" for SimpleCal event URLs. The default is "events", so the URL to an event would resemble "https://yoursite.com/events/EventTitle" and the archive would be at "https://yoursite.com/events/".</p>';
 	}
 
-	public function field_custom_css() {
-		$value = get_option('simplecal_custom_css', self::$options_defaults['simplecal_custom_css']);
-		echo '<textarea name="simplecal_custom_css" rows="8" class="large-text code" disabled>' . esc_textarea($value) . '</textarea>';
-		echo '<p class="description"><em>Coming soon!</em> Add custom CSS applied to the calendar and single event layouts.</p>';
-	}
-
 	public function field_auto_delete_toggle() {
 		$value = (int) get_option('simplecal_auto_delete_past_events', self::$options_defaults['simplecal_auto_delete_past_events']);
 		echo '<label><input type="checkbox" name="simplecal_auto_delete_past_events" value="1" ' . checked(1, $value, false) . ' disabled /> Enable automatic deletion of past events</label>';
@@ -164,14 +143,6 @@ class Settings {
 	// Sanitize callbacks
 	public function sanitize_text($value) {
 		return sanitize_text_field($value);
-	}
-
-	public function sanitize_css($value) {
-		// allow safe style but remove PHP tags and scripts — keep plain CSS text
-		$clean = trim((string) $value);
-		$clean = str_replace('<?', '', $clean);
-		$clean = str_replace('?>', '', $clean);
-		return $clean;
 	}
 
 	public function sanitize_checkbox($value) {

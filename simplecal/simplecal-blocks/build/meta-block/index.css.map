@@ -1,1 +1,0 @@
-{"version":3,"file":"meta-block/index.css","mappings":";;;AAAA;EACC;AACD,C","sources":["webpack://simplecal-blocks/./src/meta-block/editor.scss"],"sourcesContent":[".left-indent {\r\n\tmargin-left: 24px;\r\n}"],"names":[],"sourceRoot":""}

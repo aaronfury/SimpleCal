@@ -85,11 +85,11 @@ if ($block_type === 'value') {
 
 switch ($block_type) {
 	case 'value':
-?>
-		<span <?php echo get_block_wrapper_attributes(['class' => 'simplecal_meta_block_value']); ?>>
-			<?php echo $value; ?>
-		</span>
-<?php
+		$element_type = $attributes['metaDisplayAs'];
+		
+		echo '<' . $element_type . ' ' . get_block_wrapper_attributes(['class' => 'simplecal_meta_block_value']) . '>';
+		echo $value;
+		echo '</' . $element_type . '>';
 		return;
 	case 'summary':
 ?>

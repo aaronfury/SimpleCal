@@ -1,11 +1,10 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, RadioControl, SelectControl, TextControl, __experimentalHStack as HStack } from '@wordpress/components';
 
-import './editor.scss';
-
 export default function Edit({ attributes, setAttributes }) {
 	const {
 		blockType = 'value',
+		metaDisplayAs = 'div',
 		metaField = 'eventStartDateTime',
 		metaDateFormat = 'shortDateAndTime',
 		metaDateCustomFormat = '',
@@ -18,17 +17,27 @@ export default function Edit({ attributes, setAttributes }) {
 			<InspectorControls>
 				<PanelBody title="Settings">
 					<RadioControl
-						label= "Block Type"
+						label= "Block type"
 						selected= {blockType}
 						options= {[
 							{label: "Event Detail", value: "value"},
 							{label: "Event Summary", value: "summary"},
-							{label: "Full Event Details", value: "details"}
+							{label: "Full Event Details", value: "details"},
 						]}
 						onChange= {(value) => setAttributes({blockType : value})}
 					/>
 					{ blockType == 'value' ?
 						<>
+						<RadioControl
+							label= "Display as"
+							selected= {metaDisplayAs}
+							options= {[
+								{label: "Block (<div> element)", value: "div"},
+								{label: "Inline (<span> element)", value: "span"},
+							]}
+							onChange= {(value) => setAttributes({metaDisplayAs : value})}
+							help= "Inline allows you to place multiple meta blocks on the same line. Block will place each meta block on its own line."
+						/>
 						<SelectControl
 							label= "Event meta to display"
 							value= {metaField}
@@ -55,58 +64,57 @@ export default function Edit({ attributes, setAttributes }) {
 					}
 					{ blockType == 'value' && ["eventStartDateTime","eventEndDateTime","eventStartEndDateTime"].includes(metaField) ?
 						<>
-							<SelectControl
-								label= "Date format"
-								value= {metaDateFormat}
-								options= {[
-									{label: 'Day of Week', value: 'dayOfWeek', disabled: metaField == 'eventStartEndDateTime'},
-									{label: 'Short Date', value: 'shortDate'},
-									{label: 'Long Date', value: 'longDate'},
-									{label: 'Time', value: 'time'},
-									{label: 'Day of Week and Time', value: 'dayOfWeekAndTime'},
-									{label: 'Short Date & Time', value: 'shortDateAndTime'},
-									{label: 'Long Date & Time', value: 'longDateAndTime'},
-									{label: 'Custom Format', value: 'custom'}
-								]}
-								__next40pxDefaultSize
-								onChange= {(value) => setAttributes({metaDateFormat: value})}
-							/>
-
+						<SelectControl
+							label= "Date format"
+							value= {metaDateFormat}
+							options= {[
+								{label: 'Day of Week', value: 'dayOfWeek', disabled: metaField == 'eventStartEndDateTime'},
+								{label: 'Short Date', value: 'shortDate'},
+								{label: 'Long Date', value: 'longDate'},
+								{label: 'Time', value: 'time'},
+								{label: 'Day of Week and Time', value: 'dayOfWeekAndTime'},
+								{label: 'Short Date & Time', value: 'shortDateAndTime'},
+								{label: 'Long Date & Time', value: 'longDateAndTime'},
+								{label: 'Custom Format', value: 'custom'}
+							]}
+							__next40pxDefaultSize
+							onChange= {(value) => setAttributes({metaDateFormat: value})}
+						/>
 						</>
 						: null
 					}
 					{ blockType == 'value' && metaDateFormat == 'custom' ?
 						<>
-							<HStack alignment='top'>
-								<TextControl
-									label= "Date format"
-									value= {metaDateCustomFormat}
-									onChange= {(value) => setAttributes({metaDateCustomFormat: value})}
-									__next40pxDefaultSize
-								/>
-								<TextControl
-									label= "Time format"
-									value= {metaTimeCustomFormat}
-									onChange= {(value) => setAttributes({metaTimeCustomFormat: value})}
-									__next40pxDefaultSize
-								/>
-							</HStack>
-							<small>Use <a href="https://www.php.net/manual/en/datetime.format.php" target="_blank" rel="noopener noreferrer">PHP DateTime format</a>. Leave blank to hide date or time.</small>
+						<HStack alignment='top'>
+							<TextControl
+								label= "Date format"
+								value= {metaDateCustomFormat}
+								onChange= {(value) => setAttributes({metaDateCustomFormat: value})}
+								__next40pxDefaultSize
+							/>
+							<TextControl
+								label= "Time format"
+								value= {metaTimeCustomFormat}
+								onChange= {(value) => setAttributes({metaTimeCustomFormat: value})}
+								__next40pxDefaultSize
+							/>
+						</HStack>
+						<small>Use <a href="https://www.php.net/manual/en/datetime.format.php" target="_blank" rel="noopener noreferrer">PHP DateTime format</a>. Leave blank to hide date or time.</small>
 						</>
 						: null
 					}
 					{ blockType == 'value' && ["eventVenueName","eventFullAddress","eventVirtualPlatform","eventMeetingLink","eventWebsite"].includes(metaField) ?
 						<>
-							<SelectControl
-								label= "Link meta field to map/meeting/website?"
-								value= {linkType}
-								options= {[
-									{label: 'None', value: 'none'} ,
-									{label: 'Link text', value: 'text'} ,
-									{label: 'Link after', value: 'after'} 
-								]}
-								onChange= {(value) => setAttributes({linkType: value})}
-							/>
+						<SelectControl
+							label= "Link meta field to map/meeting/website?"
+							value= {linkType}
+							options= {[
+								{label: 'None', value: 'none'} ,
+								{label: 'Link text', value: 'text'} ,
+								{label: 'Link after', value: 'after'} 
+							]}
+							onChange= {(value) => setAttributes({linkType: value})}
+						/>
 						</>
 						: setAttributes({linkType: 'none'})
 					}

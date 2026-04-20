@@ -43,7 +43,6 @@ I love you all.
 - Calendar view
 - Infinite Scroll??
 - Sync to/from external calendars (Very unlikely)
-- Custom CSS support (Not really *necessary* since everything is classed and the WP CSS editor can be used)
 
 ## Minor To-Dos
 - Figure out a way to persist agenda page across page navigation (without annoying URL anchors)

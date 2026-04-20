@@ -3,26 +3,32 @@ const path = require( 'path' );
 
 const configs = Array.isArray( defaultConfig ) ? defaultConfig : [ defaultConfig ];
 
-const [ mainConfig, ...otherConfigs ] = configs;
+module.exports = configs.map( ( config, index ) => {
+    // Only add our extra entry to the FIRST (scripts) config.
+    // The second config (if present) handles view modules via --experimental-modules
+    // and shouldn't be touched.
+    if ( index !== 0 ) {
+        return config;
+    }
 
-const resolveEntry = ( entry ) => {
-	typeof entry === 'function' ? entry() : entry;
-};
+    const originalEntry = config.entry;
 
-module.exports = [
-	{
-		...mainConfig,
-		entry: async () => {
-			const existing = await resolveEntry( mainConfig.entry );
-			return {
-				...existing,
-				'query-block-variation/index': path.resolve(
-					process.cwd(),
-					'src/query-block-variation',
-					'index.js'
-				),
-			};
-		},
-	},
-	...otherConfigs,
-];
+    return {
+        ...config,
+        entry: async ( ...args ) => {
+            const resolved =
+                typeof originalEntry === 'function'
+                    ? await originalEntry( ...args )
+                    : originalEntry;
+
+            return {
+                ...resolved,
+                'query-block-variation/index': path.resolve(
+                    process.cwd(),
+                    'src/query-block-variation',
+                    'index.js'
+                ),
+            };
+        },
+    };
+} );
